@@ -1,4 +1,4 @@
-# Appunti-Latex
+# appuntiLatex
 
 Appunti in Latex riferiti ad alcuni corsi della triennale in Informatica di Pisa.
 
