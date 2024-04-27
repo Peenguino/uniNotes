@@ -1,6 +1,6 @@
 # Appunti-Latex
 
-Appunti in Latex riferiti ad alcuni corsi della triennale di Informatica di Pisa.
+Appunti in Latex riferiti ad alcuni corsi della triennale in Informatica di Pisa.
 
 Il contenuto vuole essere molto informale.
 
