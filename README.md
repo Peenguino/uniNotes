@@ -8,4 +8,4 @@ Il contenuto non è pensato per la stampa, ma solo per l'utilizzo in digitale da
 
 Diverse rappresentazioni sono acquisite dal materiale fornito dall'Università stessa.
 
-Sono presenti anche delle implementazioni in JS degli esempi ed esercizi mostrati negli appunti.
+A volte sono presenti anche delle implementazioni degli esempi ed esercizi mostrati negli appunti.
