@@ -1,6 +1,6 @@
-# appuntiLatex
+# uniNotes
 
-Appunti in Latex riferiti ad alcuni corsi della triennale in Informatica di Pisa.
+Appunti riferiti ad alcuni corsi della triennale in Informatica di Pisa.
 
 Il contenuto vuole essere molto informale.
 
