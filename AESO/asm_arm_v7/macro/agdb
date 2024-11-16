@@ -1,0 +1,4 @@
+#
+echo "Running a.out with parameters $*"
+qemu-arm -g 12345 a.out $* &
+gdb-multiarch -q --nh -ex 'set architecture arm' -ex 'set arm fpu vfp' -ex 'file a.out' -ex 'target remote localhost:12345'

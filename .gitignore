@@ -1,2 +1,6 @@
 .vscode/
 .git/
+*.out
+.executables/
+*.o
+Strumenti ARM.pdf
