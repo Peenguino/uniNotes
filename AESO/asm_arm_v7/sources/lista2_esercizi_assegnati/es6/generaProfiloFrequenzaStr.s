@@ -6,8 +6,8 @@
 generaProfiloFreqStr:
     push {r4-r8,lr}
     mov r4,r0 @ r4 mantiene ptr str
-    mov r1,#100 @ corrisponde a grandezza array (25 pos * 4 byte ciascuna)
-    mov r0,#0
+    mov r1,#4 @ corrisponde a grandezza array (25 pos * 4 byte ciascuna)
+    mov r0,#26
     bl calloc
     mov r5,r0 @ r5 mantiene ptr array
     mov r6,#0 @ corrente elemento della stringa
