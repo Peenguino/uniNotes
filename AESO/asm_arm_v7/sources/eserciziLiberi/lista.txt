@@ -1,4 +1,3 @@
-
 1. Operatori ed operando
 
     Scrivi due file sorgente in ARM v7:
@@ -6,10 +5,16 @@
         forma di stringa) ed un operatore [+,-,*] (anch'esso stringa).
         Questo main chiama la funzione del punto b. e stampa a video l'operazione effettuata.
         b. Il secondo converte gli operandi dati invocando la atoi e successivamente esegue l'operazione
-        rappresentata dall'operando passato
+        rappresentata dall'operando passato.
 
 2. Quadrato e Cubo in stdout
 
     Scrivi un main in ASM che acquisisce da stdin un decimale, e stampa a video Quadrato
-    e Cubo secondo questa format_str: "Quadrato: %d\nCubo: %d\n"
+    e Cubo secondo questa format_str: "Quadrato: %d\nCubo: %d\n".
+
+3. Moltiplica argomenti dispari, somma argomenti pari
+
+    Assumendo di ricevere dei numeri come argomenti durante l'invocazione del programma, questo li converte
+    ed accumula la somma complessiva dei pari e il prodotto dei dispari.
+
 
