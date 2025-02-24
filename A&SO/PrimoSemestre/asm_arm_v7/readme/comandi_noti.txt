@@ -1,0 +1,13 @@
+--- AGDB (macro)
+    1. break main: pone uno break point sul main
+    2. tui reg gen: permette la visualizzazione grafica dei registri
+    3. s, step: permette l'avanzamento di un passo nel debugger
+    4. cont, continue: esegue tutta l'esecuzione del programma
+
+--- AGCC (macro)
+    1. Dando l'opzione -c produciamo formato oggetto (linkabile, non ancora eseguibile)
+    2. Necessario il link statico con l'opzione -static durante il linking oggetti prodotti in C e ASM
+    3. Linking effettuato con "agcc -static [oggetto_asm.o] [oggetto_c.o]"
+
+--- QEMU (simula l'architettura richiesta)
+    1. Se vogliamo far eseguire del codice compilato per architettura ARMv7 usiamo "qemu-arm [nome_eseguibile]"

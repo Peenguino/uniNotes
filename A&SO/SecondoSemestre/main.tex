@@ -1,0 +1,1083 @@
+\documentclass{article}
+
+\usepackage{amsmath, amsthm, amssymb, amsfonts}
+\usepackage{thmtools}
+\usepackage{graphicx}
+\usepackage{setspace}
+\usepackage{geometry}
+\usepackage{float}
+\usepackage{hyperref}
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\usepackage{framed}
+\usepackage[dvipsnames]{xcolor}
+\usepackage{tcolorbox}
+
+%Define the listing package
+\usepackage{listings} %code highlighter
+\usepackage{color} %use color
+\definecolor{mygreen}{rgb}{0,0.6,0}
+\definecolor{mygray}{rgb}{0.5,0.5,0.5}
+\definecolor{mymauve}{rgb}{0.58,0,0.82}
+ 
+%Customize a bit the look
+\lstset{ %
+backgroundcolor=\color{white}, % choose the background color; you must add \usepackage{color} or \usepackage{xcolor}
+basicstyle=\footnotesize, % the size of the fonts that are used for the code
+breakatwhitespace=false, % sets if automatic breaks should only happen at whitespace
+breaklines=true, % sets automatic line breaking
+captionpos=b, % sets the caption-position to bottom
+commentstyle=\color{mygreen}, % comment style
+deletekeywords={...}, % if you want to delete keywords from the given language
+escapeinside={\%*}{*)}, % if you want to add LaTeX within your code
+extendedchars=true, % lets you use non-ASCII characters; for 8-bits encodings only, does not work with UTF-8
+frame=single, % adds a frame around the code
+keepspaces=true, % keeps spaces in text, useful for keeping indentation of code (possibly needs columns=flexible)
+keywordstyle=\color{blue}, % keyword style
+% language=Octave, % the language of the code
+morekeywords={*,...}, % if you want to add more keywords to the set
+numbers=left, % where to put the line-numbers; possible values are (none, left, right)
+numbersep=5pt, % how far the line-numbers are from the code
+numberstyle=\tiny\color{mygray}, % the style that is used for the line-numbers
+rulecolor=\color{black}, % if not set, the frame-color may be changed on line-breaks within not-black text (e.g. comments (green here))
+showspaces=false, % show spaces everywhere adding particular underscores; it overrides 'showstringspaces'
+showstringspaces=false, % underline spaces within strings only
+showtabs=false, % show tabs within strings adding particular underscores
+stepnumber=1, % the step between two line-numbers. If it's 1, each line will be numbered
+stringstyle=\color{mymauve}, % string literal style
+tabsize=2, % sets default tabsize to 2 spaces
+title=\lstname % show the filename of files included with \lstinputlisting; also try caption instead of title
+}
+%END of listing package%
+ 
+\definecolor{darkgray}{rgb}{.4,.4,.4}
+\definecolor{purple}{rgb}{0.65, 0.12, 0.82}
+ 
+%define Javascript language
+\lstdefinelanguage{JavaScript}{
+keywords={typeof, new, true, false, catch, function, return, null, catch, switch, var, if, in, while, do, else, case, break},
+keywordstyle=\color{blue}\bfseries,
+ndkeywords={class, export, boolean, throw, implements, import, this},
+ndkeywordstyle=\color{darkgray}\bfseries,
+identifierstyle=\color{black},
+sensitive=false,
+comment=[l]{//},
+morecomment=[s]{/*}{*/},
+commentstyle=\color{purple}\ttfamily,
+stringstyle=\color{red}\ttfamily,
+morestring=[b]',
+morestring=[b]"
+}
+ 
+\lstset{
+language=JavaScript,
+extendedchars=true,
+basicstyle=\footnotesize\ttfamily,
+showstringspaces=false,
+showspaces=false,
+numbers=left,
+numberstyle=\footnotesize,
+numbersep=9pt,
+tabsize=2,
+breaklines=true,
+showtabs=false,
+captionpos=b
+}
+
+\colorlet{LightGray}{White!90!Periwinkle}
+\colorlet{LightOrange}{Orange!15}
+\colorlet{LightGreen}{Green!15}
+
+\newcommand{\HRule}[1]{\rule{\linewidth}{#1}}
+
+\NewEnviron{NORMAL}{% 
+    \scalebox{2}{$\BODY$} 
+} 
+
+\declaretheoremstyle[name=Theorem,]{thmsty}
+\declaretheorem[style=thmsty,numberwithin=section]{theorem}
+\tcolorboxenvironment{theorem}{colback=LightGray}
+
+\declaretheoremstyle[name=Proposition,]{prosty}
+\declaretheorem[style=prosty,numberlike=theorem]{proposition}
+\tcolorboxenvironment{proposition}{colback=LightOrange}
+
+\declaretheoremstyle[name=Principle,]{prcpsty}
+\declaretheorem[style=prcpsty,numberlike=theorem]{principle}
+\tcolorboxenvironment{principle}{colback=LightGreen}
+
+\setstretch{1.2}
+\geometry{
+    textheight=9in,
+    textwidth=5.5in,
+    top=1in,
+    headheight=12pt,
+    headsep=25pt,
+    footskip=30pt
+}
+
+% ------------------------------------------------------------------------------
+
+\begin{document}
+
+% ------------------------------------------------------------------------------
+% Cover Page and ToC
+% ------------------------------------------------------------------------------
+
+\title{ \normalsize \textsc{}
+		\\ [2.0cm]
+		\HRule{1.5pt} \\
+		\LARGE \textbf{\uppercase{Sistemi Operativi} \\
+        Architetture e Sistemi Operativi - II Semestre
+		\HRule{2.0pt} \\ [0.6cm] \LARGE{Corso A} \vspace*{10\baselineskip}}
+		}
+\date{\text{Ultima Compilazione - }\today}
+\author{\textbf{Autore} \\ 
+		Giuseppe Acocella \\
+		2024/25\\}
+        
+
+\maketitle
+\newpage
+
+\tableofcontents
+
+%\begin{figure}[htbp]
+    %\center
+    %\includegraphics[scale=0.4]{img/classiComplessita2.png}
+%\end{figure}
+
+
+\newpage
+
+\section{Caching}
+
+Il Caching ha come obiettivo quello di astrarre sulle gerarchie di memoria e creare l'\textbf{illusione} di avere la stessa quantità di memoria "lenta" ma alla velocità della memoria "veloce". Questo è solo un esempio che cerca di illustrare l'obiettivo del caching.
+Si vuole creare una gerarchia di memorie, classificate per velocità e "vicinanza" alla CPU, permettendo l'accesso a dati ricorrenti in tempo breve.
+
+\subsection{Gerarchia di Memorie}
+
+Classifichiamo le memorie secondo la loro velocità. Più veloci saranno e più saranno costose e piccole in termini di spazio in $byte$.
+Oltre a questo dobbiamo tenere in considerazione 
+il modo in cui si stanno evolvendo le CPU e le memorie:
+
+\begin{figure}[htbp]
+    \center
+    \includegraphics[scale=0.25]{img/rapporto_CPU_mem.png}
+\end{figure}
+
+Questo è un altro motivo per cui si vuole gestire in maniera più intelligente la comunicazione tra processore e memoria.
+
+\paragraph{Istanza di Caching} Assumiamo di avere quattro memorie:
+\[ A1,\:\:A2,\:\:A3,\:\:A4 \]
+Ed ognuna di queste memorie sarà caratterizzata da un tempo, ordinate in tempo crescente:
+\[ T_{A1},\:\:T_{A2},\:\:T_{A3},\:\:T_{A4} \]
+E' necessario tenere in considerazione come modello di riferimento quello di \textit{Von Neumann}, di conseguenza abbiamo una \textbf{CPU} che interagisce con una \textbf{memoria} grazie ad un canale di comunicazione. Spesso l'utilizzo di questo canale causa un effetto di \textbf{bottleneck}. Si vuole quindi trovare un compromesso che possa velocizzare la comunicazione tra \textbf{CPU} e \textbf{memoria}. Le prestazioni di una memoria dipendono fortemente dalla tecnologia del supporto\footnote{La classificazione di tecnologia delle memorie è presente nel primo modulo di appunti: Architetture degli Elaboratori.}.
+\newpage
+
+Illustriamo la gerarchia delle memorie e la loro "distanza" dalla CPU.
+
+\begin{figure}[htbp]
+    \center
+    \includegraphics[scale=0.42]{img/gerarchiaMemorie.png}
+\end{figure}
+
+Possiamo assumere queste tempistiche delle memorie:
+    \[ T_{A_{1}} = 4 \tau \: \: \: \: T_{A_{2}} = 10 \tau\]
+    %\vspace{-px}
+    \[ T_{A_{3}} = 20 \tau \: \: \: \: T_{A_{4}} = 60/80\:nsec \]
+
+\subsection{Hit/Miss Rate, Miss Penalty, AMAT}
+
+Una volta impostata la gerarchia rappresentata sopra, è necessario capire se un \textbf{indirizzo} dato sia o meno presente ad uno specifico \textbf{livello} tra quelli illustrati. 
+
+\begin{enumerate}
+    \item \textbf{Hit Rate}: Percentuale di "Hit", ossia dati \textbf{trovati}.
+    \item \textbf{Miss Rate}: Percentuale di "Miss", complementare a quella di "Hit", ossia dati \textbf{non trovati}.
+    \item \textbf{Miss Time}: Tempo impiegato per effettuare la fetch con esito di "Miss".
+    \item \textbf{Miss Penalty}: Tempo impiegato per risalire la gerarchia delle cache fino al ritrovamento del dato cercato.
+    \item \textbf{AMAT}: Average Memory Access Time: 
+    \[ AMAT\: = \: HIT\_TIME \: + \:( MISS\_RATE \: * \: MISS\_PENALTY) \]
+\end{enumerate}
+
+La differenza tra \textbf{Miss Time} e \textbf{Miss Penalty} può variare anche di ordini di grandezza. L'\textbf{Hit Rate} deve essere superiore al $90\%$ per rendere efficiente lo schema delle cache così impostate.
+
+\newpage
+
+\subsection{Principio di Località}
+
+Risulta necessario stabilire il criterio con il quale vengono caricati questi blocchi di memoria più performanti e vicini alla CPU. Le informazioni caricate sulla cache seguono il cosiddetto \textbf{principio di località}:
+
+\begin{enumerate}
+    \item \textbf{Località Spaziale}: Solitamente per un certo periodo di tempo, molti dati potrebbero risultare vicini tra di loro. In questo caso si stabilisce quindi la grandezza di un blocco e questo verrà caricato tutto sulla cache. Questo permetterà probabili accessi successivi in tempi ridotti, anche di svariati ordini di grandezza.
+    Secondo questo principio, accedendo a $M[PC]$, molto probabilmente accederò a $M[PC+4]$, $M[PC+8]$ ... 
+    \item \textbf{Località Temporale}: Spesso un dato corrente potrebbe essere riutilizzato in breve tempo. Di conseguenza si preferisce mantenere il dato in cache. Secondo questo principio, accedendo a $M[PC]$, probabilmente in breve tempo potrei riaccedere a $M[PC]$.
+\end{enumerate}
+
+Grazie a questo principio si stabilisce il criterio con cui vengono caricati i blocchi in cache. Questo procedimento permette in $1\tau$\footnote{Tempo breve generico, abbiamo assunto un ciclo di clock, per rendere l'idea che un blocco viene caricato tutto sulla cache in un singolo tempo, essendo appunto in "blocco".} di caricare in cache un blocco di grandezza arbitraria. E' necessario ricordare che questi principi possono essere applicati a tutti i tipi di dato (codice oppure effettivo dato in memoria).
+
+\subsection{Tempi CPU (CPI e Miss Penalties)}
+
+Elenchiamo diverse formule di calcolo dei tempi CPI (clock per instructions), illustrando anche l'influenza su questi tempi delle penalties causate dalle informazioni non trovate nella cache.
+
+\[ CPU_{TIME} \: = \: (CPI_{PERFECT} \: + CPI_{MISS\_PENALTY}) \: * \: LEN\_CICLO\_CLOCK  \]
+\vspace*{-10px}
+\[ CPI_{PERFECT} \: = \: \frac{IC_{CPU}}{IC}CPI_{CPU} \: + \: \frac{IC_{MEM}}{IC}CPI_{MEM}\]
+\vspace*{-10px}
+\[ CPI_{MISS\_PENALTY} \: = \: \frac{IC_{MEM}}{IC} \: * \: MISS\_RATE \: * \: MISS\_PENALTY  \]
+\vspace*{-10px}
+\[ CPI_{STALL} = CPI_{STALL\_IST} \: + \: CPI_{STALL\_DATA} \]
+\vspace*{-10px}
+\[ CPI \: = \: CPI_{PERFECT} \: + \: CPI_{STALL} \]
+\vspace*{-10px}
+\[ CPI_{STALL} = MISS\_RATE_{IST} \: \:*  \: \: MISS\_PENALTY\]
+\vspace{5px}
+
+L'identificatore $IC$ corrisponde al contatore di istruzioni. Un caching efficiente tende a minimizzare la percentuale di miss rate. Questa minimizzazione spesso è forzata da tecniche di \textbf{prefetching}, ossia si manda in background il caricamento della cache cercando di "prevedere" i dati che verranno utilizzati in caso siano validi i principi di località.
+
+\newpage
+
+\subsection{Tipi di Indirizzamento}
+
+Abbiamo definito i criteri e l'organizzazione fisica del caching. Ma non abbiamo ancora definito come possiamo effettivamente trovare/non trovare un determinato indirizzo dato in cache. Se assumiamo che la cache sia un sottoinsieme della memoria principale, allora abbiamo la certezza (conoscendo le dimensioni di entrambe le memorie citate) che degli indirizzi possono collidere. Sicuramente almeno due indirizzi della memoria principare avranno la stessa locazione in cache. Di conseguenza elenchiamo tre tipi di indirizzamento caratterizzati da proprietà diverse.
+
+\vspace*{15px}
+
+\paragraph{Working Set} Insieme di istruzioni/dati consecutivi in un certo intervallo di tempo. \newline L'analisi della località di questi set permette la gestione logica delle cache.
+
+\begin{figure}[htbp]
+    \center
+    \includegraphics[scale=0.50]{img/workingSet.png}
+\end{figure}
+
+\subsubsection{Indirizzamento Diretto}
+
+Immaginiamo di avere una memoria principale di dimensioni $N$, la cache a disposizione della CPU sarà invece di dimensioni $N^{I}$ con $N >> N^{I}$. Alla base dell'indirizzamento diretto c'è l'interpretazione di parte dell'indirizzo cercato come \textbf{tag} da cercare nelle linee della cache. 
+
+\begin{figure}[htbp]
+    \center
+    \includegraphics[scale=0.425]{img/indirizzamento_diretto_indirizzi.png}
+\end{figure}
+
+\paragraph{Trashing} A causa delle differenze di dimensioni tra memoria e cache, sicuramente più indirizzi avranno la stessa chiave, di conseguenza se dovesse capitare di dover caricare in cache più indirizzi con la stessa chiave si andrebbe in contro ad un continuo \textbf{caricamento} e \textbf{scaricamento} di dati tra la cache e la memoria. Questo fenomeno è detto \textbf{trashing} ed è un punto di debolezza delle cache ad indirizzamento diretto. Effettuare questi spostamenti continui di dati invaliderebbe infatti tutti i vantaggi ottenuti dall'utilizzo delle cache.
+
+\vspace*{5px}
+
+Mostriamo a pagina successiva la logica di questo tipo di indirizzamento e la sua implementazione fisica su rete combinatoria.
+
+\newpage
+
+\begin{enumerate}
+    \item \textbf{Implementazione Logica}: Mostriamo uno schema della logica dietro \newline l'indirizzamento diretto ed analizziamolo a step.
+    \begin{figure}[htbp]
+        \center
+        \includegraphics[scale=0.375]{img/ind_diretto_logico.png}
+    \end{figure}
+    \begin{enumerate}
+        \item Ogni dato in memoria avrà un \textbf{indirizzo}. Assumiamo un indirizzo composto da $4$ bit e diamo un interpretazione alle cifre.
+        \item Ogni indirizzo sarà dunque composto da un \textbf{tag} (bit 0-1), un \textbf{blocco} (bit 2) e da un \textbf{offset} (bit 3).
+        \item Nella cache saranno presenti vari blocchi (linee) e ciascuna di queste avrà un \textbf{tag}, un \textbf{bit di presenza} (p) e varie \textbf{word}, se saranno selezionabili grazie all'\textbf{offset} determinato dall'indirizzo cercato. 
+    \end{enumerate}
+    \item \textbf{Implementazione Fisica}: Mostriamo la rete combinatoria dietro l'indirizzamento diretto ed analizziamola a step.
+    \begin{figure}[htbp]
+        \center
+        \includegraphics[scale=0.325]{img/ind_diretto_fisico.png}
+    \end{figure}
+    \begin{enumerate}
+        \item Tre moduli rappresentanti la cache, il primo mantiene le informazioni riguardanti il \textbf{tag} ed il \textbf{bit di presenza}.
+        \item L'indirizzo in input è interpretato come nell'implementazione logica.
+        \item Il confrontatore prende in input il tag dell'indirizzo in ingresso ed il tag della cache.
+        \item La porta \textbf{AND} produce in output l'esito di \textbf{hit/miss}, mentre il multiplexer permette di selezionare la word cercata, se presente.
+    \end{enumerate}
+\end{enumerate}
+
+\newpage
+
+\subsubsection{Indirizzamento Associativo}
+
+Questo tipo di indirizzamento interpreta parte dell'indirizzo in ingresso come chiave e dedica, ad ogni possibile chiave, una linea di cache. Questo permette di avere una cache molto flessibile e non presenterà problemi causati dalle collisioni. Questa gestione della cache però è davvero costosa, dato che saranno presenti un numero molto alto di confrontatori. Mostriamo le implementazioni di questo schema di cache:
+
+\vspace*{15px}
+
+\begin{enumerate}
+    \item \textbf{Implementazione Logica}: Illustriamo la gestione delle linee di cache e dell'indirizzo in ingresso.
+    \begin{figure}[htbp]
+        \center
+        \includegraphics[scale=0.5]{img/ind_associativo_logico.png}
+    \end{figure}
+    \begin{enumerate}
+        \item Ogni cache avrà due colonne, la prima rappresenterà i \textbf{tag} mentre la seconda le $kword$ per ogni linea.
+        \item Ogni indirizzo avrà quindi una corrispondente linea in cache, e la word singola in output sarà determinata dalla parte di \textbf{offset}.
+    \end{enumerate}
+
+    \vspace*{15px}
+    
+    \item \textbf{Implementazione Fisica}: Illustriamo l'implementazione fisica di una \textbf{singola} linea di cache.
+    \begin{figure}[htbp]
+        \center
+        \includegraphics[scale=0.5]{img/ind_associativo_fisico.png}
+    \end{figure}
+    \vspace*{15px}
+    \newline
+    Questa illustrazione permette di capire il costo di questa gestione della cache. Ogni \textbf{singola linea} di cache richiederà un \textbf{confrontatore} ed un multiplexer. Solitamente una cache contiene una quantità di linee che si aggira sull'\textbf{ordine delle migliaia}.
+\end{enumerate}
+
+\newpage
+
+\subsubsection{Indirizzamento Set Associativo}
+
+Le due precedenti gestioni di cache offrivano pro e contro. Di conseguenza si preferisce un ibrido tra indirizzamento diretto ed associativo, in modo tale da poter bilanciare rispettivamente sia i problemi causati dalle collisioni sia i costi eccessivi. Illustriamo la gestione di questo tipo di indirizzamento:
+
+\begin{enumerate}
+    \item \textbf{Implementazione Logica}: Descriviamo per step il funzionamento di questo schema:
+
+    %\begin{figure}[htbp]
+    %    \center
+    %    \includegraphics[scale=0.5]{img/ind_set_associativo_logico.png}
+    %    \includegraphics[scale=0.5]{img/indirizzamento_diretto_indirizzi2.png}
+    %\end{figure}
+    
+\begin{figure}[H]
+  \centering
+  \begin{minipage}[b]{0.4\textwidth}
+    \includegraphics[width=\textwidth]{img/ind_set_associativo_logico.png}
+  \end{minipage}
+  \hspace{10px}
+  \begin{minipage}[b]{0.4\textwidth}
+    \includegraphics[width=\textwidth]{img/indirizzamento_diretto_indirizzi2.png}
+  \end{minipage}
+\end{figure}
+
+    \begin{enumerate}
+        \item Ogni \textbf{indirizzo} in \textbf{ingresso} sarà interpretato con \textbf{tag}, \textbf{numero set} ed \textbf{offset}.
+        \item Le \textbf{linee} di cache vengono raggruppati in \textbf{set}. Di conseguenza si effettua un indirizzamento \textbf{associativo} sul \textbf{set} di appartenenza.
+        \item Una volta selezionato il \textbf{set} si effettua un indirizzamento \textbf{diretto} utilizzando il \textbf{tag} tra le varie linee del \textbf{set} corrente.
+        \item Infine, se si ha un segnale di \textbf{hit}, allora si utilizza l' \textbf{offset} per ricavare la \textbf{singola word} tra le \textbf{kword}.
+    \end{enumerate}
+
+    \item \textbf{Implementazione Fisica}: Descriviamo la composizione di questa rete di una cache a $2$ vie.
+
+    \begin{figure}[htbp]
+        \center
+        \includegraphics[scale=0.3]{img/ind_set_associativo_fisico.png}
+    \end{figure}
+
+    \begin{enumerate}
+        \item Ogni via è caratterizzata da un modulo contenente \textbf{tag} e \textbf{bit} di \textbf{presenza} ed i restanti le \textbf{word} di quella linea.
+
+        \newpage
+        
+        \item L'\textbf{indirizzo} in ingresso è caratterizzato da \textbf{tag}, \textbf{numero} di \textbf{set} ed \textbf{offset}.
+        \item Tutti i moduli contenenti \textbf{word} danno in input ad un \textbf{multiplexer} il loro contenuto, il cui segnale di controllo è rappresentato dall'\textbf{offset} dell'\textbf{indirizzo} in ingresso.
+        \item Viene utilizzato un numero di comparatori pari al numero di \textbf{set}, questi avranno in input il \textbf{tag} del primo modulo del corrente \textbf{set} ed il \textbf{tag} dell'\textbf{indirizzo} in \textbf{ingresso}.
+        \item Delle porte \textbf{AND} prendono in ingresso il \textbf{bit} di \textbf{presenza} e l'output dei \textbf{comparatori} per ogni \textbf{set} e producono un segnale di \textbf{hit/miss} entrando in una porta \textbf{OR}.
+        \item Infine, l'output delle porte \textbf{AND} viene portato ad un multiplexer come segnale di controllo, permettendo la scelta tra le uscite dei \textbf{multiplexer} di \textbf{ciascun set}. In questo particolare caso non è necessario utilizzare un codificatore prima dell'ingresso di controllo sull'ultimo multiplexer in basso, essendo il caso di soli due set, altrimenti sarebbe stato necessario anche quel componente.
+    \end{enumerate}
+    
+\end{enumerate}
+
+\vspace*{15px}
+
+\paragraph{Confronto Caratteristiche Indirizzamenti} Riassumiamo le caratteristiche di ciascun tipo di indirizzamento sopra illustrato:
+
+\vspace*{20px}
+
+\begin{center}
+\begin{tabular}{ |c|c c| } %|c|c|c|%
+ \hline
+  & \#vie & \#insiemi \\ 
+ \hline
+ diretto & 1 & \#linee cache \\ 
+ associativo & \#linee cache & $1$ \\
+ set associativo & \#vie & $\frac{\#linee}{\#vie}$ \\
+ \hline
+\end{tabular}
+\end{center}
+
+\vspace*{15px}
+
+\subsection{Accenni di Gestione Stalli Miss Penalties}
+
+Nel momento in cui accade una \textbf{miss penalty} il processore entra in \textbf{stallo} per un periodo di tempo abbastanza ampio. Per questo motivo si preferisce attuare delle politiche grazie alle quali si "nasconde" il tempo di stallo in questione:
+
+\begin{enumerate}
+    \item \textbf{Out of Order Execution}: Si eseguono operazioni future non in ordine e che permettano di non invalidare le Condizioni di Bernstein.
+    \item \textbf{Esecuzione Speculativa Salti}: Si prevede un salto, assumendo che porti a qualcosa di già fatto.
+    \item \textbf{Prefetching}: Si cerca di prevedere cosa verrà caricato in cache, avviando veri e propri caricamenti in cache in \textbf{background}. Questo non sempre può essere realizzato, ma quando possibile permette un efficace minimizzazione degli stalli causati dalle miss penalty.
+\end{enumerate}
+
+\newpage
+
+\subsection{Tipologie di Miss}
+
+I \textbf{miss} si dividono in \textbf{specifiche categorie} rispetto alla "causa" che li genera:
+
+\begin{enumerate}
+    \item \textbf{Fisiologici}: Cronologicamente il primo miss necessario al caricamento della cache.
+    \item \textbf{Capacità}: La grandezza del \textbf{Workspace} supera quella della \textbf{cache}.
+    \item \textbf{Conflitto}: Causato dal tipo di indirizzamento. Questa tipologia può essere risolta a tempo di compilazione.
+\end{enumerate}
+
+\subsection{Scrittura in Cache}
+
+Elenchiamo tutte le caratteristiche e le problematiche della scrittura in cache e della sua consistenza in relazione ai dati presenti in memoria principale.
+
+\subsubsection{Problemi in Scrittura}
+
+Elenchiamo le possibili problematiche causate dalla scrittura in cache:
+
+\begin{enumerate}
+    \item \textbf{Scrittura 1 word/b word}: Assumiamo di avere un indirizzo su cui vogliamo effettuare una $STR$ in una cache set associativa a $2$ vie. Non posso semplicemente scrivere il \textbf{dato (singola word)} e segnare a quella linea il bit di presenza ad $1$ perché starei sprecando tutte le $b-1$ word presenti in quella linea su cui potrei ancora scrivere. Dunque si effettua lo stesso procedimento delle $LDR$, favorendo il caricamento di tutti i dati adiacenti a quello corrente nella linea di cache.
+    
+    \begin{enumerate}
+        \item \textbf{Eccezione}: Questo comportamento può causare problematiche nel caso in cui si voglia inizializzare un array con elementi arbitrari (da modificare successivamente) al suo interno. In quel caso non avrebbe senso caricare in cache tutti i dati, dato che verrebbero riscritti poco dopo. Questi tipi di ottimizzazioni vengono controllate dal compilatore, se è in grado di accorgersi di queste problematiche.
+    \end{enumerate}
+\end{enumerate}
+
+\subsubsection{Inconsistenza Cache/Memoria - Write Back/Write Through}
+
+La scrittura in cache causa un altro tipo di problematica, ossia la \textbf{consistenza} dei dati in \textbf{cache} ed in \textbf{memoria principale}. Tutte le locazioni paralleli dovrebbero essere "informate" di una potenziale modifica. Esistono $2$ approcci diversi che risolvono questa problematica:
+
+\begin{enumerate}
+    \item \textbf{Strategia Write Back}: Si aggiunge un nuovo \textbf{bit flag} alle linee di cache, ossia $M \in \{ 0,1 \}$, se il contenuto della linea è stato modificato allora la flag va ad $1$, altrimenti resta a $0$. Sarà dunque necessario ad un certo punto un "refresh" della memoria, trasportando tutti i dati modificati ai livelli superiori.
+    \item \textbf{Strategia Write Through}: Non utilizzo un bit flag, ma ogni modifica effettuata in cache viene messa in coda ad un \textbf{buffer} e l'aggiornamento dei livelli superiori avverrà in maniera \textbf{asincrona}. Questo approccio dipende fortemente dalla dimensione del buffer, questo dovrà essere abbastanza grande da contenere tutte le modifiche in coda fino all'effettivo refresh.
+    \newpage
+    \item \textbf{Strategia Write Back Bufferizzata}: Versione asincrona del write back, si compone di queste fasi:
+    \begin{enumerate}
+        \item Si copia la modifica nel buffer di scrittura.
+        \item Senza attendere la fase precedente, carico le $b$ parole nuove in cache.
+        \item Finisce l'accesso in cache.
+    \end{enumerate}
+\end{enumerate}
+
+\subsection{Politiche di Rimpiazzamento - Sequenziale/LRU}
+
+Che criterio segue ogni tipologia di indirizzamento di cache nel caso in cui bisogna aggiungere un nuovo dato in una cache già piena?
+
+\begin{enumerate}
+    \item \textbf{Indirizzamento Diretto}: Viene sostituita in maniera secca la linea di cache a cui sta facendo riferimento il nuovo indirizzo.
+    \item \textbf{Indirizzamento Associativo}: Dato che questo tipo di indirizzamento non provocava collisioni, siamo costretti a scegliere una "vittima" in cache da sostituire con l'indirizzo corrente, essendo certi di aver finito lo spazio.
+    \item \textbf{Indirizzamento Set Associativo}: Viene scelta una "vittima" da sostituire come nel caso precedente ma in uno specifico set.
+\end{enumerate}
+
+Il focus diventa quindi la gestione del \textbf{working set}, in modo tale da ottimizzare il caricamento/scaricamento delle cache in relazione al corrente working set.
+
+\begin{enumerate}
+    \item \textbf{Politica Sequenziale - Indirizzamento Diretto}: Questo approccio è quello più semplice possibile, infatti dopo il primo miss in cache si carica in cache un blocco di $b$ words. Appena sarà richiesta una word fuori da quel blocco viene effettuato un nuovo caricamento di blocco di words in cache.
+    \item \textbf{Politica LRU\footnote{LRU sta per Least Recent Used, dunque utilizzato meno recentemente.} Puro - Indirizzamento Set Associativo}: L'idea è quella di mantenere un tempo di accesso $t_{a}$ per sostituire quello che servirà tra più tempo. Questo porta però ad un costo molto alto, dato che per ogni linea andrebbe controllato il tempo "mancante" al prossimo accesso. Si preferisce quindi un compromesso, ossia l'LRU Approssimato.
+    \item \textbf{Politica LRU Approssimato - Indirizzamento Set Associativo}: Ogni linea di cache si porta dietro una flag d'accesso $A \in \{ 0,1 \}$ che viene alzata ad ogni accesso a quella linea. Ogni $k$ cicli di clock viene effettuata un operazione di \textbf{azzeramento}, dove tutte le $A$ vengono portate a $0$. Questa logica non è molto costosa dal punto di vista implementativo, ma è fortemente influenzata dall'ampiezza del periodo di refresh, dato che un periodo troppo lungo porterebbe a troppi bit $A=1$, mentre troppo breve porterebbe alla scelta random di locazioni.
+\end{enumerate}
+
+\newpage
+
+\subsection{Cache Coherence}
+
+Assumiamo di essere in un contesto multicore, dove ciascun core dispone di almeno un livello di cache completamente dipendente dal core stesso. La gestione concorrente dell'esecuzione complessiva dei programmi va attentamente gestita, dato che facilmente può crearsi inconsistenza tra copie dello stesso dato in cache di core diversi.
+
+\paragraph{Mantenimento Coerenza} Abbiamo bisogno di due meccanismi per mantenere la coerenza delle cache:
+
+\begin{enumerate}
+    \item Meccanismo di \textbf{tracciamento} copie di un determinato dato $x$ in tutte le cache.
+    \item Meccanismo di \textbf{informazione} a tutte le copie di un dato $x$ sulla \textbf{modifica} apportata. Potenzialmente esistono due approcci:
+    \begin{enumerate}
+        \item Propagazione del nuovo valore di $x$ a tutte le copie in tutte le cache.
+        \item Invalidazione di tutte le altre copie di $x$.
+    \end{enumerate}
+\end{enumerate}
+
+\subsubsection{Cache Coherence Protocols}
+
+Esistono due protocolli che permettono la sincronizzazione dei dati tra tutte le cache di primo livello dei vari core. Elenchiamoli:
+
+\begin{enumerate}
+    \item \textbf{Snoopy Based}: Tutti i core sono in ascolto su un \textbf{bus}, quando un \textbf{core} effettua una \textbf{write} in una sua \textbf{cache} manda un segnale sul \textbf{bus} che permette una sincronizzazione tra tutti i core.
+    \item \textbf{Directory Based}: Si mantiene una \textbf{tabella} nel primo livello di \textbf{cache comune} tra tutti i core che contiene tutte le informazioni sui dati e sulle locazioni di tutte le sue copie. In questo modo, utilizzando questa \textbf{mappa} è possibile \textbf{sincronizzare} tutte le copie nelle varie \textbf{cache.}
+\end{enumerate}
+
+Ogni tipo di protocollo scelto influisce sull'\textbf{AMAT} complessivo.
+
+\subsubsection{False Sharing}
+
+In specifici contesti, questi protocolli di sincronizzazione causano una quantità molto grande di operazioni "inutili" derivate dalla logica alla base della coerenza implementata in questo modo. Mostriamo un esempio:
+
+\vspace*{12px}
+
+\begin{enumerate}
+    \item Assumiamo di avere un array molto grande, sull'ordine dei $k$ in grandezza.
+    \vspace*{12px}
+    \item Assumiamo di avere una macchina con $4$ core, suddividiamo l'array in quattro parti e ciascun core calcolerà la somma di ogni quarto di array, depositando il risultato in una specifica posizione di un array risultato di $4$ posizioni.
+    \newpage
+    \item Ogni core caricherà in cache una copia dell'array risultato e cercheranno di sincronizzare tutti i valori di quest'ultimo ad ogni operazione effettuata. Ma impostato in questo modo, l'array risultato è "impropriamente condiviso", infatti ogni core si occupa di \textbf{una sola} cella. Questo fenomeno è detto \textbf{false sharing} ed è un effetto collaterale della \textbf{cache coherence} che causa inutile traffico di sincronizzazione non desiderato. Una soluzione è quella di posizionare, grazie al \textbf{padding}, i risultati di ciascun core in memoria che \textbf{non risulti} condivisa.
+\end{enumerate}
+
+\section{Gestione I/O e Periferiche}
+
+Per rendere un calcolatore in grado di acquisire dati dall'interno/esterno è necessario gestire l'\textbf{I/O}. Assumiamo che un programma impiega un tempo $t$ per terminare. Considerando quest'ultimo, si aggiunge circa un $\frac{1}{10}t$ al tempo complessivo.
+Un concetto fondamentale è anche quello della differenza tra la velocità delle operazioni di I/O e la velocità di esecuzione delle istruzioni della CPU. E' fondamentale che non si crei un collo di bottiglia al processore alla velocità delle operazioni di I/O, la CPU deve essere in grado di eseguire altre istruzioni mentre lavorano le periferiche esterne.
+
+\subsection{Legge di Amdahl}
+
+Questa legge stabilisce il rapporto "all'infinito" del tempo parallelizzabile e non parallelizzabile, in questo caso rispettivamente tempo generico di esecuzione della \textbf{CPU} e tempo dedicato all'\textbf{I/O}.
+
+\[ T_{seq} = fT_{seq} + (1-f)T_{seq} =\]
+
+\[ \lim_{x\xrightarrow{}\infty} \frac{T_{seq}}{fT_{seq} + \frac{(1-f)T_{seq}}{n}} = \]
+
+\vspace*{5px}
+
+\[ = \frac{T_{seq}}{fT_{seq}} = \frac{1}{f} \]
+
+\vspace*{5px}
+
+\subsection{Prima Descrizione Gestione I/O}
+
+Ogni genere di dispositivo di I/O ha la necessità di gestire:
+
+\begin{enumerate}
+    \item \textbf{Controllo}: Gestione degli ordini e dei segnali per gli esiti.
+    \item \textbf{Dati}: Dati di input/output.
+\end{enumerate}
+
+Descriviamo sommariamente i passi necessari alla comunicazione tra \textbf{CPU} e device \textbf{I/O}:
+
+\begin{enumerate}
+    \item CPU controlla stato periferica, l'I/O risponde al controllo.
+    \item CPU se e solo se il dispositivo è libero manda il comando alla periferica.
+    \item Periferica esegue l'istruzione.
+    \newpage
+    \begin{enumerate}
+        \item Se c'è necessità di trasferimento dati alla CPU viene eseguito in questo momento.
+    \end{enumerate}
+    \item I/O "fa rapporto" sull'esito dell'operazione appena eseguita.
+\end{enumerate}
+
+\vspace*{10px}
+
+\paragraph{Device I/O} La comunicazione del device in maniera approssimativa si mostra in questo modo:
+
+\begin{figure}[htbp]
+    \center
+    \includegraphics[scale=0.4]{img/device_io1.png}
+\end{figure}
+
+La rappresentazione del buffer è \textbf{approssimativa}, infatti non dobbiamo pensare che sia un semplice cavo da $1$ bit, ma un vero e proprio \textbf{insieme di cavi} che permettono il trasporto d'informazioni riguardo \textbf{indirizzo}, \textbf{controllo}, \textbf{dati} ed \textbf{arbitraggio}.
+
+Due \textbf{tipologie} comuni di \textbf{bus} sono ad esempio \textbf{USB} o \textbf{PCIe}.
+
+\vspace*{15px}
+
+\paragraph{Comunicazioni sul Bus} Il bus è condiviso, le informazioni vengono dunque inviate in broadcast a tutti i device, ogni dispositivo però potrebbe avere clock diversi:
+
+\begin{enumerate}
+    \item \textbf{Gestione Sincrona}: Il clock è uno solo ed ogni device si adatta a quest'ultimo.
+    \item \textbf{Gestione Asincrona}: Ogni device ha un proprio clock, generando un effetto \textbf{skewed}. Questo fenomeno va "ammortizzato" cercando di generare sincronizzazione solo ad uno specifico momento di comunicazione tra dispositivi e CPU.
+\end{enumerate}
+
+\newpage
+
+\subsection{Protocolli di Arbitraggio del Bus}
+
+Dopo aver definito il \textbf{bus} come mezzo di \textbf{comunicazione condiviso} tra tutti i dispositivi, è necessario stabilire come questi ultimi vengano arbitrati in modo tale da \textbf{non operare} in \textbf{conflitto} tra loro.
+
+\vspace*{12px}
+
+\begin{enumerate}
+    \item \textbf{Daisy Chaining}: Sul bus è settata una priorità per device:
+    \begin{figure}[htbp]
+        \center
+        \includegraphics[scale=0.325]{img/daisy_chaining.png}
+    \end{figure}
+    \vspace*{10px}
+\item \textbf{Richiesta Indipendente}: Una componente \textbf{arbitro} sceglie chi può o meno comunicare sul bus tra tutte le periferiche esterne:
+\begin{figure}[htbp]
+        \center
+        \includegraphics[scale=0.325]{img/richieste_indipendenti.png}
+    \end{figure}
+    \vspace*{10px}
+\item \textbf{Token Passing}: Esiste una sorta di comunicazione "ad anello" su cui gira un \textbf{token}. Chi acquisisce il token ha il permesso di comunicare sul bus e al termine della loro operazione dovranno restituire il token:
+\begin{figure}[htbp]
+        \center
+        \includegraphics[scale=0.325]{img/token_passing.png}
+    \end{figure}
+\end{enumerate}
+
+\vspace*{10px}
+
+\newpage
+
+\subsection{Meccanismi di Gestione Bus}
+
+Una volta definita la composizione e gli arbitraggi del bus bisogna descrivere in che modo vengono inviati i dati ed i segnali grazie a specifici meccanismi.
+
+\subsubsection{Memory Mapped I/O}
+
+Immaginiamo di star lavorando con un architettura a 32 bit, \textbf{riserviamo} una quantità di questi \textbf{bit} in ogni indirizzo come \textbf{flag} che indichi se bisognerà o meno \textbf{dirottare} il contenuto verso la \textbf{memoria principale} o la \textbf{memoria} di qualche \textbf{periferica}.
+
+\vspace*{10px}
+
+    \begin{figure}[htbp]
+        \center
+        \includegraphics[scale=0.45]{img/memory_mapped_io.png}
+    \end{figure}
+
+\vspace*{10px}
+
+L'unità che ci permette di effettuare questa scelta è la \textit{Memory Managment Unit} (\textbf{MMU}) che ha accesso sia alla memoria sia alle periferiche. Abbiamo quindi un modo per reindirizzare operazioni di load/store anche sul buffer delle periferiche.
+
+\subsubsection{Interruzioni}
+
+Un altro meccanismo fondamentale è quello della gestione delle interruzioni, ossia dei segnali che permettono la comunicazione tra periferiche e CPU. Immaginiamo che la CPU stia eseguendo questo loop:
+
+\vspace*{10px}
+
+\begin{lstlisting}[language = JavaScript]
+    while (true){
+        fetch
+        decode
+        execute
+        memory
+        write back
+        interruzione?
+    }
+\end{lstlisting}
+
+Questo ci permette di ottenere un segnale sul chi e perchè sia stata lanciata un interruzione (se è stata lanciata), in modo che la CPU possa agire di conseguenza.
+
+\newpage
+
+\subsection{Metodi di Query sullo Stato dell'I/O}
+
+Assumiamo che la CPU abbia ordinato l'esecuzione di un istruzione ad una periferica. Come fa la CPU a sapere quando la periferica ha terminato l'operazione in questione? 
+
+    \begin{figure}[htbp]
+        \center
+        \includegraphics[scale=0.45]{img/buffer_periferica.png}
+    \end{figure}
+
+
+Presentiamo le due principali metodologie:
+
+\begin{enumerate}
+    \item \textbf{Programmed I/O}: Metodologia sincrona, la CPU effettua continue richieste alla periferica (nello specifico al campo \textit{ready} del suo buffer) per capire se l'operazione è conclusa. Elenchiamo nello specifico le fasi della CPU:
+    \begin{enumerate}
+        \item Controlla se la periferica è in \textit{idle}. Se lo è, assegna l'operazione (passando \textit{cmd} e \textit{params}).
+        \item Controlla attivamente lo stato \textit{ready} della periferica in questione.
+        \item Quando la periferica ha finito, acquisisce il risultato.
+    \end{enumerate}
+
+    \paragraph{Polling} E' possibile modificare questa attesa attiva grazie al fenomeno del polling, ossia una \textbf{frequenza} di \textbf{richiesta} al campo \textit{ready} del buffer della periferica. Questa frequenza va settata con cura, dato che richieste troppo frequenti si avvicinerebbero all'attesa attiva, mentre richieste poco frequenti causerebbero poca reattività. Questa metodologia causa quindi un rallentamento della CPU dato che si effettuerebbero molte operazioni inutili, ma si cerca di evitare la piena attesa attiva.
+
+    \item \textbf{Interrupt Driven I/O}: Metodologia asincrona, la CPU carica l'istruzione alla periferica e attende non attivamente un segnale di terminazione da parte della periferica stessa. Illustriamo per step:
+    \begin{enumerate}
+        \item CPU legge l'\textit{idle} della periferica, se trova $1$ carica \textit{cmd} e \textit{params}.
+        \item CPU riprende il suo ciclo standard, controllando ad ogni ciclo di clock se sono presenti segnali d'interruzione.
+        \item Se dovessero incorrere delle interruzioni, la CPU salverebbe il corrente stato dell'operazione e analizzerebbe l'interruzione data.
+    \end{enumerate}
+    Questa metodologia ci permette di evitare il calcolo di un \textbf{polling} ottimale dato che sarà la periferica stessa a notificare il completamento dell'operazione grazie all'unità delle \textbf{interruzioni}.
+\end{enumerate}
+
+\newpage
+
+\paragraph{System Bus} Notiamo che dopo le ultime modifiche è necessario che la memoria non sia collegata solo al processore. Di conseguenza viene posizionato un nuovo bus che permetta l'interazione diretta tra memoria e device esterni.
+
+\begin{figure}[htbp]
+        \center
+        \includegraphics[scale=0.45]{img/bus_sys.png}
+    \end{figure}
+
+Il modulo \textit{Direct Memory Access} (\textbf{DMA}) permette l'interazione stabilita prima.
+
+\paragraph{Priorità tra i due Bus} E' necessario stabilire a quale \textbf{bus} dare \textbf{priorità}. Sappiamo che le operazioni sui dispositivi di I/O sono molto più lente delle operazioni del processore, ma se ricevessimo un segnale d'interruzione risulterebbe molto probabile che il buffer del device che ha inviato l'interruzione è pieno. Di conseguenza, per prevenire perdite di dati dei buffer, si preferisce dare priorità al bus I/O.
+
+\paragraph{DMA e Coerenza Cache} La coesistenza di \textbf{cache}, \textbf{buffer I/O} e \textbf{memoria} principale causata dal \textbf{DMA} può causare forte inconsistenza. Conosciamo infatti i meccanismi che permettono di tenere coerenti le linee di cache e le informazioni in memoria principale. In presenza del \textbf{DMA} si preferisce invalidare la cache, per evitare a monte di avere problemi con i meccanismi di coerenza citati prima.
+
+\newpage
+
+\section{Introduzione ai Sistemi Operativi}
+
+Il sistema operativo è il software fondamentale per un calcolatore. Solitamente scritto in un linguaggio ad "alto" livello (es. C), si occupa della gestione del calcolatore (processi, I/O, memoria).
+
+\begin{figure}[htbp]
+        \center
+        \includegraphics[scale=0.55]{img/os1.png}
+    \end{figure}
+
+\paragraph{Astrazioni del Sistema Operativo} Uno degli obiettivi del'OS è quello di rendere questi tre tipi di astrazione all'user:
+
+\begin{enumerate}
+    \item \textbf{Illusionist}: Il sistema operativo permette di immaginare spazi di memoria allocati in maniera contigua. Questo è più un concetto \textbf{logico} che fisico, infatti sarà lo stesso \textbf{OS} ad occuparsene a basso livello, astraendo l'user dalla gestione fisica della memoria.
+    \item \textbf{Referee}: Il sistema operativo deve gestire le risorse condivise ed il settaggio delle proprietà di ciascun utente.
+    \item \textbf{Glue}: Il sistema operativo mette a disposizione le librerie e le utilities necessarie alla coesistenza di CPU, memoria e disco.
+\end{enumerate}
+
+\paragraph{Proprietà Garantite dal Sistema Operativo} Per costruire l'astrazione, il sistema operativo deve garantire specifiche proprietà:
+
+\begin{enumerate}
+    \item \textbf{Affidabilità}
+    \begin{enumerate}
+        \item Disponibilità
+    \end{enumerate}
+    \item \textbf{Sicurezza}
+    \item \textbf{Portabilità}
+    \newpage
+    \item \textbf{Performance}
+    \begin{enumerate}
+        \item Latenza
+        \item Throughput (Tasso di produzione per unità di tempo)
+        \item Overhead (Quanto lavoro aggiuntivo necessario alla resa dell'astrazione)
+        \item Fairness (In presenza di più utenti, questi devono avere stesse possibilità di utilizzo delle risorse)
+        \item Predictability (Possibilità di prevedere sommariamente il comportamento del sistema operativo in base al contesto)
+    \end{enumerate}
+\end{enumerate}
+
+\begin{figure}[htbp]
+        \center
+        \includegraphics[scale=0.375]{img/stack_os.png}
+    \end{figure}
+
+\subsection{Struttura Kernel - Monolitica vs a Micro Kernel}
+
+Esistono diversi modi per organizzare il nucleo di un sistema operativo, illustriamo le due metodologie agli antipodi:
+
+\begin{enumerate}
+    \item \textbf{Kernel Monolitico}: Tutto ciò che è a disposizione dell'OS è nel suo kernel, di conseguenza ogni modifica o aggiunta di funzionalità integrate comporta l'estensione del kernel stesso.
+    \item \textbf{Micro Kernel}: L'effettivo kernel contiene solo pochissime funzionalità (come lo scheduling di attività o l'acquisizione dell'I/O), il resto delle attività vengono integrate come veri e propri processi.
+\end{enumerate}
+
+\subsection{Computazioni nel Tempo - (Batch, Spool, Time Sharing)}
+
+Elenchiamo tre metodologie di gestione delle elaborazioni nei primi calcolatori:
+
+\begin{enumerate}
+    \item \textbf{Sistema Batch}: Assumiamo di avere una lista di \textit{jobs} da elaborare. \[ Batch = \{job_1,\:job_2, \:job_3\} \]
+    Ognuno di questi \textit{job} si compone di parte CPU e parte I/O. Il sistema Batch è il più semplice, infatti eseguirà in maniera sequenziale i lavori.
+    \item \textbf{Spool}: Con lo \textit{spool} si tenta di riempire i "vuoti" di elaborazione durante operazioni di I/O con calcoli con CPU del \textit{job} successivo che non risulti in nessun modo dipendente da quello prima.
+    
+    \newpage
+    
+    \item \textbf{Time Sharing}: La CPU eseguirà frazioni alternate di ogni \textit{job} in coda. Quando viene richiesto dell'I/O da un \textit{job} questo non sarà più contato in questa operazione di interleaving.
+\end{enumerate}
+
+\subsection{Protezione del Calcolatore}
+
+Il sistema operativo deve occuparsi anche di meccanismi di \textbf{protezione} del calcolatore. Nello specifico, con protezione intendiamo dei meccanismi per cui ogni operazione sia legata a relativi \textbf{diritti} e \textbf{permessi}.
+
+\vspace*{15px}
+
+\subsubsection{Dual Mode - User/System}
+
+Esistono vari ruoli in base al sistema operativo utilizzato che permettono o meno di eseguire determinate istruzioni. Mostriamo uno schema semplice basato su due ruoli, ossia \textbf{User} e \textbf{System}:
+
+    \vspace*{10px}
+
+
+\begin{enumerate}
+    \item \textbf{User Mode}: L'user avrà \textbf{meno} \textbf{privilegi}, di conseguenza potrà eseguire meno istruzioni. Spesso l'user avrà modo di utilizzare funzioni "più ad alto livello" come ad esempio una \textit{fread} oppure una \textbf{syscall}, senza avere accesso direttamente alla routine di esecuzione effettuata dal sistema.
+    \item \textbf{System Mode}: Il System avrà \textbf{più privilegi}, di conseguenza ha il permesso di eseguire più istruzioni. Una particolarità del "ruolo" System è quello di poter eseguire le routine invocate dalle \textbf{syscalls} degli user. Per questo l'invocazione di syscall causa uno switch di modalità, per fare in modo che la sua routine possa essere eseguita dal lato system.
+\end{enumerate}
+
+\vspace*{15px}
+
+\subsubsection{Meccanismi Necessari alla Gestione del Dual Mode}
+
+Per garantire una dual mode consistente l'OS deve prima fornire questi meccanismi:
+
+\begin{enumerate}
+    \item \textbf{Istruzioni Privilegiate}: Operazioni non eseguibili dall'user, sarà la \textit{CPSW} ad indicare se sarò o meno user. Degli esempi di istruzioni privilegiate:
+    \begin{enumerate}
+        \item Disabilitare le interruzioni.
+        \item Scrivere manualmente nella \textit{CPSW}.
+        \item Scrivere manualmente nel \textit{timer}.
+    \end{enumerate}
+    \newpage
+    \item \textbf{Limitazione sugli Indirizzi di Memoria}: Si limitano gli indirizzi di memoria accessibili dall'user, rendendo visibile all'user solo una memoria virtuale che mappa su quella reale secondo degli schemi specifici, come ad esempio il \textit{Base \& Bound}.
+    \begin{figure}[htbp]
+    \center
+    \includegraphics[scale=0.5]{img/ind_fisico_virtuale.png}
+    \caption{Due esempi di limitazione e mapping di memoria virtuale su quella fisica.}
+\end{figure}
+\item \textbf{Timer}: Si definisce un modo per gestire interruzioni in caso di \textbf{overtime}, se un processo dovesse infatti "bloccarsi" avremmo un modo per gestire in maniera semiautomatica il suo overtime, interrompendolo nel caso in cui sia trascorso troppo tempo.
+\item \textbf{Safe Ways per Switch Mode}: L'OS deve anche garantire metodologie \textbf{sicure} per lo \textbf{swap} tra le modalità user e system. In \textbf{ARM} una di queste metodologie è la \textit{SVC} (supervisor call), che funziona esattamente come una chiamata di funzione, ossia si aspetta i parametri nei registri $R_{0},R_{1},R_{2}\:\:...$ e nello specifico in $R_{7}$ si aspetta il codice della \textit{syscall} che si sta effettuando.
+
+\begin{enumerate}
+    \item \textbf{Esempio di una read}: Vediamo un esempio di syscall, ossia a cosa corrisponde effettuare una read:
+    \vspace*{5px}
+    \[ \boxed{read(file\_desc,\:buff,\:len)} \]
+    \vspace*{5px}
+\begin{lstlisting}[language = JavaScript]
+    MOV R0, "file_desc"
+    MOV R1, "buff"
+    MOV R2, "len"
+    MOV R7, "#CODICE_READ"
+    SVC 0
+\end{lstlisting}
+
+Stiamo descrivendo in "pseudo ARM" le operazioni effettuate dall'invocazione della read, ossia una comune \textit{syscall}.
+
+\end{enumerate}
+
+In vari casi si effettuando degli \textbf{switch mode}, ad esempio \textbf{da user a supervisor} in casi come \textit{syscall}, \textit{interruzioni} o \textit{eccezioni}, mentre \textbf{da supervisor a user} in return dalle operazioni elencate prima, in \textit{creazioni di processi} e in \textit{upcall} (ossia se scatta il timer esegui una specifica operazione).
+
+\end{enumerate}
+
+\newpage
+
+\subsection{Descrizione di un Processo}
+
+Immaginiamo un processo che "nasce" da queste fasi:
+
+\begin{enumerate}
+    \item Un \textbf{programma} (codice sorgente) viene compilato.
+    \item La \textbf{compilazione} produce un \textbf{eseguibile}.
+    \item L'\textbf{eseguibile} viene lanciato, creando un \textbf{processo}.
+    \begin{enumerate}
+        \item Verrà allocata della memoria durante il lancio dell eseguibile, necessaria al corretto funzionamento del processo.
+        \item Viene generato un \textbf{descrittore di processo} durante il lancio dell'eseguibile, per fare in modo che si possano mantenere dei \textbf{metadati} riguardanti il processo stesso.
+    \end{enumerate}
+    
+\end{enumerate}
+
+\subsubsection{Thread e Processi}
+
+Assumendo che ogni \textbf{processo} abbia spazio d'indirizzamento indipendente dagli altri, possiamo descrivere le differenze con i \textbf{thread} che invece \textbf{condividono} tra loro memoria \textbf{dati} ed \textbf{istruzioni}. Dunque un processo sarà "composto" da più thread, che condivideranno lo spazio allocato per il processo "padre".
+
+\subsubsection{PCB - Process Control Block}
+
+Il \textbf{PCB} descrive un intero processo, portandosi dietro una serie di informazioni utili, elenchiamole:
+
+\begin{enumerate}
+    \item \textbf{PID}: ID del processo.
+    \item \textbf{Stato Processo}: Corrente stato del processo (\textit{running}, \textit{new}, \textit{ready}, \textit{wait}, \textit{terminated}).
+    \item \textbf{Registri CPU}: Stato architetturale, ossia contenuto dei registri della CPU durante l'esecuzione del processo.
+    \item \textbf{Informazioni di Scheduling}: Priorità d'esecuzione assegnata al processo in questione.
+    \item \textbf{Puntatore ai Thread}: Puntatore a tutti i thread che compongono il processo.
+    \item \textbf{Informazioni su Memoria Allocata}: Informazioni sulla memoria allocata automaticamente che dovrà essere deallocata a tempo di terminazione del processo.
+    \item \textbf{Informazioni su Risorse Allocate}: Informazioni su tutta la memoria allocata a supporto del funzionamento del processo (ad esempio descrittori di file).
+\end{enumerate}
+
+\newpage
+
+\subsection{Descrizione Interruzioni}
+
+Descriviamo tutti i meccanismi a supporto del funzionamento delle interruzioni:
+
+\begin{enumerate}
+    \item \textbf{Interrupt Vector}: La vera e propria interruzione sarà un semplice \textbf{codice} numerico. L'interrupt vector mappa a quel codice l'effettiva routine da eseguire nel caso venga rilevata l'interruzione in questione. Possiamo dunque definirla come zona di memoria che da contesto alle interruzioni in base al loro codice.
+    \item \textbf{Kernel Interrupt Stack}: Nel momento in cui l'OS si accorge di un interruzione ha la necessità di salvare il corrente stato architetturale\footnote{Per stato architetturale s'intende il corrente contenuto dei registri.}. Tutti questi dati corrispondono però a dati di \textbf{sistema} e non di \textbf{user}, di conseguenza non possono essere pushati sullo stack regolare ma devono essere riposti nel \textbf{kernel stack}. In questo modo sappiamo dove il sistema dovrà riacquisire i dati dopo la completa elaborazione dell'interruzione.
+    \item \textbf{Interrupt Masking}: Opzione di apertura/chiusura delle interruzioni, possiamo in questo modo disattivare la ricezione di interruzione durante specifiche fasi critiche.
+    \item \textbf{Swap Mode Atomico}: Meccanismo di swap mode safe.
+    \item \textbf{Ripartenza del Ciclo CPU Regolare}: Meccanismo di ripristino della routine standard del processore.
+\end{enumerate}
+
+\subsubsection{Handler di Interruzioni}
+
+Gli \textbf{Handler} sono gestori di interruzioni ed hanno l'obiettivo di eseguire tutte le fasi necessarie all'elaborazione completa di un interruzione. Possono essere visti come \textbf{kernel threads}, si fermano solo quando hanno terminato di elaborare l'interruzione e hanno lo scopo di effettuare queste fasi:
+
+\begin{enumerate}
+    \item Salvare lo \textbf{stato} a tempo d'acquisizione dell'interruzione.
+    \item \textbf{Trattare l'evento} in base alla \textbf{specifica interruzione} ricevuta.
+    \item \textbf{Interagire} con lo schedulatore per dare \textbf{priorità} all'evento legato 
+    
+    all'elaborazione dell'interruzione.
+\end{enumerate}
+
+Dopo la sua esecuzione vanno restabiliti: \textbf{stato precedente}, \textbf{program stack}, \textbf{parola di stato} e \textbf{modalità utente}, ripristinando anche il funzionamento delle interruzioni.
+
+\paragraph{Interruzioni in ARM} In architettura \textbf{ARM} quando il processore coglie un interruzione a fine del suo ciclo standard, va nell'unità \textbf{INT}, che ha una "propria memory mapped I/O", ricavando così le informazioni sul chi e sul perchè sia stata sollevata l'interruzione in questione.
+
+\newpage
+
+\subsection{Esempi d'Implementazione su Architettura ARM}
+
+Mostriamo come meccanismi generici dei sistemi operativi vengano implementati su ARM.
+
+\subsubsection{CPSR ed Interrupt Masking}
+
+Nel registro \textbf{CPSR} (Current Program Status Register) sono presenti delle informazioni riguardanti le interruzioni, infatti:
+
+\begin{enumerate}
+    \item \textbf{Bit I (Interrupt)}: Questo bit, solitamente settato a $0$ può essere cambiato in $1$ effettuando così un mask. Questo ci permetterebbe temporaneamente di ignorare tutte le interruzioni.
+    \item \textbf{Bit F (Fast Interrupt)}: Funziona allo stesso modo, a differenza del normale Interrupt il Fast Interrupt salva parte dello stato architetturale automaticamente in specifici registri ombra.
+\end{enumerate}
+
+Un bit tra quelli del \textbf{CPSR} è dedicato anche al \textbf{Thumb Arm}, settando ad $1$ la \textbf{flag} si ha infatti la possibilità di \textbf{switchare} in direzione di ARM su istruzioni di dimensione dimezzata.
+
+\subsubsection{Modalità di Esecuzione}
+
+In ARM esistono \textbf{diverse} modalità di esecuzione, elenchiamole:
+
+\vspace*{5px}
+
+\begin{center}
+    \begin{tabular}{|c|c|}
+    \hline
+    MODE & CODICE NELLA CPSR  \\
+    \hline
+    User & $10000$ \\
+    \hline
+    Supervisor & $10011$ \\
+    \hline
+    Abort & $10111$ \\
+    \hline
+    Undefined (Reserved) & $11011$ \\
+    \hline
+    Interrupt & $10010$ \\
+    \hline
+    Fast Interrupt & $10001$ \\
+    \hline
+    \end{tabular}
+\end{center}
+
+\vspace*{5px}
+
+
+Nello specifico queste modalità avranno un vettore con locazioni contenenti ciascuna la routine da eseguire in caso di switch di modalità.
+
+\vspace*{5px}
+
+\begin{center}
+        \begin{tabular}{ |c| } %|c|c|c|%
+         \hline
+         Reset \\
+         \hline
+         Undefined \\ 
+         \hline
+         Supervisor Call \\
+         \hline
+         Prefetch Abort \\
+         \hline
+         Data Abort \\
+         \hline
+         Reserved \\
+         \hline
+         Interruption \\
+         \hline
+         Fast Interruption \\
+         \hline
+        \end{tabular}
+    \end{center}
+
+\vspace*{5px}
+
+In questo vettore \textbf{non saranno presenti} i puntatori alle routine delle modalità, infatti saranno presenti \textbf{direttamente} le routine da eseguire sottoforma di istruzioni ASM.
+
+\newpage
+
+\paragraph{Fasi di Swap Mode} Descriviamo in dettagli tutti i passi necessari ad uno scambio di modalità:
+
+\begin{enumerate}
+    \item In \textbf{Banked LR} salvo in corrente \textbf{PC}.
+    \item In \textbf{SPSR} (Banked CPSR) salvo la corrente \textbf{CPSR}.
+    \item Cambio i $5$ bit che definivano la mia corrente proprietà nella \textbf{CPSR}.
+    \item Cambio \textbf{Reg} in \textbf{Reg Banked}.
+    \item Disabilito le \textbf{Interrupt}.
+    \item In \textbf{PC} metto il codice del \textbf{mode} verso cui voglio switchare
+\end{enumerate}
+
+Ognuna di queste fasi viene eseguita in maniera \textbf{atomica} per mantenere consistenza.
+
+\subsubsection{Banked Registers}
+
+In ARM alcuni registri si definiscono \textbf{banked} perchè preservati in maniera automatica, anche durante lo swap di modalità.
+\begin{enumerate}
+    \item \textbf{Int, SVC, Abort, Undefined}: Queste quattro modalità hanno come banked registers $SP$ ed $LR$.
+    \item \textbf{Fast Int}: Ha come banked registers $R8 \: - \: R12$, $SP$ ed $LR$.
+\end{enumerate}
+
+\subsection{System Calls}
+
+\vspace*{5px}
+
+Definiamo le \textbf{SYSCALLS}, ossia una sorta di chiamata di procedura ma in direzione del sistema operativo, \textbf{caratterizzata} da uno \textbf{swap di modalità} durante la sua esecuzione.
+
+Il flusso di una syscall è così definito (esempio su architettura ARM):
+
+\vspace*{5px}
+
+\begin{enumerate}
+    \item L'\textbf{User} effettua la chiamata al sistema.
+    \item Si \textbf{switcha} verso l'\textbf{SVC}.
+    \item Si \textbf{settano} i \textbf{parametri} forniti dall'\textbf{user} in maniera tale da renderli \textbf{leggibili} anche in \textbf{modalità system} (scambi con i banked registers oppure effettuando delle pop dal kernel stack).
+    \item Si chiama la \textbf{routine della syscall} indirizzandosi sulla tabella che contiene le routine stesse grazie al \textbf{codice assegnato} alla corrente syscall.
+\end{enumerate}
+
+Queste operazioni, dallo switch di modalità in poi, sono eseguite dal \textbf{Call Handler}.
+
+\vspace*{10px}
+
+Mostriamo nel successivo sottocapitolo un esempio di implementazione in ASM ARM v7 di Call Handler.
+
+\newpage
+
+\subsubsection{Call Handler in ASM ARM v7}
+
+Mostriamo una possibile implementazione di \textbf{Call Handler} commentandola successivamente.
+
+\vspace*{5px}
+
+
+\begin{lstlisting}[language = JavaScript]
+    STMFD SP!, {R0-R12,LR}
+    ADR R8, BASE_SYS_CALL_TABLE
+    @CHECK
+    LDR PC, [R8,R7,LSL #2]
+    LDMFD SP!, {@PARAMETRI PREC.}
+    MOVS PC, LR
+\end{lstlisting}
+
+\begin{enumerate}
+    \item Store multipla dei registri e del link register per \textbf{salvare} lo stato \textbf{architetturale corrente}.
+    \item Si mette in r8 la $BASE\_SYS\_CALL\_TABLE$ (base della tabella delle syscalls) grazie all'istruzione $ADR$.
+    \item Si cambia il $PC$ grazie ad una load nella \textbf{tabella delle syscall} con \textbf{base} 
+    
+    d'indirizzamento in $R8$ e con il \textbf{codice di syscall} in $R7$, ricordando di star lavorando su indirizzi che vanno di quattro in quattro (caratteristica dell'ARM v7).
+    \item \textbf{Restore} dello \textbf{stato architetturale} pre-call.
+    \item Si \textbf{ristabilisce} il vecchio \textbf{Program Counter} per \textbf{ritornare} a chi ha invocato la syscall.
+\end{enumerate}
+
+\subsection{Upcalls - Segnali}
+
+In user mode abbiamo la possibilità di registrare un \textbf{handler} che verrà invocato dal \textbf{kernel} a tempo dell'occorrenza di uno specifico \textbf{evento}. Il concetto di \textbf{up} deriva dal fatto che sto definendo qualcosa a livello \textbf{user} che verrà eseguito dal \textbf{kernel} quando necessario. Elenchiamo altre caratteristiche vantaggiose delle upcalls:
+
+\begin{enumerate}
+    \item Gestiscono lo stack \textbf{user-space} in \textbf{maniera distaccata} dal resto delle informazioni.
+    \item Hanno meccanismi di \textbf{auto salvataggio} dei \textbf{registri}.
+    \item Permettono il \textbf{masking} degli \textbf{altri segnali} durante l'esecuzione di un handler.
+\end{enumerate}
+
+\subsection{Kernel Boot}
+
+Descriviamo cosa accade all'accensione di un calcolatore:
+
+\begin{enumerate}
+    \item La \textbf{CPU} accede ad una locazione di una memoria ROM/EEPROM facendo in modo che il \textbf{BIOS} possa caricare il \textit{first stage bootloader}.
+    \item Questa \textbf{prima forma} di \textbf{bootloader} inizializza il controllo della memoria, qualche dispositivo di I/O e \textbf{carica} il \textit{second stage bootloader}.
+
+\newpage
+
+    \item Questa \textbf{seconda forma} di \textbf{bootloader} si occupa del caricamento del \textbf{kernel} del sistema operativo e della \textbf{root} del file system, lasciando infine il controllo al kernel.
+
+\end{enumerate}
+
+\subsection{Sommario Specifiche Hardware Necessarie all'OS}
+
+Possiamo dunque riassumere tutti i minimi meccanismi necessari alla composizione di un sistema operativo consistente:
+
+\begin{enumerate}
+    \item \textbf{Livelli di Privilegio}: E' necessaria l'esistenza di \textbf{almeno} due livelli di privilegio (user/system) anche se abbiamo visto che in ARM ne sono presenti diversi (SVC, Abort, User, Interrupt...)
+    \item \textbf{Istruzioni Privilegiate}: Istruzioni eseguibili \textbf{solo se} \textbf{non} siamo in \textbf{modalità user} per garantire sicurezza.
+    \item \textbf{Traduzione Indirizzi Memoria}: Meccanismo di map di \textbf{indirizzi} \textbf{virtuali} disponibili a reali \textbf{indirizzi} di memoria \textbf{fisici}.
+    \item \textbf{Eccezioni}: Routine eseguite in caso di \textbf{violazione di privilegi}.
+    \item \textbf{Interruzioni}: Meccanismo di interruzioni che permetta la \textbf{comunicazione} tra \textbf{device} e \textbf{CPU}.
+    \item \textbf{Mask di Interruzioni}: Meccanismo che ci permetta di disattivare le interruzioni in fasi critiche.
+    \item \textbf{Syscalls}: Interfaccia tra \textbf{utente} e \textbf{macchina} tramite invocazione di operazioni "standard", dunque possibilità di esecuzione di azioni privilegiate da un programma user.
+    \item \textbf{Boot}: Routine di avvio della macchina.
+    \item \textbf{Operazioni Atomiche su Memoria}: Operazioni in memoria il cui utilizzo \textbf{garantisce consistenza} anche in contesti multithread.
+    \item \textbf{Virtualizzazione}: Gestione di \textbf{hypervisors} che permettano di creare \textbf{diversi ambienti virtuali} anche sulla stessa macchina fisica. 
+\end{enumerate}
+
+
+
+\newpage
+
+\end{document}

@@ -1,0 +1,21 @@
+1. Concatenazione di due liste
+Dati due puntatori a due liste diverse ma con lo stesso tipo di elementi (intero + puntatore next), restiuire la lista che contiene la 
+concatenazione della prima e della seconda lista (l1 = 1 -> 2  e l2 = 4 -> 5 ris = 1 -> 2 -> 4 -> 5)
+
+2. Cerca occorrenze lettere maiuscole
+Scrivere una funzione che cerca le occorrenze di lettere maiuscole in una stringa
+
+3. Somma di tutti i numeri in una stringa
+Scrivere una funzione che resituisce la somma dei valori di tutti i caratteri numerici in una stringa (e.g. "ab3hj4y12h" -> 10)
+
+4. Check stesso registro dst in due istruzioni
+Scrivere una funzione che, data la rappresentazione di due istruzioni operative (trovate i codice con l'assemblatore) restituisce
+1 se il registro destinazione è lo stesso nelle due istruzioni, 0 altrimenti
+
+5. Stampa tipo ist. macchina
+Scrivere una funzione che stampa il tipo di una istruzione in linguaggio macchina la cui rappresentazione 
+in linguaggio macchina è passata come parametro  (tipo in {OP, LDST, BRANCH})
+
+6. Profilo frequenza di una str. su un array 
+Scrivere una funzione che restituisce un array di 21 posizioni, contenente alla posizione i il numero di occorrenze
+della i-esima lettera dell'alfabeto in una stringa passata come argomento. Il vettore va allocato e se ne deve restituire l'indirizzo base.

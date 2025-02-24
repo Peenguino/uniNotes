@@ -1,3 +1,0 @@
-#
-echo "Compiling $*"
-arm-linux-gnueabihf-gcc -mfpu=vfp -static -ggdb3 $*
