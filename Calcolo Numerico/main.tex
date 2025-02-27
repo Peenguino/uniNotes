@@ -958,8 +958,6 @@ Procediamo a dimostrare per induzione questo teorema:
            \[ y = U^{T}_{n-1}w \]
            \item Prodotto seconda riga di $L$ seconda colonna di $U$:
            \[ a_{nn} = w^{T}z + 1\beta \]
-           ******
-           %**Si utilizza Th. Binet Det(A*B) = Det(A) * Det(B) ma perchè?**
        \end{enumerate}
    \end{enumerate}
 \end{enumerate}
@@ -989,9 +987,51 @@ $E$ è quindi definita come \textbf{Matrice di Gauss}.
 \begin{enumerate}
     \item Queste matrici sono \textbf{triangolari inferiori} con tutti $1$ sulla diagonale e sono \textbf{invertibili}.
     \item Vale che:
+    \vspace*{5px}
     \[ E^{-1} = I + ve^T_k \]
 \end{enumerate}
 
+Il metodo di Gauss può essere utilizzato senza scambio di \newline righe se e solo se
+$a^{k-1}_{kk} \neq 0 \:\:\: \forall k = 1 \: ... \: n$.
+
+\newpage
+
+\paragraph{Teorema} Dato un $A \in \mathbb{R}$: 
+
+\[ A(1:k,1:k) \neq 0  \Leftrightarrow p^{k-1}_{kk} \neq 0 \:\: \forall k \in \{ 1, \: ... \:, n-1 \} \]
+
+E quindi, considerando che $Ly = b$:
+
+\[ [A|B] \: \rightarrow_{E_{1}} \:\: ... \:\: \rightarrow_{E_{2}} \:\: ... \:\: \rightarrow_{E_{n-1}} = [U|y] \] 
+
+\subsection{Tecniche di Pivoting}
+
+Assumiamo di avere un pivot pari a $0$, è necessario che si generi una \textbf{permutazione}
+della corrente matrice per fare in modo che il pivot in questione non sia nullo.
+\[
+    \begin{bmatrix}
+    a_{11} & * & *  & * \\
+    0 & 0_{k+1} &  & ...\\
+     ...& ... & ... &  ...\\
+     0 & a_{nk} & 0 & *
+    \end{bmatrix}
+\]
+
+Questo mi causa però la \textbf{fattorizzazione LU} di una permutazione della matrice
+$A$ e non di $A$ stessa.
+
+\[ U = E_{n-1}P^{n-1} \:\:\: ... \:\:\: E_{(1)}P^{(1)}E_{(0)}P^{(0)}A^{(0)} \]
+
+\paragraph{Stabilità e Pivoting} Le tecniche di pivoting non sono utilizzate solo
+nel caso in cui un pivot risulti nullo, ma anche per questioni di stabilità degli
+algoritmi causati.
+
+Si può dunque dimostrare che i fattori $\tilde{L}$ e $\tilde{U}$ calcolati sono tali
+per cui $\tilde{L} \tilde{U} = A + E $, dove $E$ corrisponde all'errore in rappresentazione
+in numeri di macchina.
+Vale dunque che:
+
+\[ \frac{||E||}{||\tilde{L}||\:\: ||\tilde{U}||} = O(u) \]
 \newpage
 
 \end{document}
