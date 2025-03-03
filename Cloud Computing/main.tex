@@ -411,4 +411,37 @@ Immaginiamo di aver costruito un intera applicazione grazie alla composizione di
 
 \newpage
 
+\section{Platform as a Service (PaaS)}
+
+Questo modello basato sulla piattaforma come servizio deresponsabilizza ancora di più l'utente
+rispetto all'infrastruttura come servizio, l'user infatti non dovrà occuparsi della \textbf{gestione dell'ambiente}
+e questo modello risulta anche facilmente adattabile a nuove tecnologie. Nello specifico l'user non sarà più
+il responsabile della gestione del \textbf{Setup}, dello \textbf{Scale} e del \textbf{Managment}.
+Solitamente l'IaaS viene utilizzato in contesti di sviluppo, debug, testing o deployment.
+
+\paragraph{Differenze tra PaaS e IaaS} Spesso il confine tra questi due tipi di modelli non è ben definito, infatti molti provider forniscono contemporaneamente sia PaaS sia Iaas.
+Formalmente però il PaaS è più ad alto livello, liberando l'user da ancora più responsabilità. Un esempio di piattaforma come servizio può essere l'utilizzo di un IDE online. Solitamente nei PaaS ci
+vengono fornite direttamente le piattaforme d'utilizzo dell'user e non l'accesso diretto alla macchina host.
+
+\paragraph{Add-On e Lock In dei PaaS} Una delle migliori funzionalità di questo modello è la presenza di Add Ons
+che offrono la possibilità di aggiungere estensioni quasi in modalità "drag and drop". Questo tipo di aggiunte però
+lega l'applicazione al corrente provider di (PaaS), dato che tutti i plug in aggiunti sono proprietari. In tale modo si definisce un
+tipo intrinseco di \textbf{lock in} del provider sull'applicazione.
+
+
+
+\subsection{Heroku} Servizio cloud (PaaS) basato su containerizzazione di ambienti. La caratteristica di questi container è la loro facile scalabilità.
+I container di questo servizio sono denominati \textbf{dynos}, e la loro gestione automatica genera grande
+scalabilità del servizio.
+
+\paragraph{Scalabilità dei Dynos} L'user non dovrà mai occuparsi della gestione manuale delle dynos, ma
+queste verranno scalate automaticamente in base alle richieste effettuate al servizio hostato sulle varie dynos.
+Sono quindi dei container basati su Linux autogestiti sotto il punto di vista dello scaling.
+
+\paragraph{Build/Run Time} Durante il tempo di build, avendo a disposizione il codice sorgente da deployare e tutta la lista di dipendenze, si compone un \textbf{Procfile} che
+contiene il comando da eseguire all'avvio. L'esecuzione del procfile è detta \textbf{build} e produce un oggetto detto \textbf{slug}.
+Il tempo di run invece acquisendo uno \textbf{slug} permette la costruzione di uno stack e "l'engine" saprà quante dynos dedicare all'esecuzione dello slug in questione.
+La grande scalabilità si basa anche sullo schema simil "produttore/consumatore" utilizzato spesso tra i vari tipi di dynos.
+\newpage
+
 \end{document}
