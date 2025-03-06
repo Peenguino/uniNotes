@@ -453,7 +453,16 @@ Sia $f(x) \in C^{2}$ (ossia derivabili due volte con entrambe le derivate contin
 
 Grazie a questo possiamo determinare se un problema risulta mal condizionato o ben condizionato:
 
-\[ \boxed{C_{amplificazione} = \frac{x}{f(x)}} \]
+\begin{center}
+    \begin{tabular}{ c | c | c | c | c }
+    & somma & sottrazione & prodotto & divisione \\
+    \hline
+    c1 & $\frac{x}{x+y}$ & $\frac{x}{x-y}$ & $1$ & $1$ \\
+    \hline
+    c2 & $\frac{y}{x+y}$ & $\frac{-y}{x-y}$ & $1$ & $-1$ \\
+    \hline
+    \end{tabular}
+\end{center}
 
 \vspace*{5px}
 
@@ -594,7 +603,7 @@ Contestualizziamo la norma alle matrici:
 
 \newpage
 
-\subsubsection{Th. Compatibilità delle Norme (con Dim*.)}
+\subsubsection{Th. Compatibilità delle Norme (con Dim.)}
 
 \begin{enumerate}
     \item Il teorema afferma questo:
@@ -609,14 +618,12 @@ Contestualizziamo la norma alle matrici:
     \[ x=0 \Rightarrow vera \: , \: \: 0 \leq ||A|| * 0 \]
     \item \textbf{Vettore Strettamente Positivo}:
     \begin{enumerate}
-        \item Prendo vettore $x$ e lo normalizzo:
-        \[ \frac{x}{||x||} \]
-        \item Prendo la norma del risultato e la pongo uguale alla norma di un ipotetico $y$:
-        \[ ||y|| = ||\frac{x}{||x||}|| = \frac{1}{||x||} * ||x|| = 1 \]
-        \item Seguendo la catena di uguaglianze precedenti ricaviamo:
-        \[ ||\frac{x}{||x||}|| = 1 \]
-        % non si capisce come continuare
-        \item ******
+        \item Definizione di \textbf{norma matriciale indotta}:
+        \[ ||\:A\frac{v}{||v||}|| \leq ||\:A\:|| = max_{\{ z \in \mathbb{F} \: : \: ||z|| \: = \: 1 \}} ||\:A\:z\:|| \]
+        \item Portiamo fuori $\frac{1}{||x||}$ grazie alla proprietà 2 delle norme matriciali e moltiplichiamo a sx e dx:
+        \[ ||v||\:\frac{1}{||v||}||A{v}|| \leq ||A|| * ||v|| \]
+        \item Risolviamo i calcoli ed otteniamo:
+        \[ \boxed{ ||A{v}|| \leq ||A|| \: ||v|| } \] 
     \end{enumerate}
 \end{enumerate}
 
@@ -655,7 +662,7 @@ Elenchiamo proprietà caratterizzanti delle matrici simmetriche che verranno cit
 
 \paragraph{Definizione} Se $||\: .\:||$ è una norma matriciale indotta, allora:
 
-\[ \lambda^{(A)} \: < \:||A|| \]
+\[ | \lambda^{(A)} | \: < \:||A|| \]
 
 
 \begin{figure}[htbp]
@@ -674,9 +681,9 @@ E' come se stessimo "localizzando" la posizione degli autovalori.
     \item Applico la norma a sx e dx ed inverto l'ordine:
     \[ ||\:\lambda\:v\:|| = ||\:A\:v\:||\]
     \item Proprietà $(2.)$ e $(4.)$ delle norme matriciali:
-    \[ \lambda\:||A|| = ||A\:v|| \leq ||A|| \:|| v || \]
+    \[ |\lambda|\:||\:v\:|| = ||\:A\:v \:|| \leq ||\:A\:|| \:||\:v\:|| \]
     \item Considero dunque primo e terzo termine, dividendo a sx e dx per $||v||$:
-    \[ \boxed{\lambda \leq ||A||} \]
+    \[ \boxed{|\lambda| \leq ||A||} \]
 \end{enumerate}
 
 \newpage
@@ -799,7 +806,7 @@ Vogliamo dunque esprimere la risoluzione in questa forma:
 
 \[ x = A^{-1}b \]
 
-\subsubsection{Teorema* (con dim*)} 
+\subsubsection{Teorema sul Condizionamento di Norme Matriciali (con dim)} 
 
 \paragraph{Definizione} Sia $A$ invertibile e $b \neq 0$, allora:
 
@@ -818,9 +825,15 @@ Dove $||A||\:\:||A^{-1}||$ è detto \textbf{numero di condizionamento} di A.
     \item Sostituiamo $(1.)$ in $||\tilde{x}-x||$:
     \[ || \: A^{-1}\tilde{b} \: - \: A^{-1}{b} \: || \]
     \item Raccolta di $A^{-1}$ e compatibilità di norme a motivazione del $(\leq)$:
-    \[ ||A^{-1}(\tilde{b}-b)|| \leq ||A^{-1}|| \: \: ||\tilde{b}-b|| \]
+    \[ ||\tilde{x} - x|| = ||A^{-1}(\tilde{b}-b)|| \leq ||A^{-1}|| \: \: ||\tilde{b}-b|| \]
     \item Scriviamo la forma standard di risoluzione di sistema lineare applicando le norme a sx e dx, e utilizziamo anche qui la compatibilità delle norme per $(\leq)$ a dx:
     \[ ||Ax|| = ||b|| \: \rightarrow \: ||b|| = ||Ax|| \leq ||A|| \: \: ||x|| \]
+    \item Da questo possiamo dunque ricavare che:
+    \[ ||x|| \: ||A|| \geq  ||b|| \rightarrow ||x|| \geq \frac{||b||}{||A||} \]
+    \item Tornando dunque al punto (3.) possiamo dividere $||\tilde{x} - x||$ per $||x||$ ed a dx del $\leq$ dividiamo per $\frac{||b||}{||A||}$ rispettando quindi la maggiorazione (dato il punto precedente).
+    \[ \frac{||\tilde{x}-x||}{||x||} \leq ||A|| \: ||A^{-1}|| \: \frac{||\tilde{b}-b||}{b} \] 
+    \item Avendo concluso la dimostrazione definiamo $\mu$, il \textbf{numero di condizionamento} di $A$:
+    \[ \mu = ||A||\:||A^{-1}|| \]
 \end{enumerate}
 
 \newpage
@@ -989,12 +1002,27 @@ $E$ è quindi definita come \textbf{Matrice di Gauss}.
     \item Vale che:
     \vspace*{5px}
     \[ E^{-1} = I + ve^T_k \]
+    \vspace*{5px}
+    Questo statement si può dimostrare effettuando la moltiplicazione tra $E$ ed $E^{-1}$ ottenendo $I$.
+    \item Sia $x \in \mathbb{R}$ con $x_{k} \neq 0$. Allora esiste una matrice elementare di Gauss tale che
+    \[ Ex = {\begin{bmatrix}
+        x_{1} & ... & x_{k} & 0 & ... & 0
+    \end{bmatrix}}^{T} \]
+    \newpage
+    \item Assumendo di avere due matrici elementari di Gauss:
+    \[ \boxed{E = I - ve^T_k} \:\:\:\:\:\: \boxed{\overline{E} = I - we^T_l} \]
+    allora
+    \[ \boxed{E \: \overline{E} = I_{n} - ve_{k}^{T} - we_{l}} \]
+    che informalmente vuol dire che il prodotto tra le due matrici elementari di Gauss viene costruito posizionando
+    semplicemente nella posizione corretta i due vettori $v$ e $w$ di fattori.
+    \item Il prodotto di $Ey$, dove $E = I - ve_{k}^{T}$ è una matrice elementare di Gauss ed $y$ un vettore, può essere calcolato in $n-k$
+    operazioni moltiplicative, infatti ponendo $Ey = z$ otteniamo che $z_{j} = y_{j}$ per $1 \leq j \leq k$ mentre $z_{j} = y_{j} - v_{j}y_{k}$.
 \end{enumerate}
 
-Il metodo di Gauss può essere utilizzato senza scambio di \newline righe se e solo se
-$a^{k-1}_{kk} \neq 0 \:\:\: \forall k = 1 \: ... \: n$.
+\vspace*{10px}
 
-\newpage
+Il metodo di Gauss può essere utilizzato senza scambio di \newline righe se e solo se
+$a^{k-1}_{kk} \neq 0 \:\:\: \forall k = 1 \: ... \: n$, ossia se tutti i pivot risultano essere diversi da 0.
 
 \paragraph{Teorema} Dato un $A \in \mathbb{R}$: 
 
