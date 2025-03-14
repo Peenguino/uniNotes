@@ -1076,9 +1076,566 @@ Possiamo dunque riassumere tutti i minimi meccanismi necessari alla composizione
     \item \textbf{Virtualizzazione}: Gestione di \textbf{hypervisors} che permettano di creare \textbf{diversi ambienti virtuali} anche sulla stessa macchina fisica. 
 \end{enumerate}
 
-\[ \sum^{N}_{i=1} x1^{2} \]
+\newpage
+
+\section{Interfaccia di Programmazione di Applicazioni di un OS}
+
+Un sistema operativo deve fornire un interfaccia che permetta di:
+
+\begin{enumerate}
+    \item Creare \textbf{processi} e gestirli.
+    \item Gestire l'\textbf{I/O} fornendo operazioni di apertura, chiusura, scrittura e lettura.
+    \item Gestire la \textbf{comunicazione} tra \textbf{processi} (IPC).
+\end{enumerate}
+
+In questo capitolo descriveremo quindi la gestione di questi meccanismi fondamentali che dei sistemi operativi devono offrire.
+
+\subsection{Gestione Processi - (Fork, Exec, Wait, Sleep, Exit)}
+
+I processi vengono creati e differenziati grazie a due specifiche \textbf{syscalls}:
+
+\begin{enumerate}
+    \item \textbf{Fork}: Crea un processo clone al padre che sta effettuando la chiamata alla fork. Si effettua una \textbf{copia}
+    on demand del primo PCB (Process Control Block). Non viene dunque copiato tutto il blocco descrittore del padre a priori, ma verrà utilizzato
+    come riferimento nel caso in cui sia necessario. Si genera dunque un nuovo \textbf{PID}, ossia id del processo. Non è assicurato che la syscall sia un 
+    successo, di conseguenza se qualcosa dovesse far fallire la syscall verrebbe inserito $-1$ in \textit{errno}.
+
+    \vspace*{10px}
+\begin{lstlisting}[language = C]
+    pid_t pid = fork(); // Valore > 0 se padre, == 0 se figlio, -1 se fallisce, in modo da distinguere facilmente i processi
+    if (pid > 0) {
+        printf("Sono il padre");
+    } else if (pid == 0) {
+        printf("Sono il figlio");
+    } else {
+        perror("fork failed");}
+    \end{lstlisting}    
+
+    \item \textbf{Exec}: Differenzia il codice presente nel \textbf{PCB} di riferimento. In questo modo il processo figlio avrà modo di eseguire
+    istruzioni diverse dal padre. Esistono due tipi di exec, la \textbf{exec list (l)} ed \textbf{exec vector (v)} in base a come si aspettano i parametri
+    che gli stiamo fornendo. Elenchiamo tutte le caratteristiche di questa syscall:
+    \paragraph{Passi effettuati da una Exec}
+    \begin{enumerate}
+        \item \textbf{Rimpiazzamento} del \textbf{codice} del \textbf{padre} nel PCB corrente.
+        \item Se ha successo, non ritorna.
+        \item \textbf{Mantiene PID e PCB} assegnati durante la fork.
+        \item \textbf{Resetta} segnali (\textbf{upcalls}) pendenti.
+        \item Mantiene le risorse assegnate.
+    \end{enumerate}
+
+    
+\newpage
+
+\item \textbf{Wait}: Se un processo padre, dopo averlo creato volesse l'esito del figlio allora dovrebbe effettuare l'operazione di \textbf{wait (attesa)}
+su quest'ultimo. Se un processo padre effettuasse la exit prima della terminazione del figlio allora quest'ultimo si definirebbe
+\textbf{processo zombie}. Il \textbf{sistema operativo} ha però la responsabilità di occuparsi anche di questi casi limite, infatti assegnerà al processo zombie
+un nuovo processo padre, ossia \textit{init}, che dovrà occuparsi della \textbf{deallocazione} delle \textbf{risorse} utilizzate per la descrizione
+del processo figlio.
+
+\item \textbf{Sleep}: Questa syscall permette allo scheduler di effettuare degli \textbf{swap} tra processi eseguiti in maniera "esplicita". Ricordiamo che infatti
+lo scheduler non è un vero e proprio componente ma più un automa che ha una quantità di stati a disposizione ed effettua transizioni tra stati
+in base agli input forniti. Se infatti un $processo1$ dovesse invocare la $sleep$ allora verrebbe \textbf{rischedulato} un \textbf{processo pronto} all'esecuzione.
+    
+\item \textbf{Exit}: Se un processo figlio chiama la exit, quest'ultimo termina chiudendo tutte le risorse ad esso allocate, e viene salvato un codice di uscita
+passato ad exit come argomento. Il processo figlio sarà zombie fino a quando il processo padre non acquisirà il codice dato in argomento dalla exit
+e salvato dal kernel. L'acquisizione da parte del padre di questo codice è effettuata con una \textit{wait} oppure una \textit{waidpid}.
+
+\end{enumerate}
+
+\subsection{Comunicazioni tra Processi - (Pipe)}
+
+A differenza dei thread che hanno la possibilità di condividere memoria e dunque di comunicare tramite essa, i \textbf{processi} hanno \textbf{spazi d'indirizzamento dedicati}. Di conseguenza risulta necessario definire dei meccanismi che permettano a due (o più) processi di \textbf{comunicare} tra loro. In Unix questo viene
+gestito in maniera "regolare" grazie alla gestione di ogni cosa come se fosse un file. Questo ci permette di aprire "file speciali" con specifici \textbf{descrittori}
+di file in lettura e scrittura che gestiscono la comunicazione tra processi. Nello specifico in Unix questa gestione "a file" (ossia gestione dell'I/O) segue questi specifici principi:
+
+\begin{enumerate}
+    \item \textbf{Tutto} è visto come un \textbf{file}.
+    \item Si segue un principio di \textbf{uniformità}, basando ogni operazione di I/O su open, read, write e close.
+    \item Tutto il sistema è detto \textbf{Orientato al Byte}, ossia si stabilisce un interpretazione al byte delle informazioni lette.
+    \item Le read/write saranno \textbf{Kernel Buffered}, sarà dunque il kernel ad occuparsi del buffer utilizzato durante queste syscalls.
+    \item Alla fine va effettuata sempre una \textbf{close}, che permette il \textbf{flush} delle operazioni eseguite.
+\end{enumerate}
+
+Ma perchè questo nel capitolo dedicato alla comunicazione interprocesso? Perchè in qualche modo anche questa in Unix è gestita ad apertura e chiusura
+di file e relativi descrittori in lettura/scrittura. Elenchiamo le caratteristiche nella pagina successiva.
+
+\newpage
+
+\paragraph{Descrittori in Lettura/Scrittura e Chiusura Duale} Ogni "file di comunicazione" aperto avrà queste caratteristiche:
+
+\begin{enumerate}
+    \item \textbf{Buffer in Lettura}: Buffer che permette la lettura in un solo verso tra due processi.
+    \item \textbf{Buffer in Scrittura}: Buffer che permette la scrittura in un solo verso tra due processi.
+    \item \textbf{Chiusura Duale}: Fino a quando sarà possibile scrivere in un buffer sarà vietata la sua chiusura
+\end{enumerate}
+
+Mostriamo pseudocodice C dell'utilizzo della syscall pipe e dei buffer che genera:
+
+\vspace*{10px}
+\begin{lstlisting}[language = C]
+    int fd[2]; // fd[0] parte lettura, fd[0] parte scrittura
+    if (pipe(fd) == -1) { // Creazione della pipe
+        perror("pipe failed");
+        exit(1);
+    }
+    /* Grazie alla gestione dei PID non scriveremo codice diverso
+    per ciascun processo, infatti eseguiremo istruzioni diverse in base al valore del PID */
+    pid = fork();
+    if (pid > 0) { // Processo padre
+        close(fd[0]); // Chiude il lato di lettura
+        write(fd[1], "Hello, child!", 14);
+        close(fd[1]); // Chiude il lato di scrittura
+    } else if (pid == 0) { // Processo figlio
+        close(fd[1]); // Chiude il lato di scrittura
+        read(fd[0], buffer, sizeof(buffer));
+        printf("Child received: %s\n", buffer);
+        close(fd[0]); // Chiude il lato di lettura
+    } else {
+        perror("fork failed");
+        exit(1);
+    }
+\end{lstlisting}
+
+Questo meccanismo di comunicazione è unidirezionale (padre scrive e figlio legge), di conseguenza se volessimo gestire la comunicazione in entrambi i versi
+risulterebbe necessario creare una pipe gestita in maniera speculare ma in verso opposto di comunicazione.
+
+\newpage
+
+\subsection{Gestione Threads}
+
+Uno degli obiettivi di un Sistema Operativo è quello di implementare l'MTAO (Multiple Things at Once) e di coordinare queste moltepici operazioni
+eseguite in contemporanea. Fino ad ora avevamo infatti visto solo dei processi, la cui struttura era indipendente e "monolitica", ciascuno aveva
+a disposizione il proprio spazio d'indirizzamento (testo, dati, stack, ...) ma risulterebbe comodo al sistema operativo avere anche unità più
+dinamiche e schedulabili in base alle necessità.
+
+\paragraph{Definizione e Motivazioni di Utilizzo Threads} Flusso di controllo schedulabile, ossia che può essere mandato in esecuzione. Può essere visto come una "parte" di programma
+che ha vita propria e che può essere mandata in esecuzione. Motivazioni:
+
+\begin{enumerate}
+    \item \textbf{Strutturazione}: Un programma può essere visto come composizione di tanti moduli indipendenti ma che agiscono sulle stesse risorse.
+    \item \textbf{Reattività}: Dei calcolatori potrebbero avere la necessità di essere molto reattivi, l'utilizzo dei threads potrebbe ad esempio aiutare
+    nel caso di polling su dispositivi I/O, fornendo così un approccio alternativo a quello tradizionale delle interruzioni.
+    \item \textbf{Multicore}: La gestione a moduli separati permette un reale utilizzo delle risorse offerte da architetture multicore.
+    \item \textbf{Performance}: La gestione parallela consistente permette il raggiungimento di ottime performance rispetto ad una esecuzione esclusivamente basata sull'interleaving.
+\end{enumerate}
+
+Ogni processo può essere dunque composto da più thread i quali ereditano i diritti del processo che li "possiede".
+
+\paragraph{User/Kernel Thread} Un punto da analizzare è quello sulla visibilità del kernel sui threads. Un \textbf{User Thread} risulterebbe invisibile
+alla schedulazione reale del kernel, verrebbe dunque del tutto gestito dal processo che lo possiede. Questo va ad intaccare il concetto di "modularità"
+proprio perchè sarà impossibile per il kernel schedulare l'esecuzione di quel thread, potra a massimo infatti mandare in esecuzione il processo che lo contiene.
+Per queste motivazioni si preferiscono attualmente strategie basate sui \textbf{Kernel Threads}, creano un po' più di overhead ma sono del tutto visibili
+dal kernel che avrà modo di schedularli.
+
+\newpage
+
+\subsubsection{Schedulazione e Potenziale Inconsistenza}
+
+Dato che abbiamo definito i threads come flussi schedulabili che hanno accesso allo stesso spazio d'indirizzamento è necessario definire "formalmente"
+cosa significhi la parola schedulazione.
+
+\begin{figure}[htbp]
+    \center
+    \includegraphics[scale=0.325]{img/automa_schedulatore.png}
+    \caption{Automa della schedulazione.}
+\end{figure}
+
+Lo \textbf{schedulatore} non è un vero e proprio componente, ma più una reazione all'input rispetto allo stato in cui si trova un thread. E' quindi rappresentato
+meglio da una serie di routine da eseguire in specifici eventi che accadono. E' necessario dunque che il codice scritto sia adatto ad un contesto multithread, per
+fare in modo che sia corretto in ogni tipo di schedulazione. Risulta infatti impossibile prevedere in che ordine saranno schedulati i threads. 
+
+\paragraph{Thread Control Block (TCB) e Transizioni di Stato} Le varie funzioni eseguibili provocheranno cambi di valori all'interno dei TCB, elenchiamo ad esempio alcune operazioni effettuate durante
+una thrdCreate:
+
+\begin{enumerate}
+    \item Si crea il TCB del nuovo thread.
+    \item Si settano il program counter del thread e tutto il suo stato architetturale in modo tale che quest'ultimo possa eseguire il suo runnable\footnote{Runnable, in Java è la funzione eseguita da un thread, usato come sinonimo di "funzione del thread".}.
+    \item Si setta lo stato nel TCB a ready (schedulazione).
+    \item Si segnala a chi è in coda ready che l'esecuzione della create è finita.
+    \item Si ritorna.
+\end{enumerate}
+
+\vspace*{5px}
+
+\begin{center}
+    \begin{tabular}{ c|c|c } 
+    Stato & Dov'è il TCB & Dove sono i Registri del Thread \\ 
+        \hline
+    INIT & ? & TCB \\ 
+    READY & Lista Ready & TCB \\
+    RUN & Lista Exec & Registri Processore \\ 
+    WAIT & TCB(wait) & TCB \\ 
+    END & ? & TCB \\ 
+
+    \hline
+    \end{tabular}
+    \end{center}
+
+\vspace*{5px}
 
 
+Ogni thread avrà dunque uno \textbf{stack privato}, il codice e l'heap \textbf{condivisi}, mentre le variabili dipenderanno dal modo in cui vengono
+dichiarate (se thread local o meno). 
+
+% devi riprendere la tua dei thd e sincronizzazione e 34 delle slide
+
+\newpage
+
+\subsubsection{Yield/Interruzione di Thread}
+
+Definiamo i modi in cui i thread passano ad uno stato di WAIT grazie ad una deschedulazione.
+
+\begin{enumerate}
+    \item \textbf{Yield}: Deschedulazione volontaria, gestita in modi diversi dal tipo di thread:
+    \begin{enumerate}
+        \item \textbf{User Thread Yield}: Viene effettuata la deschedulazione volontaria seguendo questi passi:
+        \begin{enumerate}
+            \item Salvataggio \textbf{stato architetturale} nel TCB (nello specifico nell'area registri).
+            \item Si effettua lo switch verso un nuovo thread, questo comporta un \textbf{passaggio} ad un \textbf{nuovo stack}, che tecnicamente
+            corrisponde a \textbf{copiare} nei registri l'\textbf{area registri} contenuta nel TCB del thread che stiamo schedulando. Questa fase
+            è definita come commutazione di contesto e comporta un costo in tempo per il calcolatore.
+            \item Si effettua il return.
+        \end{enumerate}
+        \item \textbf{Kernel Thread Yield}: Viene effettuata la deschedulazione volontaria seguendo questi passi:
+        \begin{enumerate}
+            \item Si effettuano gli stessi passi di un User Level Thread tranne per il fatto che il return corrisponderà esattamente
+            ad una modifica al program counter.
+        \end{enumerate}
+    \end{enumerate}
+    \item \textbf{Interrupt}: Assumiamo che un thread possa essere interrotto dall'I/O oppure da un timer, esistono due modalità di "risposta":
+    \begin{enumerate}
+        \item \textbf{Modalità Semplice}: Si seguono questi step:
+        \begin{enumerate}
+            \item L'Interrupt Handler salva i registri nel Kernel Stack.
+            \item Si effettua lo switch di thread.
+            \item Dopo l'esecuzione si ripristinano i registri precedentemente pushati nel Kernel Stack.
+        \end{enumerate}
+        \item \textbf{Modalità Veloce}: Si seguono questi step:
+        \begin{enumerate}
+            \item L'Interrupt Handler salva i registri correnti nel relativo TCB del thread interrotto.
+            \item L'Interrupt Handler carica i registri dal TCB del thread che vuole far partire.
+        \end{enumerate}
+    \end{enumerate}
+\end{enumerate}
+
+In conclusione possiamo dunque affermare che la commutazione comporta un costo e che un approccio multithread è quello più adatto ad architetture multicore.
+
+\newpage
+
+\subsection{Sincronizzazioni}
+
+La gestione multithread del flusso di un programma complica la situazione, dato che risulta necessario garantire consistenza dei risultati qualsiasi sia
+la schedulazione dei thread in gioco. Elenchiamo dunque tutti i punti fondamentali della sincronizzazione e le problematiche che bisogna gestire:
+
+\begin{enumerate}
+    \item \textbf{Race Condition}: Condizione nella quale l'output del programma risulta dipendente dalla velocità relativa e dai tempi dei threads. Questa è la
+    classica condizione che causa inconsistenza in contesti multithread, dato che si otterranno risultati completamente diversi ciascuna esecuzione del programma,
+    data la completa dipendenza dal tipo di schedulazione.
+    \item \textbf{Mutua Esclusione}: Definiamo delle sezioni critiche in cui solo un thread ha il permesso di operare. Spesso questo meccanismo è utilizzato
+    durante operazioni su risorse condivise tra threads. Bisogna ricordare anche però che questa gestione causa un vero e proprio blocco delle esecuzioni in parallelo, 
+    di conseguenza risulta necessario operare in mutua esclusione solo su brevi operazioni necessarie.
+    \item \textbf{Lock}: Meccanismo che garantisce di operare in mutua esclusione. Le operazioni effettuate solitamente sono di lock/unlock.
+    \item \textbf{Correttezza}: Garanzia che l'esecuzione rimarrà consistente a prescindere dal tipo di schedulazione effettuata durante quella specifica
+    esecuzione.
+    \item \textbf{Fairness}: Tutti i threads devono avere le stesse possibilità sull'utilizzo della CPU.
+    \item \textbf{Conclusione Programma}: Non devono esistere possibili condizioni di stallo e/o di starvation, condizione per cui non è presente un
+    effettivo stallo ma un task non viene schedulato mai data una cattiva gestione delle priorità.
+\end{enumerate}
+
+Analizziamo dunque tutti i tipi di \textbf{meccanismi di sincronizzazione} tra threads nelle pagine successive.
+
+\subsubsection{Spinlock}
+
+Meccanismo di attesa attiva sullo stato locked di un mutex. A differenza dei meccanismi che vedremo successivamente
+non cerca di deschedulare un thread per poi risvegliarlo successivamente, ma lo lascia attendere attivamente in modo tale che
+quando la risorsa sarà liberata quest'ultimo potrà accedervi. In specifici contesti questo approccio risulta più economico in termini di tempo
+dato che con comporta nessuna commutazione di contesto. Spesso questo è implementabile in maniera abbastanza semplice dato che diverse architetture offrono
+istruzioni specifiche che causano dei comportamenti corrispondenti ad una spinlock.
+
+\vspace*{5px}
+
+\begin{lstlisting}[language = C]
+    EXCH r0, [r1, r2]
+\end{lstlisting}
+
+\vspace*{-8px}
+
+Semanticamente corrisponde a $ MEM[r1+r2] \rightleftarrows r0 $, settando dei valori di default di $0$ chiuso ed $1$ aperto se cicliamo su questa istruzione abbiamo implementato uno spinlock in ARM.
+
+\newpage
+
+\subsubsection{Lock}
+
+Il lock è un oggetto condiviso tra i vari thread, ciascuno di essi può effettuare due operazioni:
+
+\begin{enumerate}
+    \item \textbf{Lock/Acquire}: Si attende che il lock sia aperto e lo si acquisisce.
+    \item \textbf{Unlock/Release}: Si apre il lock e si sbloccano potenziali threads in attesa.
+\end{enumerate}
+
+\begin{figure}[htbp]
+    \center
+    \includegraphics[scale=0.325]{img/rappresentazione_lock.png}
+\end{figure}
+
+Il release dunque se dovesse trovare almeno un elemento nella lista allora non setterebbe il lock a $0$ ma lascerebbe il controllo direttamente
+al prossimo thread.
+
+\paragraph{Proprietà Garantite dai Lock} Utilizzando questo meccanismo riusciamo a garantire queste proprietà:
+
+\begin{enumerate}
+    \item \textbf{Safety}: Viene eseguita una sola attività concorrente alla volta.
+    \item \textbf{Liveness}: Se il lock è aperto l'acquire lo prende, mentre se chi ha il lock effettua la release allora chi è in attesa ha priorità.
+\end{enumerate}
+
+Possiamo dunque considerare che le "parentesi" create da lock/unlock rendono quella sezione critica di codice come se fosse atomica.
+Vengono dunque effettuati questi \textbf{passi} nel caso in cui il \textbf{lock} risulta \textbf{chiuso}:
+
+\begin{enumerate}
+    \item Si registra il TCB del corrente thread nella coda di attesa del lock.
+    \item Si deschedula il thread modificando lo stato del thread da EXEC a WAIT.
+    \item Quando il lock si libera verrà schedulato il thread modificando lo stato da READY a EXEC.
+\end{enumerate}
+
+\paragraph{Regole di Utilizzo dei Lock} Per una corretta esecuzione in mutua esclusione vanno seguite queste regole:
+
+\begin{enumerate}
+    \item Il lock è sempre aperto a tempo di dichiarazione.
+    \item Sempre effettuare l'acquire prima della sezione critica.
+    \item Sempre effettuare la release dopo la fase critica.
+    \item Non bisogna effettuare accessi a variabili protette fuori da una sezione compresa tra un acquire ed un release.
+\end{enumerate}
+
+\newpage
+
+\subsubsection{Condition Variables}
+
+Questo nuovo costrutto ci permette aggiungere un "layer" alla sincronizzazione vista con i lock. Sarà infatti necessario combinare queste variabili
+all'utilizzo dei lock per costruire un attesa condizionale basata su operazioni di \textbf{wait} e \textbf{signal}, elenchiamo tutto in dettaglio:
+
+\begin{enumerate}
+    \item \textbf{Wait}: Il thread che la esegue rilascia il lock e si mette in attesa e in ascolto su una condition variable.
+    \item \textbf{Signal}: Il thread che la esegue notifica uno tra tutti i thread in attesa ed ascolto sulla condition variable.
+    \item \textbf{Broadcast}: Il thread che la esegue notifica tutti i thread in attesa ed ascolto sulla condition variable.
+\end{enumerate}
+
+\paragraph{Potenziali Signal a Vuoto} Dato che l'operazione di signal non richiede una specifica condizione per essere eseguita, allora non è garantito
+che l'operazione non venga eseguita inutilmente, a differenza dei semafori\footnote{Subsubcapitolo successivo.}.
+
+\paragraph{Test per Wait effettuata con un While} Risulta necessario porre l'operazione di wait in un while e non testando semplicemente con un if per
+queste motivazioni:
+
+\begin{enumerate}
+    \item Il meccanismo di wait/signal può causare degli wakeup non attesi, la guardia del while riuscirebbe dunque a porre di nuovo in attesa il thread.
+    \item La semantica introdotta permetterebbe ad un altro thread concorrente l'acquisizione della risorsa. Per mantenere consistenza si preferisce quindi
+    ritestare la condizione della wait.
+\end{enumerate}
+
+\paragraph{Semantica Mesa/Hoare} Esistono due semantiche diverse per la gestione delle condition variable:
+
+\begin{enumerate}
+    \item \textbf{Mesa}: Assumendo di avere un numero $k$ di threads in attesa e in ascolto su una specifica condition variable $cnd1$. Quando un thread $k+1$
+    eseguirà ad esempio una signal, in questa semantica tutti i thread in attesa competono sull'acquisizione del lock. Questo comporta una semantica più semplice, il che la rende la
+    più utilizzata. Nello specifico il thread che viene segnalato non va in stato di EXEC ma in READY, e da lì in poi dovrà competere ed essere effettivamente schedulato.
+    \item \textbf{Hoare}: La signal passa il lock a chi è stato segnalato, di conseguenza l'ordine di esecuzione diventa indipendente al tipo di schedulazione. Questo comporta una gestione più complessa.
+    Il lock dopo il passaggio al thread segnalato andrebbe anche ritornato al thread "segnalante", questo solo per rendere minimamente l'idea della complessità generata da questa semantica.
+\end{enumerate}
+
+\newpage
+
+\paragraph{Punti Fondamentali Condition Variables} Elenchiamo i punti fondamentali cercando di riassumere in funzionamento delle condition variables:
+
+\begin{enumerate}
+    \item Le \textbf{operazioni} su \textbf{condition variable} vanno sempre effettuate in \textbf{fasi safe} dopo l'acquisizione del lock.
+    \item Le condition variables \textbf{non hanno uno stato interno}, di conseguenza non ho informazioni su se dei thread stiano facendo o meno attesa su una variabile di condizione.
+    \item La \textbf{wait} permette il \textbf{release atomico del lock}.
+    \item Un \textbf{thread oggetto} di una \textbf{signal} \textbf{non passa} necessariamente ad \textbf{uno stato di esecuzione}. Dopo una signal il suo campo riferito allo \textbf{stato} nel suo TCB passa a \textbf{READY}, da lì in poi il tutto dipenderà dallo schedulatore (semantica Mesa).
+    \item L'operazione di wait va sempre fatta in un loop, sia in semantica Mesa sia in Hoare.
+\end{enumerate}
+
+\subsubsection{Semafori}
+
+Ulteriore meccanismo di sincronizzazione, nello specifico definiremo i \textbf{semafori contatori}\footnote{Questo perchè se la variabile fosse binaria allora staremmo rappresentando veri e propri mutex.}, ossia oggetti che oltre alla sincronizzazione
+riescono anche a conservare uno stato interno a differenza delle condition variables. Descriviamo la composizione di un semaforo:
+
+\begin{enumerate}
+    \item \textbf{Contatore Intero}: Valore intero $N > 0$. Inizializzato al numero di wait effettuabili da parte di processi prima di essere blocccati, dunque nello specifico $N$ corrisponde al numero di risorse condivise disponibili.
+    \item \textbf{Operazione di Wait - (P)}: Mostriamo la logica seguita in pseudocodice:
+    
+    \begin{lstlisting}[language = C]
+    P(N):
+        if (N > 0):
+            N = N - 1
+            lascia il processo in run
+        else:
+            metti il processo in lista attesa
+    \end{lstlisting}   
+    \vspace*{-8px}
+    \item \textbf{Operazione di Signal - (V)}: Mostriamo anch'essa in pseudocodice:
+    \begin{lstlisting}[language = C]
+    V(N):
+        N = N + 1
+        if (almeno un processo in lista attesa):
+            sblocca il primo processo in lista attesa
+    \end{lstlisting}
+\end{enumerate}
+\vspace*{-20px}
+Bisogna immaginare che il \textbf{contatore} $N$ corrisponda al numero di \textbf{risorse condivise libere} a tempo di esecuzione di una wait oppure una sleep. In questo
+modo riusciamo a giustificare il perchè si effettuino dei \textbf{decrementi} durante delle \textbf{Wait} (P) e degli \textbf{incrementi} durante delle \textbf{Signal} (V).
+
+\newpage
+
+\subsection{Esempi di Implementazioni Lock/Unlock}
+
+Fino ad ora abbiamo assunto di avere a disposizione delle funzioni che permettessero di bloccare e sbloccare i mutex. Mostriamo e commentiamo delle specifiche
+implementazioni di queste operazioni:
+
+\paragraph{Lock/Unlock in Uniprocessor} Mostriamo l'implementazione delle funzioni lock/unlock su processori monocore:
+
+\begin{lstlisting}[language = C]
+    // 01: Lock implementata 
+    lock Acquire(){
+        disabilita interruzioni
+        if(chiuso){
+            listaAttesa.add(myTCB)
+            sospendi e riabilita interruzioni
+        } else {
+            chiudo il lock
+        }
+        abilita interruzioni
+    }    
+
+    // 02: Unlock implementata
+    lock Release(){
+        disabilita interruzioni
+        if(esiste TCB in listaAttesa){
+            TCB = rimuovi da listaAttesa
+            TCB.stato = READY
+        }
+        else {
+            apro il lock
+        }
+        abilita interruzioni
+    }
+\end{lstlisting}
+
+\paragraph{Multiprocessor, Istruzioni Speciali e Implementazione Spinlock}
+
+Per permettere istruzioni di load e store esclusive l'ARM rende disponibile due specifiche istruzioni
+
+$LDREX, STREX$ che rispettivamente leggono e bloccano, caricano e sbloccano.
+
+Oltre a questo, per garantire una base all'implementazione delle lock in Multiprocessor è necessario prima definire l'implementazione delle Spinlock:
+
+\begin{lstlisting}[language = C]
+    spinlock Acquire(){
+        while(test_and_set(value) == BUSY) {;}
+    }
+
+    spinlock Release(){
+        value = FREE;
+        memory_barrier(); //istruzione speciale che permette il "commit" delle modifiche sulla memoria
+    }
+    
+\end{lstlisting}
+
+\newpage
+
+\paragraph{Lock/Unlock in Multiprocessor} Mostriamo l'implementazione delle funzioni lock/unlock su processori multicore:
+
+\begin{lstlisting}[language = C]
+    // 01: Lock implementata 
+    lock Acquire(){
+        disabilita interruzioni
+        spinlock Acquire(&spl)
+        if(value == BUSY){
+            TCB -> listaAttesa
+            invocazione schedulatore
+        } else {
+            value = BUSY
+            spinlock Release(&spl)
+        }
+        abilita interruzioni
+    }
+
+    // 02: Unlock implementata
+    lock Acquire(){
+        disabilita interruzioni
+        spinlock Acquire(&spl)
+        if(!wait.empty()){
+            TCB = remove(listaAttesa)
+            schedulatore(TCB -> READY)
+        } else {
+            value = FREE
+        }
+        abilita interruzioni
+    }
+\end{lstlisting}
+
+Notiamo come sia stato necessario basarsi sull'implementazione delle spinlock per la creazione dei lock. Il corpo del lock e dell'unlock dunque è reso "atomico" grazie
+all'utilizzo di spinlock. Allo stesso modo, anche nelle implementazioni delle operazioni P e V dei semafori, verranno invocati dei acquire/release su spinlock.
+
+\newpage
+
+\paragraph{Implementazione Semafori} Mostriamo l'implementazione delle funzioni P/V su processori multicore:
+
+\vspace*{15px}
+
+\begin{lstlisting}[language = C]
+    // 01: P(sem) implementata 
+    P(sem){
+        disabilita interruzioni
+        spinlock Acquire(&spl)
+        if(sem.value == 0){
+            TCB -> lista attesa semaforo
+            sospendi(&spl)
+        } else {
+            sem.value--
+            spinlock Release(&spl)
+        }
+        abilita interruzioni
+    }
+
+    // 02: V(sem) implementata 
+    V(sem){
+        disabilita interruzioni
+        spinlock Acquire(&spl)
+        if(lista di attesa non vuota){
+            TCB <- remove(lista di attesa)
+            schedulatore(TCB -> READY)
+        } else {
+            sem.value++
+        }
+        spinlock Release(&spl)
+        abilita interruzioni
+    }
+\end{lstlisting}
+
+\subsubsection{Monitor e Sincronizzazioni Multi Object}
+
+Dei \textbf{monitor} sono oggetti che offrono funzioni che operano di \textbf{default} in mutua esclusione. Ne è un esempio il Java, che fornisce molti oggetti
+che di default dispongono metodi detti \textbf{synchronized}, ossia operanti in mutua esclusione, astraendo dall'utilizzo manuale di costrutti come i mutex.
+
+\paragraph{Sincronizzazioni Multi Object} Possiamo definire formalmente quali siano le caratteristiche e i problemi dell'orchestrazione della programmazione concorrente.
+
+\begin{enumerate}
+    \item \textbf{Stallo e Correttezza}: Bisogna sempre verificare tutte le possibili schedulazioni di un programma, garantendone la correttezza. In ogni caso, in occorrenza di stalli, si
+    assumono politiche di gestione e cura di stalli.
+    \item \textbf{Performance}: Abbiamo avuto modo di analizzare tutte le complicazioni causate dalla computazione parallela, risulterebbe molto più semplice operare solo in interleaving. Ma una gestione concorrente
+    consistente può portare grandi benefici alle performance del programma.
+\newpage
+    \item \textbf{Definizioni}: Necessario menzionare anche questi aspetti:
+    \begin{enumerate}
+        \item \textbf{Tipi di Risorse}: Riutilizzabilità di una risorsa.
+        \begin{enumerate}
+            \item \textbf{Prentable}: Il Sistema Operativo potrebbe chiedermi indietro la risorsa.
+            \item \textbf{Imprentable}: Il Sistema Operativo non può chiedermi indietro la risorsa.
+        \end{enumerate}
+        \item \textbf{Deadlock}: Condizione di stallo.
+        \item \textbf{Starvation}: Non propriamente una condizione di stallo ma di cattiva gestione di priorità nella schedulazione che causa l'esecuzione
+        poco frequente di uno specifico thread.
+    \end{enumerate}
+\end{enumerate}
 
 \newpage
 
