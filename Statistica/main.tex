@@ -68,7 +68,7 @@ stringstyle=\color{red}\ttfamily,
 morestring=[b]',
 morestring=[b]"
 }
- 
+
 \lstset{
 language=JavaScript,
 extendedchars=true,
@@ -318,11 +318,575 @@ Dati $x_{1}, x_{2}, \: ... \:, x_{n}$ dati quantitativi definiamo $F_{e}:\mathbb
 
 \vspace*{5px}
 
-\subsection{Quantili, Percentili, BoxPlot}
+\subsection{Quantili, Percentili, BoxPlot, Outlier}
 
-Dati $x_{1}, x_{2}, ... , x_{n}$ dati quantitativi, $k$ un numero naturale tra $0$ e $100$ allora:
+Dati $x_{1}, x_{2}, ... , x_{n}$ dati quantitativi, $k$ un numero naturale tra $0$ e $100$ allora, avendo un $\beta = \frac{k}{100} \in (0,1)$:
 
-\paragraph{Definizione} 
+\paragraph{Definizione} k-esimo percentile o $\beta-\text{quartile}$ è il dato $r_{\beta} = x_{i}$ tale che:
+
+\begin{enumerate}
+    \item Almeno il $k\%$ dei dati sia inferiore o uguale ad $x_{i}$.
+    \item Almeno il $(100-k)\%$ dei dati sia superiore o uguale ad $x_{i}$.
+\end{enumerate}
+
+\newpage
+
+Se i due dati soddisfano questa condizione, si prende come k-esimo percentile la loro media aritmetica.
+
+\paragraph{Outlier} Valore anomalo che differisce in modo significativo dalla maggioranza dei dati.
+
+\[ 10, 22, 23, 5, 23, 7, 1001 \]
+
+In questo caso l'Outlier risulta essere $1001$ e può essere causato da errori di misurazione o da dati molto rari. Gli outlier influenzano in modo significativo alcuni indici statistici: media, varianza.
+Altri indici sono invece poco influenzati: mediana, percentili.
+
+\section{Dati Bivariati}
+
+Consideriamo coppie di dati (due caratteri di un individuo di un campione), analizzando se esistono eventuali relazioni tra i dati $x_{i}$ ed $y_{i}$.
+
+\subsection{Scatterplot e Regressione}
+
+In uno scatterplot sono riportati i dati bivariati $(x_{i}, y_{i})$ sul piano cartesiano.
+
+\begin{figure}[htbp]
+    \center
+    \includegraphics[scale=0.325]{img/scatterplot.png}
+    \includegraphics[scale=0.325]{img/scatterplotLineare.png}
+    \includegraphics[scale=0.325]{img/scatterplotNonLineare.png}
+    \caption{Da sinistra verso destra: Scatterplot Generico, Scatterplot Relazione Lineare, Scatterplot Relazione Non Lineare}
+\end{figure}
+
+\paragraph{Regressione} Dato un insieme di punti $(x_{i}, y_{i})$ come possiamo determinare quale curva nel piano approssima meglio quell'insieme? Ci occuperemo solo di
+relazioni lineari, la cui classe di curve corrisponde alle rette.
+
+\subsubsection{Covarianza e Correlazioni Campionarie}
+
+Definiamo prima la notazione necessaria:
+
+\[ \boxed{\overline{x} = \frac{1}{n} \sum^{n}_{i=1} x_{i}} \:\:\:\:\:\: \boxed{Var(x) = \frac{1}{n-1}\sum_{i=1}^{n} (x_{i} - \overline{x})} \:\:\:\:\:\: \boxed{\sigma(x) = \sqrt{Var(x)}} \]
+
+\[ \boxed{\overline{y} = \frac{1}{n} \sum^{n}_{i=1} y_{i}} \:\:\:\:\:\: \boxed{Var(y) = \frac{1}{n-1}\sum_{i=1}^{n} (y_{i} - \overline{y})} \:\:\:\:\:\: \boxed{\sigma(y) = \sqrt{Var(y)}} \]
+
+\newpage
+
+\paragraph{Covarianza Campionaria Empirica tra x ed y}
+
+\[ Cov_{e}(x) = \frac{1}{n} \sum^{n}_{i=1} (x_{i} - \overline{x}) (y_{i} - \overline{y}) \]
+
+\[ Cov(x) = \frac{n}{n-1}Cov_{e}(x,y) \]
+
+\paragraph{Coefficiente di Correlazione Campionario tra x e y} Supponiamo $\sigma(x) \neq 0$ e $\sigma(y) \neq 0$ allora:
+
+\vspace*{8px}
+
+\[ r(x,y) = \frac{Cov(x,y)}{\sigma(x) \: \sigma(y)} \]
+
+\subsubsection{Th. Retta di Regressione ai Minimi Quadrati}
+
+Vogliamo trovare la retta di equazione $y=a+bx$ che meglio approssima un insieme di dati bivariati $(x_{i}, y_{i})$. Risulta quindi necessario trovare $a$ e $b$ in modo tale da minimizzare
+
+\[ min_{a,b \in \mathbb{R}} \sum^{n}_{i=1} (y_{i} - (a+bx_{i}) )^{2} \]
+
+\begin{figure}[htbp]
+    \center
+    \includegraphics[scale=0.425]{img/teorema-quadrati.png}
+\end{figure}
+
+\paragraph{Teorema} Ricaviamo dunque $a,b$ della funzione $y=ax+b$:
+
+\[ b = b^{*} = \frac{Cov(x,y)}{Var{x}} \:\:\:\:\:\: a = a^{*} = \overline{y} - b^{*}\overline{x} \]
+
+\vspace*{5px}
+
+Dunque sostituendo nella funzione da minimizzare definita sopra:
+
+\[ min_{a,b \in \mathbb{R}} \sum^{n}_{i=1} (y_{i} - (a+bx_{i}) )^{2} = \sum^{n}_{i=1} (y_{i} - \overline{y})^{2} (1-r(x,y)^{2}) \]
+
+La retta di regressione è quindi la retta che meglio approssima l'insieme di dati bivariati, la bontà dell'approssimazione lineare è tanto migliore tanto è più piccolo $1-r^{2}$.
+
+\newpage
+
+\section{Probabilità}
+
+Elenchiamo delle definizioni fondamentali per lo studio delle probabilità, ossia la descrizione degli esiti di un esperimento aleatorio:
+
+\begin{enumerate}
+    \item \textbf{Spazio Campionario}: Insieme $\Omega$ di tutti i possibili esiti dell'esperimento.
+    \item \textbf{Esperimento Aleatorio}: Fenomeno il cui esito non è determinato con certezza a priori.
+    \item \textbf{Evento}: Sottoinsieme dello Spazio Campionario, rappresentano \textbf{affermazioni} 
+    
+    sull'\textbf{esito} dell'\textbf{esperimento}.
+    \[ \Omega = \{ 1,2,3,4,5,6 \} \: \: \: \: \text{"Esce numero pari"} = A = \{ 2,4,6 \} \]
+    \item \textbf{Relazioni logiche ed operazioni insiemistiche}: Elenchiamo alcune delle operazioni eseguibili:
+    \begin{enumerate}
+        \item $\text{Accade A o B} \: \mapsto \: A \cup B$
+        \item $\text{Accade A e B} \: \mapsto \: A \cap B$
+        \item $\text{Non accade A} \: \mapsto \: \overline{A} = \Omega - A$
+        \item $\text{Accade A ma non B} \: \mapsto \: A - B$
+        \item $\text{Se accade A allora accade B} \: \mapsto \: A \subseteq B$
+        \item $\text{A e B non possono accadere contemporaneamente} \: \mapsto \: A \cap B = \varnothing$ 
+    \end{enumerate}
+    \item \textbf{Definizioni Storiche di Probabilità}: Esistono diverse interpretazioni di probabilità:
+    \begin{enumerate}
+        \item \textbf{Definizione Classica}: Viene così definita:
+        \[ P(A) = \frac{\text{casi favorevoli ad A}}{\text{casi possibili}} = \frac{\#A}{\#\Omega} \]
+        \item \textbf{Definizione Frequentista}: Viene così definita:
+        \[ P(A) = lim_{n\rightarrow\infty} \: (\text{frequenza relativa di A in n prove ripetute dell'esperimento}) \]
+        \item \textbf{Definizione Soggettivista}: Viene così definita:
+        \[ P(A) = \text{grado di fiducia che accada A da parte di un soggetto razionale} \]
+    \end{enumerate}
+\end{enumerate}
+
+L'obiettivo è dunque quello di associare un valore $P(A) \in [0,1]$ ad un evento in modo tale da esprimere quanto sia probabile l'evento $A$ in questione.
+
+\newpage
+
+\paragraph{Regole Fondamentali di Probabilità} Abbiamo visto che esistono varie interpretazioni di probabilità, di conseguenza risulta necessario trovare dei principi minimi che devono essere rispettati
+per definire una probabilità. Assumiamo un $\Omega$ spazio campionario ed una funzione $P:\mathbb{P}(\Omega) \rightarrow \mathbb{R}$ dove $\mathbb{P}(\Omega)$ rappresenta l'insieme delle parti di $\Omega$:
+
+\begin{enumerate}
+    \item $0 \leq P(A) \leq 1 \:\:\:\:\:\: \forall A \subseteq \Omega$
+    \item $P(\Omega) = 1$
+    \item Se $A_{i}$ è una successione di eventi a due a due disgiunti (ossia $A_{i} \cap A_{j} = \varnothing \:\: \forall i \neq j$) allora:
+    \vspace*{5px}
+    \[ P(A_{1} \cup A_{2} \cup \: ... \: \cup A_{n}) = \sum_{i=1}^{n} P(A_{i}) \]
+\end{enumerate}
+
+Definiamo grazie a questo uno \textbf{spazio di probabilità}, ossia la coppia $(\Omega, P)$.
+
+\paragraph{Evento Trascurabile ed Evento Quasi Certo}: Definiamo due specifici tipi di eventi:
+
+\begin{enumerate}
+    \item \textbf{Evento Trascurabile}: $P(A) = 0$.
+    \item \textbf{Evento Quasi Certo}: $P(A) = 1$.
+\end{enumerate}
+
+\paragraph{Proprietà di Probabilità} Elenchiamo delle proprietà a disposizione di qualunque probabilità:
+
+\begin{enumerate}
+    \item $P(\overline{A}) = 1 - P(A)$
+    \item $B \subseteq A \Rightarrow P(A-B) = P(A) - P(B)$
+    \item Dati $A,B \subseteq \Omega$ non necessariamente disgiunti, allora:
+    \[ P(A \cup B) = P(A) + P(B) - P(A \cap B) \]
+\end{enumerate}
+
+% stiamo alla 3.2 delle note corso
+
+\subsection{Modello Uniforme}
+
+Un modello uniforme è uno spazio di probabilità $(\Omega, P)$ tale che $\Omega$ è finito ed ogni esito $\omega \in \Omega$ risulta essere equiprobabile, ossia che
+$P(\omega)$ risulta essere la stessa per ogni omega.
+
+\paragraph{Probabilità in Modelli} Se $(\Omega, P)$ è un modello uniforme, allora:
+
+\[ P(A) = \frac{\#A}{\#\Omega} \:\:\:\: \forall A \subseteq \Omega \]
+
+\newpage
+
+\subsubsection{Accenno di Combinatoria}
+
+Elenchiamo diversi tipi di sequenze dato un insieme di $n$ oggetti:
+
+\begin{enumerate}
+    \item Numero di sequenze ordinate con ripetizione di k oggetti:
+    \[ \#\{ (a_{1}, a_{2}, ... , a_{n}) \} \: | \: a_{j} \in \{ 1,2, ..., n \} = n^{k}\]
+    \item Numero di sequenze ordinate senza ripetizione di k oggetti:
+    \[ \#\{ (a_{1}, a_{2}, ... , a_{n}) \} \: | \: a_{j} \in \{ 1,2, ..., n \} = \frac{n!}{(n-k)!} \]
+    \item Numero di sottoinsiemi di $\{ 1,2,3, ... ,n \}$ formati da $k$ elementi $(k \leq n)$:
+    \[ \text{numero sottoinsiemi} = \frac{n!}{k!(n-k)!} \]
+\end{enumerate}
+
+\subsection{Probabilità Condizionata}
+
+Dato $(\Omega, P)$ spazio di probabilità, $B$ evento non trascurabile, $A$ evento di probabilità condizionata di $A$ dato $B$:
+
+\[ P(A|B) = \frac{P(A|B)}{P(B)} \]
+
+$P(A|B)$ corrisponde dunque alla probabilità che avvenga $A$ sapendo che si verifica $B$.
+
+\subsubsection{Regole Prodotto, Catena, Fattorizzazione della Probab. Condizionata}
+
+Elenchiamo le regole della Probabilità Condizionata:
+
+\begin{enumerate}
+    \item \textbf{Regola Prodotto}: $P(A \cap B) = P(A|B) \: P(B)$
+    \item \textbf{Regola Catena}: E' possibile applicare la regola del prodotto $n$ volte. In questo modo di definisce la catena.
+    \item \textbf{Regola Fattorizzazione}: La probabilità dell'unione dei rami di una rappresentazione ad albero\footnote{Vedi lezione 3.3, 20/02/2025.} corrisponde alla somma delle probabilità dei rami.
+\end{enumerate}
+
+\paragraph{Formula di Fattorizzazione}
+
+Definiamo prima un sistema di alternative 
+
+(eventi $B_{1}, B_{2}, ..., B_{n}$) caratterizzato da:
+
+\begin{enumerate}
+    \item Eventi a due a due disgiunti.
+    \item $\Omega = \bigcup_{i=1}^{n} B_{i} $
+    \item $P(B_{i}) > 0 \: \: \: \: \forall i$
+\end{enumerate}
+
+Date quindi $B_{1}, B_{2}, ..., B_{n}$ sistema di alternative, allora $\forall A \subseteq \Omega$:
+\vspace*{-5px}
+\[ \boxed{P(A) = \sum_{i=1}^{n} P(A|B_{i}) \: P(B_{i}) }\]
+
+\newpage
+
+\subsection{Formula di Bayes}
+
+Siano $A$ e $B$ eventi non trascurabili, allora:
+
+\[ P(B|A) = \frac{P(A|B)\:P(B)}{P(A)} \]
+
+In particolare se $B_{1}, B_{2}, ..., B_{n}$ sistema di alternative, allora:
+
+\[ P(B_{i}|A) = \frac{P(A|B_{i})\:P(B_{i})}{\sum_{j=1}^{n} P(A|B_{j})\:P(B_{j}) } \:\:\:\: \forall i = 1, ..., n \]
+
+\paragraph{Applicazione e Funzionamento}: Solitamente questo teorema viene utilizzato per invertire il condizionamento, tipicamente in due casi:
+
+\begin{enumerate}
+    \item Accade un evento $A$ riferito ad un osservabile.
+    \item Vogliamo calcolare la probabilità di una possibile causa $B_{i}$.
+\end{enumerate}
+
+\subsection{Indipendenza}
+
+Vogliamo definire formalmente in concetto che la probabilità di un determinato evento $A$ non cambia sapendo che accade $B$. Per $A$ e $B$ non trascurabili accade:
+
+\[ P(A) = P(A|B) = \frac{P(A \cap B)}{P(B)} \: \: \Longleftrightarrow \: \: P(A) P(B) = P(A \cap B) \]
+
+Dunque due \textbf{eventi} sono detti \textbf{indipendenti}\footnote{Se due eventi sono disgiunti, allora non sono indipendenti, dato che se accade ad esempio il primo allora non può accadere il secondo.} se:
+
+\[ P(A \cap B) = P(A) \: P(B) \]
+
+\paragraph{Indipendenza a 3 o più Eventi} Dati tre eventi $A,B,C$ questi sono indipendenti se:
+
+\begin{enumerate}
+    \item Sono a due a due indipendenti, ossia:
+        \[ P(A \cap B) = P(A) \: P(B) ,\:\:\: P(A \cap C) = P(A) \: P(C), \:\:\: P(B \cap C) = P(B) \: P(C) \]
+    \item Vale che $P(A \cap B \cap C) = P(A) \: P(B) \: P(C) $
+\end{enumerate}
+
+Questo informalmente vuol dire che avere informazioni riguardo alcuni degli eventi non cambia la probabilità relativa degli altri eventi, quindi l'indipendenza a due a due non implica indipendenza globale.
+
+\paragraph{Definizione Indipendenza n-esima Generica} Dati $A_{1}, ..., A_{n}$ eventi indipendenti, la probabilità di ogni possibile intersezione è
+il prodotto delle probabilità degli $A_{i}$ coinvolti nell'intersezione:
+
+\vspace{-15px}
+
+\[ P(A_{i1} \cap A_{i2} \: \cap ... \cap \: A_{ik}) = P(A_{i1}) \: P(A_{i2}) \: ... \: P(A_{ik}) \:\:\:\:\: \forall k \leq n, \:\: \forall 1 \leq i_{1} \leq i_{2} \leq ... \leq i_{k} \leq n  \]
+
+\newpage
+
+\subsubsection{Schema di Bernoulli}
+
+Date $n$ prove ripetute, in cui ciascuna prova può avere successo o insuccesso, la formulazione viene così definita:
+
+\[ \Omega = \{ (w_{1}, w_{2}, ..., w_{n}) \: | \: w_{i} \in \{0,1\} \} = \{0,1\}^{n} \]
+
+\[ f = \text{probabilità del successo della singola prova} \]
+
+\vspace{-15px}
+
+\[ P\{ (w_{1}, w_{2}, ..., w_{n}) \} = f^{\#successi} \: (1-f)^{\#insuccessi} = f^{\sum_{i=1}^{n}w_{i}} \: (1-f)^{n - \sum_{i=1}^{n}w_{i}} \]
+
+Da questo possiamo osservare che l'indipendenza non implica l'assenza di causalità e viceversa.
+
+\section{Variabili Aleatorie}
+
+Elenchiamo delle definizioni base:
+
+\begin{enumerate}
+    \item \textbf{Variabile Aleatoria (v.a)}: Carattere quantitativo dell'esperimento in esame. Ad esempio in $n$ lanci di moneta $X=\#teste$.
+    Nello specifico la definiamo come una funzione $X:\Omega \Rightarrow \mathbb{R}$.
+    \item \textbf{Legge/Distribuzione di X}: Distribuzione di probabilità della caratteristica $X$ in esame:
+    \[ P^{X}(A) = P(X \in A) = P(\#\text{teste in A}) \:\:\:\: A \subseteq \{0,1, ...,n\} \]
+    Nello specifico possiamo anche definirla come probabilità $P^{X}$ su $\mathbb{R}$ data da 
+    \[ \{\omega \in \Omega \:|\: X(\omega) \in A\} \]
+    \item \textbf{Equidistribuzione}: Due variabili aleatore $X$ ed $Y$ sono dette equidistribuite se \[P^{X} = P^{Y}\].
+\end{enumerate}
+
+\subsection{Variabili Aleatorie Discrete}
+
+Una variabile aleatoria $X$ è detta \textbf{discreta} se può assumere un numero finito o numerabile di modalità. Ad esempio nei lanci di moneta, se
+\[ X = \text{teste di n lanci di moneta}, \:\:\:\: \text{modalità} = \{ 0,1,2, ..., n \} \]
+Questo è un esempio di \textbf{variabile discreta}. Risulta necessario ricordare che parliamo di possibili modalità e non di dati di uno specifico campione.
+
+\newpage
+
+\paragraph{Funzione di Massa (Densità Discreta)}
+
+Data una variabile aleatoria $X$ definiamo $p{X}: \{ a_{1}, a_{2}, ..., a_{n} \} \rightarrow \mathbb{R} $ definita da:
+
+\[ p^{X}(a_{i}) = P\{ X = a_{i} \} = P^{X}(\{a_{i}\}) \]
+
+Da questo possiamo ricavare un altra caratteristica:
+
+\subparagraph{Calcolo delle Probabilità Relative ad X} Dagli statement definiti sopra otteniamo:
+
+\[ P(X \in A) = \sum_{a_{i}\in A} P(X=a_{i}) \]
+
+\subparagraph{Proprietà delle Funzioni di Massa} Data una funzione di massa $p^{X}$, vale che:
+
+\begin{enumerate}
+    \item $p^{X}(a_{i}) \geq 0 \:\:\:\: \forall a_{i} $
+    \item $\sum_{i}p^{X}(a_{i}) = 1$
+\end{enumerate}
+
+Viceversa, se una funzione q soddisfa queste due proprietà allora esiste una variabile aleatoria $X$ che ha $q$ come funzione di massa, e la legge di $X$
+è determinata univocamente da $q=p^{X}$.
+
+\subparagraph{Interpretazione delle Definizioni Date} Mostriamo un esempio di estrazione da una popolazione, elencando tutti gli elementi in analisi:
+
+\begin{enumerate}
+    \item $\Omega = \{ \text{popolazione} \} $, assumiamo di avere $P$ uniforme, dunque ad \\ esempio $\Omega = \{ \text{italiani} \}, \: X = \#figli $
+    \item $X(\omega) = \text{carattere quantitativo di} \:\: \omega$.
+    \item $p^{X}(a_{i}) = P(X=a_{i}) = \frac{\#\{ \text{individui con} \: \: X = a_{i} \}}{\#\text{popolazione}} = $ frequenza relativa di  $ \{ X = a_{i} \} $ \\ su tutta la popolazione.
+\end{enumerate}
+
+\subsection{Variabili Aleatorie Notevoli}
+
+Questo sottocapitolo elencherà specifiche variabili aleatorie caratterizzate da funzioni di massa predefinite.
+
+Elenchiamo alcune variabili aleatorie notevoli\footnote{Capitoli 4.3, 4.4 delle note del corso 24/25.}:
+
+\begin{enumerate}
+    \item \textbf{Variabile Aleatoria Binomiale}: Variabile Aleatoria Discreta di parametri $n \in \mathbb{N^{+}}$, $f \in [0,1]$ con funzione di massa data da:
+    \[ p^{X}(k) = P(X=k) = \left (\begin{array}{c} x \\ y \end{array} \right ) f^{k}(1-f)^{n-k} \:\:\:\: k \in \{ 0,1,2, ...,n \} \]
+
+
+Mostriamo un esempio di utilizzo a pagina successiva.
+
+\newpage
+
+Singola prova: lancio di dado, $5$ prove ripetute, il successo corrisponde all'esito $"6"$, di conseguenza la probabilità è di $\frac{1}{6}$. Quanto vale
+la probabilità che almeno due lanci siano uguali a $"6"$?
+
+\[ P(\text{almeno 2 lanci "6"}) = P(X \geq 2 ) = 1 - P(X < 2) = \]
+
+\[ =  1 - P(X=0) - P(X=1) = \]
+
+\[ = 1 - \left (\begin{array}{c} 5 \\ 0 \end{array} \right ) \: \left (\frac{1}{6} \right )^{0} \: \left (1 - \frac{1}{6} \right )^{5-0} - \left (\begin{array}{c} 5 \\ 1 \end{array} \right ) \: \left (\frac{1}{6} \right )^{1} \: \left (1 - \frac{1}{6} \right )^{5-1} \: ... \]
+
+\item \textbf{Variabile Aleatoria Geometrica}: Variabile Aleatoria Geometrica di parametro $p$ con funzione di massa:
+
+\[ p^{T}(k) = \]
+
+\vspace*{-20px}
+
+\[ = f(1-f)^{k-1}, \:\:\: \text{dove} \:\:\: T \:\:\: (\text{istante}) = \text{num. prova primo successo} = min\{ x \in \mathbb{N}^{+} \: | \: \omega_{n} = 1 \} \]
+
+\item \textbf{Variabile Aleatoria Poisson}: $X$ Variabile Aleatoria di Poisson ($Poisson(\lambda)$) di parametro $\lambda > 0$: variabile discreta, a valori
+a valori in $\mathbb{N} = \{ 0,1,2, ... \}$, con funzione di massa:
+
+\[ p^{X}(k) = p\{ X = k \} = \frac{\lambda^{k}}{k!}e^{-k} \]
+
+\paragraph{Interpretazione} La variabile aleatoria $X$ di Poisson conta il numero di eventi rari, ossia in numero di successi in $n$ prove ripetute con $n$
+molto grande ed $f$ probabilità di successo molto piccola (ossia in successo è raro), con $\lambda = nf > 0$.
+
+\end{enumerate}
+
+\subsection{Variabili Aleatorie con Densità}
+
+Le variabili aleatorie $X$ con densità sono caratterizzate appunto da una funzione $f:\mathbb{R} \rightarrow \mathbb{R}$ dove $P(X)$ corrisponde a:
+
+\[ P(X \in A) = \int_{A} f(x)dx \]
+
+Quindi $P(X)$ corrisponde all'area sottesa alla funzione. Questo implica che ogni caratteristica sugli estremi dell'integrale influenzerà la densità ed il suo calcolo.
+
+\paragraph{Interpretazione} La densità calcolata sulla funzione $f$ corrisponde alla distribuzione di $X$ per unità di lunghezza. Questo tipo di variabili si utilizzano per caratteri continui.
+
+\newpage
+
+\paragraph{Proprietà delle Densità} Elenchiamo le proprietà delle densità:
+
+\begin{enumerate}
+    \item $f(x) \leq 0 \:\:\:\:\: \forall x \in \mathbb{R} $
+    \item $\int_{+\infty}^{-\infty} f(x)dx = 1$
+\end{enumerate}
+
+Di conseguenza se $f$ soddisfa le due proprietà allora esiste almeno una variabile aleatoria $X$ con densità $f$ e la sua distribuizione è
+univocamente determinata da $f$. 
+
+\subsubsection{Variabili Aleatorie con Densità Note}
+
+Elenchiamo e descriviamo alcune variabili con densità note:
+
+\begin{enumerate}
+    \item \textbf{Variabili Aleatorie Uniformi}: $X$ variabile uniforme su un intervallo $(\alpha, \beta)$ dato $(U(\alpha, \beta))$ con densità:
+    \[ f(x) =  \left\{ \begin{array}{rcl}
+        \frac{1}{\beta - \alpha} & \mbox{se} & x \in (\alpha,\beta) \\
+         0 & \mbox{se} & x \notin (\alpha,\beta)
+        \end{array}\right. \]
+    La parte a tratti viene "fattorizzata" come un ulteriore funzione, ossia:
+    \[ {1}_{A}(x) =  \left\{ \begin{array}{rcl}
+        {1} & \mbox{se} & x \in (\alpha,\beta) \\
+         0 & \mbox{se} & x \notin (\alpha,\beta)
+        \end{array}\right. \]
+    Di conseguenza la funzione viene così definita:
+    \[ f(x) = \frac{1}{\beta - \alpha} \: 1_{\alpha, \beta}(x) \]
+    \paragraph{Interpretazione} Viene scelto un punto a caso nell'intervallo dato senza alcuna preferenza.
+
+    \item \textbf{Variabili Aleatorie Esponenziali}: $X$ variabile esponenziale di parametro $\lambda > 0$ e con densità:
+    \vspace*{15px}
+    \[ f(x) =  \left\{ \begin{array}{rcl}
+        \lambda e^{-\lambda x} & \mbox{se} & x > 0 \\
+         0 & \mbox{se} & x \leq 0
+        \end{array}\right. \]
+    Fattorizzando con la funzione $1(x)$ vista prima otteniamo $f(x) = \lambda e^{-\lambda x}\: 1_{0,+\infty}(x) $. 
+    \paragraph{Interpretazione} Tempo di attesa tra due eventi rari.
+\end{enumerate}
+
+\newpage
+
+\subsection{Funzione di Ripartizione e Quantili}
+
+Data $X: \Omega \rightarrow \mathbb{R}$ variabile aleatoria, $P_{X}$ legge di $X$ e $P_{X}(A) = P(X \in A)$ con $A \in \mathbb{R}$, definiamo la funzione
+di ripartizione (FdR) di $X$ con:
+
+\[ F_{X}: \mathbb{R} \rightarrow [0,1] \: \: \text{data da} \: \: F_{X}(x) = P(X \leq x) = P_{X}((-\infty, x]), \:\:\: x \in \mathbb{R}  \]
+
+\paragraph{Proprietà di FdR} Elenchiamo le proprieta della funzione di ripartizione:
+
+\begin{enumerate}
+    \item Non decrescente.
+    \item Continua a destra.
+    \item $lim_{x \rightarrow +\infty} F(x) = 1, \:\: lim_{x \rightarrow -\infty} F(x) = 0 $
+\end{enumerate}
+
+\paragraph{Legame tra FdR e Densità} Esiste un legame tra FdR e Densità:
+
+\[ F_{X}(x) = \int_{-\infty}^{x} f(y)dy \]
+
+Questo accade se $F_{X}$ è continua, viceversa se $f$ è continua a tratti:
+
+\[ f(x) = F^{'}_{X}(x) \]
+
+\paragraph{Calcolo Probabilità Intervalli} Calcoliamo la probabilità di un intervallo:
+
+\[ P(a \leq X \leq b) = F_{X}(b) - F_{X}(a) \]
+
+\subparagraph{Probabilità e Beta-Quantili} Data $X$ variabile aleatoria, dato $\beta \in (0,1)$ allora $\beta-$quantile:
+
+\[ \text{numero } r_{\beta} \text{ tale che } P(X \leq r_{\beta}) \geq \beta \: \: \text{e} \: \: \: \: P(X \geq r_{\beta}) \geq 1 - \beta \]
+
+\newpage
+
+\subsection{Variabili Aleatorie Gaussiane}
+
+Definiamo $Z$ o $N(0,1)$ variabile gaussiana (o normale) standard, nello specifico corrisponde ad una variabile aleatoria con densità:
+
+\[ y(x) = \frac{1}{\sqrt{2\pi}}e^{\frac{-x^{2}}{2}} \]
+
+\paragraph{Funzione di Ripartizione e Beta Quantili di N}
+
+\[ \Phi(x) = P(Z \leq x) = \int_{x}^{-\infty} \frac{1}{\sqrt{2\pi}} e^{\frac{-y^{2}}{2}} dy \:\:\:\: (\text{FdR})\]
+
+\[ q_{\beta} = \Phi^{-1}(\beta) \:\:\:\: (\text{Beta-Quantile})\]
+
+\paragraph{Esempio di Utilizzo FdR} Mostriamo un esempio in cui risulta necessario utilizzare la FdR:
+
+\begin{enumerate}
+    \item Immaginiamo di voler calcolare questa probabilità:
+    \[ P(a < z < b) = \int_{a}^{b} y(x)dx \]
+    Non esiste un espressione esplicita per questo integrale.
+    \item Si usa allora la FdR:
+    \[ P(a < z < b) = \Phi(b) - \Phi(a) \]
+\end{enumerate}
+
+\subsubsection{Trasformazioni di Variabili Aleatorie con Densità}
+
+Data $X:\Omega \rightarrow \mathbb{R}$ ed $h:\mathbb{R} \rightarrow \mathbb{R}$ allora $h \: o \:X : \Omega \rightarrow \mathbb{R}$ è anch'essa una variabile
+aleatoria. Ma $h \: o \:X$ ammette densità? In generale no, ammette densità solo se $h$ è invertibile.
+
+\paragraph{*** Proposizione sul cambio di variabile ***}
+
+\subsubsection{Variabile Aleatoria Gaussiana Generale}
+
+Dati $Z = N(0,1)$, $m \in \mathbb{R}$, $\sigma > 0$, $Y=h(z)=\sigma Z + m$ con densità:
+
+\[ f(y) = \frac{1}{\sigma}y(\frac{y-m}{\sigma}) = \frac{1}{\sqrt{2 \pi \sigma^{2}}} \: exp \left( -\frac{(y-m)^{2}}{2 \sigma^{2}} \right) \]
+
+\paragraph{Definizione} $Y$ variabile aleatoria gaussiana di media $m$ e varianza $\sigma^{2}$ con densità:
+
+\[ f(y) = \frac{1}{\sqrt{2 \pi \sigma^{2}}} \: exp \left( -\frac{(y-m)^{2}}{2 \sigma^{2}} \right) \:\:\:\: y \in \mathbb{R} \]
+
+In generale dunque ci riferiremo a questo tipo di variabile aleatoria con $(N(m,\sigma^{2}))$.
+
+\newpage
+
+\paragraph{Standardizzazione tra due tipi di N}
+
+Dato $(N(m,\sigma^{2}))$ possiamo dirigerci verso $Z = N(0,1)$ tramite standardizzazione:
+
+\[ Z = N(0,1) \Leftrightarrow y = \sigma Z + m  = N(m, \sigma^{2}) \:\:\: \text{quindi}\]
+
+\[ P(a < Y < b) = P(\frac{a-m}{\sigma} < Z < \frac{b-m}{\sigma}) = \Phi \left( \frac{b-m}{\sigma} \right)- \Phi\left(\frac{a-m}{\sigma} \right) \:\:\:\: (\Phi \:\: \text{FdR di} \: \: N(0,1)) \]
+
+\subsection{Valore Atteso e Momenti}
+
+Data $X$ variabile aleatoria \textbf{discreta}, a valori in $a_{1}, a_{2}, ...$, con funzione di massa $p$ il valore atteso di $X$:
+
+\[ \mathbb{E}[X] = \sum_{j} a_{j}\: p(a_{j}) \]
+
+\paragraph{Interpretazione}
+
+Può essere visto come il baricentro di $P$, o la media delle $a_{j}$ pesata con $p(a_{j})$.
+
+\paragraph{Valore Atteso su Variabile Aleatoria con Densità} Data $X$ variabile aleatoria con densità $f$, il valore atteso di $X$:
+
+\[ \mathbb{E}[X] = \int_{+\infty}^{-\infty} x\:f(x) dx \]
+
+Il valore atteso in queste condizioni non è sempre finito, di conseguenza non è sempre definito. Quando è definito:
+
+\begin{enumerate}
+    \item Se $X$ variabile aleatoria (discreta o con densità) è $\geq 0$, allora:
+    \[ \exists \:\: \mathbb{E}[X] = \sum_{j} a_{j}p(a_{j}) \:\:\: \text{oppure} \:\:\: \int x\:f(x)dx \:\:\:\:\:\: \in [0,+\infty] \]
+    \item Per variabile aleatoria generica, $X$ ammette valore atteso se:
+    \[ \mathbb{E}[X] = \sum_{j} |a_{j}|\:p(a_{j}) \:\:\: \text{oppure} \:\:\: \int |x|\:f(x)dx \:\:\:\:\:\: < \: +\infty \]
+    rispettivamente se è un caso discreto o con densità.
+    \item Criteri sufficienti per $\exists \: \mathbb{E}[X] \in \mathbb{R}$:
+    \begin{enumerate}
+        \item Caso Discreto: Se $a_{j}$ sono in numero finito.
+        \item Caso con Densità: Se $f=0$ fuori da un intervallo limitato $[\alpha,\beta]$.
+    \end{enumerate}
+\end{enumerate}
+
+\newpage
+
+\subsubsection{Calcolo e Proprietà del Valore Atteso}
+
+\paragraph{Calcolo Valore Atteso} Data una variabile aleatoria $X$ discreta o con densità, calcoliamo il valore atteso:
+
+\begin{enumerate}
+    \item Se $X$ è discreta con funzione di massa $p$:
+    \[ \mathbb{E}[g(X)] = \sum_{j} g(a_{j})\:p(a_{j}) \]
+    \item Se $X$ ha densità $f$:
+    \vspace*{10px}
+    \[ \mathbb{E}[g(X)] = \int_{+\infty}^{+\infty} g(x)\:f(x)\:dx \]
+\end{enumerate}
+
+\paragraph{Proprietà Valore Atteso} Siano $X,Y$ variabili aleatorie date e $a,b \in \mathbb{R}$:
+
+\begin{enumerate}
+    \item \textbf{Linearità}:
+    \begin{enumerate}
+        \item $\mathbb{E}[X+Y] = \mathbb{E}[X] + \mathbb{E}[Y]$
+        \item $\mathbb{E}[aX+b] = a\mathbb{E}[X] + b$
+    \end{enumerate}
+    \item \textbf{Monotonia}:
+    \begin{enumerate}
+        \item Se $X \geq 0$, allora $\mathbb{E}[X] \geq 0$
+        \item Se $X \geq Y$, allora $\mathbb{E}[X] \geq \mathbb{E}[Y]$
+    \end{enumerate}
+\end{enumerate}
+
+\paragraph{Momento di Ordine n-esimo} Data una variabile aleatoria $X$:
+
+\[ \mathbb{E}[X^{n}] =  \left\{ \begin{array}{rcl}
+        \sum_{j} a^{n}_{j} \: P(X = a_{j}) & \mbox{caso discreto}  \\
+        \int_{-\infty}^{+\infty} x^{n}\: f(x) \: dx   & \mbox{caso con densità} 
+        \end{array}\right. \]
 
 \newpage
 
