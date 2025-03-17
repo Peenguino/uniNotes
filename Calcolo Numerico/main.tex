@@ -134,7 +134,8 @@ captionpos=b
 \date{\text{Ultima Compilazione - }\today}
 \author{\textbf{Autore} \\ 
 		Giuseppe Acocella \\
-		2024/25\\}
+		2024/25\\
+        \url{https://github.com/Peenguino}}
 
 \maketitle
 \newpage
@@ -548,16 +549,16 @@ Elenchiamo queste definizioni:
     \item \textbf{Distanza}:
     \[ d(x,y) = || \: x - y \:|| \]
     \item \textbf{Norma 1}:
-    \vspace*{8px}
-    \[ || x ||_{1} = \sqrt{\sum^{n}_{i=1}}|x_{i}| \]
+    \vspace*{12px}
+    \[ \boxed{|| x ||_{1} = \sqrt{\sum^{n}_{i=1}}|x_{i}|} \]
     \vspace*{4px}
     \item \textbf{Norma 2}:
-    \vspace*{8px}
-    \[ || x ||_{2} = \sqrt{\sum^{n}_{i=1}}|x_{i}|^2 \]
+    \vspace*{12px}
+    \[ \boxed{|| x ||_{2} = \sqrt{\sum^{n}_{i=1}}|x_{i}|^2} \]
     \vspace*{4px}
     \item \textbf{Norma Inf*}:
-    \vspace*{8px}
-    \[ || x ||_{\infty} = nax|x| \]
+    \vspace*{12px}
+    \[ \boxed{|| x ||_{\infty} = max|x|} \]
     \vspace*{4px}
 \end{enumerate}
 
@@ -583,21 +584,17 @@ Contestualizziamo la norma alle matrici:
 
 \subsubsection{Norma Matriciale indotta da Norma Vettoriale}
 
-% spiegazione e contesto
+\vspace*{10px}
 
-***********
+\[ \boxed{||A|| \: = \: max||Av|| \: \: \: \: \textbf{con} \: \: \: \: ||v|| = 1} \] 
 
-\[||A|| \: = \: max||Av|| \: \: \: \: \textbf{con} \: \: \: \: ||v|| = 1\] 
+\vspace*{10px}
 
 \subsubsection{Norma di Frobanius}
 
-************
+\vspace*{10px}
 
-% spiegazione e contesto
-
-\[ ||A||_{F} = \sqrt{\sum^{n}_{i,j=1}|a_{ij}|^2} \]
-
-\[ ||A||_{F} = traccia(A^{H}A)\footnotemark \]
+\[ \boxed{||A||_{F} = \sqrt{\sum^{n}_{i,j=1}|a_{ij}|^2} = traccia(A^{H}A)}\footnotemark \]
 
 \footnotetext{La traccia in una matrice corrisponde alla somma degli elementi sulla diagonale principale. La matrice indicata con H è la trasposta coniugata, ossia matrice su cui abbiamo eseguito rispettivamente l'inversione tra righe e colonne e invertito i segni alle componenti immaginarie.}
 
@@ -1004,7 +1001,7 @@ $E$ è quindi definita come \textbf{Matrice di Gauss}.
     \[ E^{-1} = I + ve^T_k \]
     \vspace*{5px}
     Questo statement si può dimostrare effettuando la moltiplicazione tra $E$ ed $E^{-1}$ ottenendo $I$.
-    \item Sia $x \in \mathbb{R}$ con $x_{k} \neq 0$. Allora esiste una matrice elementare di Gauss tale che
+    \item Sia $x \in \mathbb{R}^{n}$ con $x_{k} \neq 0$. Allora esiste una matrice elementare di Gauss tale che
     \[ Ex = {\begin{bmatrix}
         x_{1} & ... & x_{k} & 0 & ... & 0
     \end{bmatrix}}^{T} \]
@@ -1060,6 +1057,214 @@ in numeri di macchina.
 Vale dunque che:
 
 \[ \frac{||E||}{||\tilde{L}||\:\: ||\tilde{U}||} = O(u) \]
+
+\newpage
+
+\section{Metodi Iterativi per Risoluzione di Sistemi Lineari}
+
+Perchè abbiamo la necessità di nuovi metodi oltre a quello di Gauss? Immaginiamo di avere questa matrice (ad albero):
+
+\[
+\begin{bmatrix}
+    1 & ... & ... & 1\\
+    . & .   & 0 & 0 \\
+    . & 0 & .& 0 \\
+    1 & & & 1
+\end{bmatrix}
+\]
+
+Applicare qui Gauss causerebbe il fenomeno del \textbf{fill-in}, aumentando il costo. L'idea sarebbe quella di approssimare $Ax = b$ grazie a questi passi:
+
+\begin{enumerate}
+    \item $x^{(0)}$ è il vettore iniziale.
+    \item $\{ x^{(k)} \}$ è una successione di vettori.
+    \item Con approssimazione si intende quindi che il limite all'infinito di ogni componente deve corrispondere a:
+    \[ \lim_{k \rightarrow \infty} x^{(k)} = x \Leftrightarrow \lim_{k \rightarrow \infty} x^{(k)} - x \Leftrightarrow \lim_{k \rightarrow \infty} ||\:x^{(k)} - x \:|| = 0 \]
+    Con questo riusciamo a dare una prima definizione alla convergenza di successione definita prima.
+\end{enumerate}
+
+\paragraph{Criterio d'Arresto} Non vado effettivamente all'infinito ma scelgo un numero di passi $k$ discreto che mi stabilisce il numero di volte che reitererò il metodo. Elenchiamo qualche criterio utilizzabile:
+
+\begin{enumerate}
+    \item Un numero $k$ completamente arbitrario.
+    \item $||\: x^{(k+1)} - x^{(k)} \:|| \leq \text{tolleranza} \approx 10^{-8} \:\: \text{oppure} \:\: 10^{-12} $
+    \item $||\: Ax^{k} - b \:|| \leq \text{tolleranza}$
+\end{enumerate}
+
+Nessuno di questi garantisce che l'errore generato sarà $<$ della tolleranza.
+
+\subsection{Metodi Basati sulla Decomposizione Additiva}
+
+Data $Ax = b$, assumiamo che $A = M - N$ con $M$ invertibile. Sostituiamo l'assunzione nella definizione originale:
+
+\vspace*{8px}
+
+\begin{enumerate}
+    \item Sostituzione:
+    \[ (M - N)x = b \Leftrightarrow Mx - Nx = b \Leftrightarrow Mx = Nx + b  \]
+    \vspace*{15px}
+    \item Dato che $M$ invertibile per ipotesi allora moltiplichiamo sx e dx per $M^{-1}$:
+    \[ x = M^{-1}Nx + M^{-1}b \]
+    \item Ponendo $P=M^{-1}N$ matrice di iterazioni e $p = M^{-1}b$, allora $x = Px + q$, quindi al passo k-esimo:
+    \vspace*{8px}
+    \[ x^{k+1} = Px^{(k)} + q \:\:\:\: \text{con} \:\: x^{(0)} \in \mathbb{R}^{n} \]
+    \item Quindi la \textbf{successione} è detta \textbf{convergente} se:
+    \[ \lim_{k \rightarrow \infty} ||\: x^{(k)} - x \:|| = 0 \]
+    \item Il \textbf{metodo} $(P,q)$ è detto \textbf{convergente} invece se: 
+    \[ \forall \: x^{(0)} \Rightarrow \:\: \text{la successione} \:\: \{ x^{(k)} \} \:\: \text{è convergente}\]
+\end{enumerate}
+
+\subsection{Th. Condizioni Sufficienti per la Convergenza di Metodo (con Dim.)}
+
+Definiamo il teorema:
+%possiamo fixare graficamente la funzione definita nella tesi, per ora si lascia così
+
+\begin{enumerate}
+    \item \textbf{Ipotesi}: Se esiste una norma matriciale indotta in cui $||P|| < 1$, allora:
+    \item \textbf{Tesi}: Il metodo definito sotto converge.
+    \vspace*{10px}
+    \[ \left\{ \begin{array}{rcl}
+        x^{(0)} \in \mathbb{R}^{n} \\ 
+        x^{k+1} = Px^{(k+1)} + q 
+        \end{array}\right.
+         \]
+\end{enumerate}
+
+\paragraph{Dimostrazione} Dimostriamo il teorema per step:
+
+\begin{enumerate}
+    \item Prendo la successione:
+    \[ x^{(k+1)} = Px^{(k)} + q \]
+    e voglio che questa converga ad $x=Px+q$, ossia che la distanza tra $x^{(k)}$ ed $x$ tende a $0$ per $x \rightarrow +\infty$.
+    \vspace*{15px}
+    \item Consideriamo $e^{(k)}$ vettore errore alla k-esima iterazione:
+    \[ e^{(k)} = x^{(k)} - x  \Leftrightarrow \]
+    \[ \Leftrightarrow e^{(k+1)} = x^{(k+1)} - x \]
+    \vspace*{15px}
+    \item Sostituiamo le definizioni di $x^{(k+1)}$ e $x^{(k)}$ date in $(1.)$ in $e^{(k+1)}$ data in $(2.)\:$:
+    \[ e^{(k+1)} = Px^{(k)} + q - (Px+q) = Px^{(k)} - Px = Pe^{(k)} \]
+    \vspace*{15px}
+    Vogliamo dunque impostare induzione su $\boxed{e^{(k+1)} = P^{(k+1)}e^{(0)}}$.
+    \newpage
+    \item Dimostrazione induttiva:
+    \begin{enumerate}
+        \item \textbf{Caso Base}: $k=0$, allora $e^{(1)} = Px^{(0)} + q - Px - q = Pe^{(0)}$ 
+        \item \textbf{Ipotesi Induttiva}: $ \boxed{e^{(k)} = P^{k}e^{(0)}} $
+        \item \textbf{Caso Induttivo}: Lavoriamo sull'n-esimo passo:
+        \[ e^{(k+1)} = Pe^{(k)} = P \: P^{k} e^{(0)} = P^{(k+1)} e^{(0)} \Rightarrow e^{(k+1)} = P^{(k+1)}e^{(0)} \]
+        Una volta raggiunto questo punto, rielaboro questa espressione grazie alle norme:
+    \end{enumerate}
+    \item Utilizziamo proprietà norme (vettoriale che induce matriciale, come chiedono le ipotesi del teorema), nello specifico la compatibilità:
+    \[ ||\: e^{(k+1)} \:|| = ||\: P^{(k+1)} e^{(0)} \:|| \leq ||\: P^{(k+1)} \:|| \: ||\: e^{(0)} \:|| \]
+    \item Possiamo tirare fuori l'esponente dato che $P^{(k+1)} = P\:^{(k)} $, quindi 
+    \[ ||\: P \: P^{(k)} \:|| \leq ||P|| \:\: ||P^{(k)}|| \]
+    Grazie a questo possiamo dire che
+    \[ ||\: e^{(k+1)} \:|| \leq ||\: P^{(k+1)} \:|| \: ||\: e^{(0)} \:|| \leq ||\: P \:||^{(k+1)} \: ||\: e^{(0)} \:||\]
+    Sappiamo anche che $||\: P \:||^{(k+1)} \: ||\: e^{(0)} \:|| = 0$ dato che $0 < ||\:P\:|| < 1 $.
+    \item Per il teorema del confronto quindi:
+    \[ \lim_{k \rightarrow \infty} ||\: e^{(k+1)} \:|| = 0 \Longleftrightarrow \lim_{k \rightarrow \infty} e^{(k)} \Longleftrightarrow \lim_{k \rightarrow \infty} x^{(k)} = x \:\:\: \boxed{} \] 
+\end{enumerate}
+
+\subsection{Th. Condizioni Necessarie per la Convergenza di Metodo (con Dim.)}
+
+Definiamo il teorema:
+%possiamo fixare graficamente la funzione definita nella tesi, per ora si lascia così
+
+\begin{enumerate}
+    \item \textbf{Ipotesi}: Se il metodo definito sotto è convergente, allora:
+    \item \textbf{Tesi}: Il raggio spettrale $\rho(P) < 1$.
+    \vspace*{10px}
+    \[ M = \left\{ \begin{array}{rcl}
+        x^{(0)} \in \mathbb{R}^{n} \\ 
+        x^{k+1} = Px^{(k+1)} + q 
+        \end{array}\right.
+         \]
+\end{enumerate}
+
+Dimostriamo il teorema a pagina successiva.
+
+\newpage
+
+\paragraph{Dimostrazione} Dimostriamo il teorema per step:
+
+\begin{enumerate}
+    \item Per ipotesi (convergenza) sappiamo che:
+    \[ e^{(0)} = x^{(k)} - x^{(0)} = P^{(k)}e^{(0)} \:\: \text{e tale che} \:\: \forall \: x^{(0)} \: \: \lim_{k \rightarrow \infty} e^{(k)} = 0\]
+    \item Sapendo che il metodo converge per ogni successione da ipotesi allora ne scelgo una particolare, in modo tale da far apparire il raggio spettrale:
+    \[ x^{(0)} = x + v \]
+    dove
+    \begin{enumerate}
+        \item $x = Px + q$ corrisponde alla soluzione.
+        \item $v$ è l'autovettore con autovalori di $P$, ossia $|\lambda| = \rho(P)$.
+    \end{enumerate}
+    \item Possiamo dunque tornare alla definizione data in $(1.)$ inserendo la definizione appena data in $(2.)$:
+    \[ e^{(k)} = P^{(k)}e^{(0)} = P^{(k)}(x^{(0)} - x) = P^{(k)}v = \lambda^{(k)}v \]
+    \item Grazie al limite dato in $(1.)$ ed ad il primo e l'ultimo termine di $(3.)$:
+    \[ 0 = \lim_{k \rightarrow \infty} ||\:e^{(k)}\:|| = \lim_{k \rightarrow \infty} ||\:\lambda^{(k)} \: v \:|| = \lim_{k \rightarrow \infty} ||\:\lambda^{(k)} \:||\:\:||\: v \:|| = \]
+    Dato che $v$ è un autovettore sicuramente $||v|| \neq 0$ e il tutto dipenderà dunque da $|\lambda|$:
+    \[ = ||v|| \lim_{k \rightarrow \infty} |\lambda^{(k)}| \]
+\end{enumerate}
+
+\subsection{Th. Condizione Necessaria e Sufficiente per la Convergenza di Metodo (con Dim.)}
+
+\vspace*{12px}
+
+\[ \text{Un metodo iterativo} \: M = \left\{ \begin{array}{rcl}
+    x^{(0)} \in \mathbb{R}^{n} \\ 
+    x^{k+1} = Px^{(k+1)} + q 
+    \end{array}\right.
+    \: \text{è convergente} \:
+    \Longleftrightarrow
+    \:
+    \rho(P) < 1
+    \]
+
+\paragraph{Dimostrazione} Dimostriamo il teorema per step, entrambi i versi d'implicazione:
+
+\begin{enumerate}
+    \item \textbf{Implicazione Destra}: Condizioni necessarie dimostrate con il teorema precedente.
+    \item \textbf{Implicazione Sinistra}: Solo se $P$ è diagonalizzabile:
+    \begin{enumerate}
+        \item Se $P$ è diagonalizzabile e $\rho(P) < 1 \Rightarrow$ il metodo converge. Ma essendo diagonalizzabile:
+        \[ \exists \: S \:\:\: \text{invertibile tale che} \:\:\: P = SDS^{-1} \:\: \text{dove} \:\: D = \begin{bmatrix}
+            \lambda_{1} & & & \\
+            & \lambda_{1} & & \\
+            & & . & \\
+            & & & \lambda_{n}
+        \end{bmatrix} \]
+        \newpage
+        \item Vogliamo che il vettore dell errore $e_{k}$ tenda a $0$:
+        \[ \boxed{e^{(k)} = P^{(k)}e^{(0)}} \]
+        \[ e^{(k)} = P^{(k)}e^{(0)} = (SDS^{-1})^{k} \: e^{(0)} = \]
+        \[ SDS^{-1}\: SDS^{-1} \: ... \: SDS^{-1} \: e^{(0)} = SD^{k}S\:e^{(0)} \]
+        \item Applichiamo lo stesso limite del teorema precedente e le norme agli estremi dell'espressione generata al punto precedente:
+        \[ \lim_{k \rightarrow \infty} ||\:e^{(k)}\:|| = \lim_{k \rightarrow \infty} ||\:SD^{k}S^{-1}\:e^{(0)}\:|| \leq \]
+        \item Maggiorazione grazie alle proprietà delle norme:
+        \[ \leq ||\:S\:||\:||\:S^{-1}\:||\:||\:e^{(0)}\:||\: \lim_{k \rightarrow \infty} ||\:D^{k}\:|| \]
+        Dunque se tutti i $\lambda$ di $D^{k} = \begin{bmatrix}
+            \lambda_{1} & & & \\
+            & \lambda_{1} & & \\
+            & & . & \\
+            & & & \lambda_{n}
+        \end{bmatrix} 
+        $ se sono tutti $< 1$ allora per $k \rightarrow \infty$ convergono tutti i $\lambda$.
+    \end{enumerate}
+\end{enumerate}
+
+\subsection{Th. Fa la Cosa Giusta* (con Dim.)}
+
+Se $\{ x^{(k)} \rightarrow x^{*} \}$ con $x^{(k+1)} = Px^{(k)} + q \Rightarrow x^{*} = Px^{*} + q$.
+
+\paragraph{Dimostrazione} Dimostriamo il teorema per step:
+
+\begin{enumerate}
+    \item $x^{*} = \lim_{k \rightarrow \infty} x^{(k+1)}$
+    \item Sostituendo definizione di $x^{(k+1)}$:
+    \[ x^{*} = (\lim_{k \rightarrow \infty} Px^{(k)}) + q \]
+    \item Essendo continua tiro fuori $P$ dal limite:
+    \[ x^{*} = P(\lim_{k \rightarrow \infty} x^{(k)}) + q = Px^{*} + q \:\: \boxed{} \]
+\end{enumerate}
+
 \newpage
 
 \end{document}
