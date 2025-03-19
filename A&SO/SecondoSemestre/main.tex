@@ -1638,6 +1638,190 @@ che di default dispongono metodi detti \textbf{synchronized}, ossia operanti in 
     \end{enumerate}
 \end{enumerate}
 
+\vspace*{15px}
+
+\subsection{Schema Lettore/Scrittore}
+
+Immaginiamo di voler impostare uno schema di lettori e scrittori che rispettivamente leggano e scrivano riferendosi allo stesso buffer.
+Possiamo impostare questo schema in \textbf{tre} modi diversi:
+
+\begin{enumerate}
+    \item Approccio \textbf{default} in \textbf{mutua esclusione}:
+    \vspace*{8px}
+    \begin{lstlisting}[language = C]
+    // --- Processo Lettore
+    while(true){
+        start Read() //lock del mutex
+        // corpo
+        end Read() //unlock del mutex
+    }
+
+    // --- Processo Scrittore
+    while(true){
+        start Write() //lock del mutex
+        // aggiorna i dati scrivendo
+        end Write() //unlock del mutex
+    }
+    \end{lstlisting}
+    
+Questo metodo applicato a questo schema non ha molto senso dato che vogliamo che gli scrittori siano in mutua esclusione ma non i lettori. Vanno quindi gestiti
+questi ultimi in un modo specifico.
+
+\newpage
+
+    \item Approccio \textbf{Active/Waiting} Readers/Writers:
+    Utilizziamo $1$ mutex e $2$ condition variables $(ReadGo, WriteGo)$, che rispettivamente sospendono la lettura e la scrittura.
+    \vspace*{8px}
+    \begin{lstlisting}[language = C]
+        // --- Funzioni dedicate alla Read
+        start Read(){
+            mutex.acquire()
+            waitingReaders++
+            while(activeWriters > 0){ //PUNTO FONDAMENTALE
+                readGo.wait(&mutex)
+            }
+            waitingReaders--
+            activeReaders++
+            mutex.release()
+        }
+
+        done Read(){
+            mutex.acquire()
+            activeReaders--
+            if(activeReaders == 0 && waitingWriters > 0)
+                writeGo.signal()
+            mutex.release()
+        }
+
+        // --- Funzioni dedicate alla Write
+        start Write(){
+            mutex.acquire()
+            waitingWriters++
+            while(activeReaders > 0 || activeWriters > 0){
+                waitGo.wait(&mutex)
+            }
+            waitingWriters--
+            activeWriters++
+            mutex.release()
+        }
+
+        done Write(){
+            mutex.acquire()
+            activeWriters--
+            if(waitingReaders > 0){
+                readGo.broadcast()
+            } else {
+                readGo.signal()
+            }
+            mutex.release()
+        }
+
+    \end{lstlisting}
+    \vspace*{-10px}
+    Questa implementazione presenta un problema di \textbf{potenziale starvation} sui lettori. Perchè? Nella guardia del while dello \textit{start Read} se non è
+    presente nessuno scrittore attivo allora si effettua lo start della read. Il problema è che \textbf{nulla vieta} ad uno scrittore di \textbf{variare} il \textbf{numero} di \textbf{scrittori} attivi nel momento in cui un lettore dovrebbe entrare in esecuzione. Di conseguenza
+    verrebbe rieffettuato il controllo che \textbf{causerebbe} nuovamente una \textbf{sleep} del thread \textbf{lettore}.
+
+\newpage
+
+    \item Approccio \textbf{Fair} con \textbf{Ordinamento}: In questo approccio si sceglie di imporre un ordinamento in modo tale da far attendere che le operazioni di lettura siano finite prima di iniziare una nuova di scrittura.
+    Nello specifico utilizzeremo $2$ mutex $(ordering, mutex)$ e $2$ condition variables $(readGo, writeGo)$. Mostriamo l'implementazione:
+    \vspace*{8px}
+    \begin{lstlisting}[language = C]
+        // --- Funzioni dedicate alla Read
+        Start Read(){
+            ordering.acquire()
+            mutex.acquire()
+            while(activeWriters > 0)
+                go.wait(&mutex)
+            activeReaders++
+            ordering.release()
+            mutex.release()
+        }
+
+        Done Read(){
+            mutex.acquire()
+            activeReaders--
+            if(activeReaders == 0)
+                go.signal()
+            mutex.release()
+        }
+
+        // --- Funzioni dedicate alla Write
+        Start Write(){
+            ordering.acquire()
+            mutex.acquire()
+            while(activeReaders > 0 || activeWriters > 0)
+                go.wait(&mutex) //PUNTO FONDAMENTALE
+            activeWriters++
+            ordering.release()
+            mutex.release()
+        }
+
+        Done Write(){
+            mutex.acquire()
+            activeWriters--
+                go.signal()
+            mutex.release()
+        }
+
+    \end{lstlisting}
+    
+Nel punto evidenziato come importante nel corpo del while nella start write notiamo che lo scrittore va in sleep lasciando solo $mutex$ e non $ordering$.
+Questo causerà un attesa che porrà appunto ordine fino al rilascio di $ordering$ da parte dello scrittore.
+
+\end{enumerate}
+
+\newpage
+
+\subsection{Problema dei Filosofi a Cena e Condizioni di Stallo}
+
+Il problema dei filosofi a cena si basa su un numero $k$ di filosofi i quali hanno bisogno di $2$ forchette per mangiare. Se ognuno acquisisse una forchetta (ad esempio quella sulla sinistra) allora all'acquisizione della forchetta destra
+si creerebbe uno stallo, questo perchè la forchetta sarebbe già stata presa dal filosofo accanto. 
+
+\begin{figure}[htbp]
+    \center
+    \includegraphics[scale=0.4]{img/preludiodidelus.png}
+\end{figure}
+
+Questo esempio ci permette di elencare tutte le condizioni necessarie affinchè si crei uno stallo:
+
+\begin{enumerate}
+    \item \textbf{Risorse limitate}: Una quantità infinita di risorse fornirebbe infatti la garanzia sull'assenza di stalli.
+    \item \textbf{No Preemption}: Risorse assegnate non possono essere riassegnate.
+    \item \textbf{Wait While Holding}: Nessuno lascia la propria risorsa, anche se è in fase di stallo.
+    \item \textbf{Attesa Circolare}.
+\end{enumerate}
+
+\paragraph{Grafi di Holt} Possiamo rappresentare in questo modo la gestione di thread e risorse, individuando gli stalli con i cicli nel grafo:
+
+\begin{figure}[htbp]
+    \center
+    \includegraphics[scale=0.325]{img/grafoHolt.png}
+\end{figure}
+
+\subsubsection{Prevenzione e Cura degli Stalli}
+
+Esistono delle politiche di prevenzione o di cura in caso occorressero degli stalli:
+
+\begin{enumerate}
+    \item \textbf{Detect and Fix - Politica di Cura Stallo}: Si analizza il Grafo di Holt e si interrompono i cicli effettuando kill dei thread scelti come vittime:
+    \begin{figure}[htbp]
+        \center
+        \includegraphics[scale=0.325]{img/kill_grafoHolt.png}
+    \end{figure}
+    Altrimenti posso eseguire politiche di \textbf{rollback} che grazie al salvataggio costante di uno stato di backup permette il ripristino nel caso in cui
+    un operazione dovesse comportare una transizione a stato di stallo. Questa pratica comporta però dei costi in termini di mantenimento stato di backup.
+    \newpage
+    \item \textbf{Metodi di Prevenzione}: Esistono vari metodi che permettono la prevenzione di stalli, ad esempio:
+    \begin{enumerate}
+        \item Aumentare le risorse disponibili.
+        \item Acquisire le risorse in un ordine imposto, ad esempio grazie ad una rigida enumerazione dei lock.
+        \item Eliminare il Wait While Holding, un thread non potrà dunque holdare la risorsa durante uno stato non esecutivo.
+        \item Acquisizione preventiva di tutte le risorse necessarie all'avvio dell'esecuzione del thread, altrimenti non si starta.
+    \end{enumerate}
+\end{enumerate}
+
 \newpage
 
 \end{document}
