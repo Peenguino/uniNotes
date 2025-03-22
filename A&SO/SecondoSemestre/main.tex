@@ -1228,6 +1228,27 @@ proprio perchè sarà impossibile per il kernel schedulare l'esecuzione di quel 
 Per queste motivazioni si preferiscono attualmente strategie basate sui \textbf{Kernel Threads}, creano un po' più di overhead ma sono del tutto visibili
 dal kernel che avrà modo di schedularli.
 
+\vspace*{5px}
+
+\begin{center}
+    \begin{tabular}{ c|c|c } 
+    Stato & Dov'è il TCB & Dove sono i Registri del Thread \\ 
+        \hline
+    INIT & ? & TCB \\ 
+    READY & Lista Ready & TCB \\
+    RUN & Lista Exec & Registri Processore \\ 
+    WAIT & TCB(wait) & TCB \\ 
+    END & ? & TCB \\ 
+
+    \hline
+    \end{tabular}
+    \end{center}
+
+\vspace*{5px}
+
+Ogni thread avrà dunque uno \textbf{stack privato}, il codice e l'heap \textbf{condivisi}, mentre le variabili dipenderanno dal modo in cui vengono
+dichiarate (se thread local o meno).
+
 \newpage
 
 \subsubsection{Schedulazione e Potenziale Inconsistenza}
@@ -1250,35 +1271,14 @@ una thrdCreate:
 
 \begin{enumerate}
     \item Si crea il TCB del nuovo thread.
-    \item Si settano il program counter del thread e tutto il suo stato architetturale in modo tale che quest'ultimo possa eseguire il suo runnable\footnote{Runnable, in Java è la funzione eseguita da un thread, usato come sinonimo di "funzione del thread".}.
+    \item Si settano il program counter del thread e tutto il suo stato architetturale in modo tale che quest'ultimo possa eseguire il suo runnable\footnote{Runnable, in Java è la funzione eseguita da un thread, usato come sinonimo di "funzione del thread".}. 
+    In realtà il thread non esegue direttamente il runnable, ma una funzione wrapper detta \textbf{stub} che chiamerà il runnable,
+    questo perchè è necessario coprire anche il caso in cui il runnable ritorni invece di effettuare una $thread\_exit$. Senza questo passo in più
+    il runnable ritornerebbe ad una qualsiasi posizione sul top dello stack. In questo modo invece il runnable ritornerà allo stub e questo eseguirà la $thread\_exit$.
     \item Si setta lo stato nel TCB a ready (schedulazione).
     \item Si segnala a chi è in coda ready che l'esecuzione della create è finita.
     \item Si ritorna.
-\end{enumerate}
-
-\vspace*{5px}
-
-\begin{center}
-    \begin{tabular}{ c|c|c } 
-    Stato & Dov'è il TCB & Dove sono i Registri del Thread \\ 
-        \hline
-    INIT & ? & TCB \\ 
-    READY & Lista Ready & TCB \\
-    RUN & Lista Exec & Registri Processore \\ 
-    WAIT & TCB(wait) & TCB \\ 
-    END & ? & TCB \\ 
-
-    \hline
-    \end{tabular}
-    \end{center}
-
-\vspace*{5px}
-
-
-Ogni thread avrà dunque uno \textbf{stack privato}, il codice e l'heap \textbf{condivisi}, mentre le variabili dipenderanno dal modo in cui vengono
-dichiarate (se thread local o meno). 
-
-% devi riprendere la tua dei thd e sincronizzazione e 34 delle slide
+\end{enumerate} 
 
 \newpage
 
@@ -1560,7 +1560,7 @@ Oltre a questo, per garantire una base all'implementazione delle lock in Multipr
     }
 
     // 02: Unlock implementata
-    lock Acquire(){
+    lock Release(){
         disabilita interruzioni
         spinlock Acquire(&spl)
         if(!wait.empty()){
@@ -1819,6 +1819,176 @@ Esistono delle politiche di prevenzione o di cura in caso occorressero degli sta
         \item Acquisire le risorse in un ordine imposto, ad esempio grazie ad una rigida enumerazione dei lock.
         \item Eliminare il Wait While Holding, un thread non potrà dunque holdare la risorsa durante uno stato non esecutivo.
         \item Acquisizione preventiva di tutte le risorse necessarie all'avvio dell'esecuzione del thread, altrimenti non si starta.
+    \end{enumerate}
+\end{enumerate}
+
+\subsection{Algoritmo del Banchiere}
+
+Descriviamo questo algoritmo che si pone l'obiettivo di riconoscere l'esistenza di almeno una schedulazione che attraversi solo stati safe, ossia stati deadlock free. Per
+presentarlo abbiamo prima la necessità di definire le ipotesi su cui si basa:
+
+\paragraph{Ipotesi dell'Algoritmo del Banchiere} Per la sua esecuzione si assumono validate queste condizioni:
+
+\begin{enumerate}
+    \item Si conosce il numero massimo di risorse richieste da un thread.
+    \item Allocazione dinamica effettuata su richiesta (on-demand).
+    \item Le richieste possono essere soddisfatte se esiste un ordinamento delle attività concorrenti dei thread/processi che sia deadlock free.
+\end{enumerate}
+
+\paragraph{Definizione di Stato Safe} Per qualunque sequenza di richieste di risorse tutte le attività concorrenti devono poter terminare. In maniera informale
+possiamo dire che ogni stato deve avere a disposizione abbastanza risorse da far terminare almeno un thread in modo tale da causare il rilascio delle risorse che mantiene.
+In questo modo, riconoscendo tanti stati safe consecutivi si identifica un path (traiettoria) che assicura l'esistenza di almeno una sequenza di stati safe che porta alla terminazione.
+In questo modo viene effettuata un over-approssimazione sugli stati unsafe, saltando ogni stato unsafe anche se di transizione.
+
+\paragraph{Complicazioni e Costi} La descrizione della traiettoria data sopra può aiutarci nel capire come per \textbf{ogni} stato safe esisterà
+un tentativo di ricerca di traiettoria safe. In questo modo si riesce a capire la complessità causata da questo tipo di algoritmo che cerca di identificare ogni potenziale
+traiettoria sicura.
+
+\newpage
+
+\subsubsection{Esempio d'Istanza e Rappresentazioni}
+
+Mostriamo un esempio di transizioni tra stati:
+
+\begin{enumerate}
+    \item Tabella iniziale, seconda riga abbiamo la quantità di ciascun tipo di risorsa e le successive righe contengono la quantità di risorse divise per tipologia
+    necessaria a ciascun thread per terminare:
+    \vspace*{8px}
+    \begin{center}
+        \begin{tabular}{ |c|c|c|c| } 
+         \hline
+             & R1 & R2 & R3 \\ 
+         \hline
+             & 4 & 2 & 2 \\ 
+         \hline
+         th1 & 2 & 2 & 2 \\ 
+         th2 & 3 & 1 & 1 \\ 
+         th3 & 4 & 0 & 2 \\
+         \hline
+        \end{tabular}
+    \end{center}
+    \vspace*{8px}
+    \item $th3$ richiede le risorse per terminare, e assumiamo che la parte di tabella inferiore non sia più
+    riferita alle risorse necessarie ma quelle assegnate:
+    \vspace*{8px}
+    \begin{center}
+        \begin{tabular}{ |c|c|c|c| } 
+         \hline
+             & R1 & R2 & R3 \\ 
+         \hline
+             & 0 & 2 & 0 \\ 
+         \hline
+         th1 & 0 & 0 & 0 \\ 
+         th2 & 0 & 0 & 0 \\ 
+         th3 & 4 & 0 & 2 \\
+         \hline
+        \end{tabular}
+    \end{center}
+    \vspace*{8px}
+    Quindi $th2$ riesce a terminare.
+    \item Lo stato successivo sarà dunque:
+    \vspace*{8px}
+    \begin{center}
+        \begin{tabular}{ |c|c|c|c| } 
+         \hline
+             & R1 & R2 & R3 \\ 
+         \hline
+             & 4 & 2 & 2 \\ 
+         \hline
+         th1 & 0 & 0 & 0 \\ 
+         th2 & 0 & 0 & 0 \\ 
+         \hline
+        \end{tabular}
+    \end{center}
+    \vspace*{8px}
+    E continuando in questo modo sarà possibile identificare o meno una traiettoria che porta alla conclusione di tutti i threads.
+\end{enumerate}
+
+\newpage
+
+\subsubsection{Pseudocodice dell'Algoritmo del Banchiere}
+
+Mostriamo una possibile implementazione dell'Algoritmo del Banchiere:
+
+\vspace*{10px}
+
+\begin{lstlisting}[language = C]
+    while(esiste un thread non marcato){
+        if(esiste un altro thrd-i tale che esigenza_i <= d){
+            marco thread-i
+            rimetto nella disponibilta le risorse assegnate al thrd-i
+        } else {
+            stato non safe //blocco, NON si assegna la risorsa al thrd-i
+        }
+        stato safe
+        procedi
+    }
+\end{lstlisting}
+
+\subsection{Scheduling}
+
+Fino ad ora abbiamo solo menzionato come lo scheduling venisse gestito da una serie di transizione di stati in base agli eventi accaduti. In questo capitolo
+elencheremo delle definizioni e successivamente delle vere e proprie politiche di scheduling.
+
+\paragraph{Definizioni} Elenchiamo delle definizioni utilizzate nella gestione dello scheduling:
+
+\begin{enumerate}
+    \item \textbf{Task/Job}: Attività da completare.
+    \item \textbf{Latency/Response Time}: Velocità del tempo di risposta, importante in schemi che danno priorità all'interattività, nello specifico:
+    \begin{enumerate}
+        \item \textbf{Latency}: Tempo che intercorre dall'inizio alla fine di un task.
+        \item \textbf{Response Time}: Tempo che intercorre dall'istante iniziale a quando ottengo l'esito del task.
+    \end{enumerate}
+    \item \textbf{Throughput}: Esecuzione di più task in contemporanea in un quanto di tempo.
+    \item \textbf{Predictability}: Vincolo di rispettare tempi in casi specifici, come contesti realtime.
+    \item \textbf{Overhead}: Quanto tempo impiego in più a causa della gestione della schedulazione, ossia azioni come:
+    \begin{enumerate}
+        \item Cambiare stato.
+        \item Aggiungere in coda.
+        \item Effettuare commutazioni di contesto.
+    \end{enumerate}
+    \item \textbf{Fairness}: Quanto risulta equa la performance ottenuta per ciascun user.
+    \item \textbf{Workload}: Set di task per sistema da dover completare. Spesso questo viene utilizzato in contesti che non danno importanza ad un alta interattività ma alle performance (contesti di number crunching).
+\newpage
+    \item \textbf{Pre-Emptive Scheduler}: Permesso il prerilascio di risorse già assegnate ad un task, se una priorità di task già in esecuzione dovesse risultare più bassa di un task in entrata allora
+    scheduler ha il permesso di riassegnare la risorsa contesa.
+    \item \textbf{Scheduling Algorithms}: Algoritmi che ricevono in input i dettagli del contesto e producono in output il modo in cui gestire la schedulazione.
+\end{enumerate}
+
+\subsubsection{Politiche di Schedulazione}
+
+Esistono vari modi per gestire la schedulazione di task:
+
+\begin{enumerate}
+    \item \textbf{FIFO}: Workload composto di task che vengono schedulati in base all'ordine in cui arrivano, seguono quindi un ordine settato da una coda, per questo 
+    
+    è detta \textbf{politica FIFO}.
+    \vspace*{-10px}
+    \paragraph{Caratteristiche} Questa politica non valuta il tempo di completamento dei task. Di conseguenza i task più brevi se entrassero dopo task più lunghi dovrebbero aspettare tutta l'esecuzione di questi, dando poca importanza quindi all'interattività.
+    \item \textbf{Shortest Job First (SJF)}: Viene data priorità ai task più brevi.
+    \begin{enumerate}
+        \item \textbf{Non Pre-Emptive}: Lista ordinata sui tempi di completamento dei \textbf{READY}. Non prendiamo in considerazione dunque i thread in stato di \textbf{EXEC}.
+        \item \textbf{Pre-Emptive}: Oltre alla lista ordinata sui \textbf{READY}, in questa versione di (SJF) se un nuovo task ha un tempo di completamento inferiore al corrente task in stato di \textbf{EXEC} allora il task in esecuzione viene sostituito dal task in entrata. 
+    \end{enumerate}
+    \vspace*{-10px}
+    \paragraph{Caratteristiche} Analizziamo pro e contro di questa politica di scheduling:
+    \begin{enumerate}
+        \item \textbf{Pro}: Buona response time media, ottimale nell'essere responsive.
+        \item \textbf{Contro}: Si presentano una serie di contro:
+        \begin{enumerate}
+            \item Overhead causato dalle frequenti operazioni di schedulazione come le commutazioni.
+            \item Potenziali lunghe posticipazioni in condizioni specifiche come un task lungo seguito da task lunghi quasi quanto il primo.
+            \item A priori dovremmo conoscere il tempo d'esecuzione di un thread/processo.
+            \item Varianza alta nel tempo di risposta.
+        \end{enumerate}
+    \vspace*{5px}
+    \item \textbf{Round Robin}: Politica basata sulla \textbf{divisione} in \textbf{quanti} di \textbf{tempo} di task e l'esecuzione di questi risulterà indipendente dalla durata dei task a cui appartengono.
+    \vspace*{-10px}
+    \paragraph{Scelta Durata Quanto di Tempo} La scelta della durata di un quanto di tempo sarà influenzata da vari elementi:
+    \begin{enumerate}
+        \item Un quanto di tempo corto causerebbe un comportamento simile ad una (SJF) mentre uno lungo risulterebbe simile ad una FIFO.
+        \item Il quanto di tempo sarà gestito anche in base al tipo di computazione, alte prestazioni richiederebbero un ampio quanto, mentre alta interattività richiederebbe un breve quanto.
+    \end{enumerate}
     \end{enumerate}
 \end{enumerate}
 

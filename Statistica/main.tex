@@ -831,7 +831,7 @@ Data $X$ variabile aleatoria \textbf{discreta}, a valori in $a_{1}, a_{2}, ...$,
 
 \paragraph{Interpretazione}
 
-Può essere visto come il baricentro di $P$, o la media delle $a_{j}$ pesata con $p(a_{j})$.
+Può essere visto come il baricentro di $P$, o la media delle $a_{j}$ pesata con $p(a_{j})$. E' dunque la media su tutta la popolazione e non su un singolo campione.
 
 \paragraph{Valore Atteso su Variabile Aleatoria con Densità} Data $X$ variabile aleatoria con densità $f$, il valore atteso di $X$:
 
@@ -887,6 +887,155 @@ Il valore atteso in queste condizioni non è sempre finito, di conseguenza non �
         \sum_{j} a^{n}_{j} \: P(X = a_{j}) & \mbox{caso discreto}  \\
         \int_{-\infty}^{+\infty} x^{n}\: f(x) \: dx   & \mbox{caso con densità} 
         \end{array}\right. \]
+
+\paragraph{Disequazione di Markov}
+
+\vspace*{5px}
+
+Sia X variabile aleatoria $\leq 0,\: a > 0$, allora:
+
+\[ P(X \geq a) \leq \frac{1}{a} \mathbb{E}[X] \]
+
+\subparagraph{Dimostrazione} Dimostriamo la disequazione di Markov:
+
+%\vspace*{10px}
+
+\[ a 1[X] \geq a(\omega) \geq X(\omega) \]
+\[ E[a\:1[X \geq a]] \leq E[X] \]
+\[ 0 \: P(X < a) + a \: P(X \geq a ) = a \: P(X \geq a) \]
+
+\newpage
+
+\subsection{Varianza e Deviazione Standard}
+
+Riprendendo la varianza empirica:
+
+\[ Var_{e}(x) = \frac{1}{n}\sum_{i=1}^{n} (x_{i} - \overline{x})^{2} = \sum_{j=1}^{m} (a_{j} - \overline{x})^{2} \: * \: \text{frequenza relativa di} \: a_{j}   \]
+che rappresenta la dispersione dei dati attorno a $\overline{x}$.
+
+\paragraph{Definizione} Data $X$ variabile aleatoria con momento secondo $(E[X^{2}]  )$, allora la varianza di $X$ sarà:
+
+\[ Var(X) = E[(X- E[X])^{2}] = \sigma(x^{2})\]
+
+La deviazione standard di X invece sarà:
+
+\[ \sigma(X) = \sqrt{Var(X)} \]
+
+\paragraph{Interpretazione della Varianza}
+
+Media degli scarti quadratici da $E[X]$: indice della dispersione di $X$, più grande sarà la dispersione e maggiore sarà in modulo da **.**.
+
+\paragraph{Calcolo della Varianza} Definiamo il calcolo 
+
+\[ Var(X) = E[X^{2}] - E[X]^{2} \]
+
+dove
+
+\[ \sum a^{2}_{j}\: p^{X}(a_{j}) - E[X]^{2} \:\:\:\: \text{Se discreto} \]
+\[ \int x^{2}\: f(x)\:dx - E[X]^{2} \:\:\:\: \text{Se con densità}\]
+
+\paragraph{Proprietà di Scaling della Varianza} Immaginiamo $X$ v.a e $a,b \in \mathbb{R}$
+
+\[ Var(aX + b) = a^{2} \: Var(X) \] 
+
+\paragraph{Disequazione di Chebyshev}
+
+Data $X$ v.a con momento secondo, $d > 0$:
+
+\[ P(|X - E[X]| \geq d) \leq \frac{1}{d^{2}}Var(x) \]
+
+Stiamo quindi cercando di capire la probabilità che un valore stia fuori da un intervallo in termini di dispersione.
+
+\newpage
+
+\subsection{Valore Atteso e Varianza per Esempi Notevoli}
+
+\begin{enumerate}
+    \item \textbf{Binomiale} $(n,p)$: Conta i numeri di successi in $n$ prove ripetute, con probabilità di successo $p$:
+    \[ E[X] = 0 * P(X = 0) + 1 * P(X=1) = p \]
+    \[ E[X^{2}] = 0^{2} * P(X = 0) + 1^{2} * P(X=1) = p \]
+    \[ Var(X) = p - p^{2} = p(1-p) \]
+    \begin{enumerate}
+        \item \textbf{n Generica}:
+        \[ X_{i} =  \left\{ \begin{array}{rcl}
+        1 & \mbox{se successo alla i-esima prova}  \\
+        0 & \mbox{altrimenti} 
+        \end{array}\right. \]
+        \[ X = X_{1} + \cdots + X_{n} =  \]
+        \[ E[X] = E[X_{1}] + \cdots + E[X_{n}] = np \]
+        \[ Var(X) = np(1-p) \]
+
+    \end{enumerate}
+    \item \textbf{Geometrica}: Istante del primo successo è $T$ con $P(T=k) = p(1-p)^{k-1} $
+    \[ E[T] = \frac{1}{p} \]
+    \[ Var(T) = \frac{1-p}{p^{2}} \]
+    \item \textbf{Poisson}: Avendo $P(X=k)=\frac{\lambda^{k}}{k!}e^{-\lambda}$
+    \[ E[X] = \lambda \]
+    \[ Var(X) = \lambda \]
+    \item \textbf{Variabile Uniforme su Intervallo}: Variabile con densità $f(x) = \frac{1}{\beta - \alpha}\:1_{\alpha,\beta}(x)$:
+    \[ E[X] = \frac{\alpha + \beta}{2} \]
+    \[ E[X] = \int_{\alpha}^{\beta} x \: \frac{1}{\beta - \alpha} dx = \cdots = \frac{\alpha + \beta}{2} \]
+    \[ E[X^{2}] = \int_{\alpha}^{\beta} x^{2} \frac{1}{\beta - \alpha} dx = \cdots =  \]
+    \[ Var(X) = \frac{(\beta - \alpha)^{2}}{12} \]
+    \item \textbf{Esponenziale}: Dato un $\lambda$, avendo una densità $f(x) = \lambda e^{-\lambda x}\:1_{(0,+\infty)}(x)$:
+    \[ E[X] = \int_{0}^{\infty} x \lambda e^{-\lambda x} dx = \cdots = -\frac{1}{\lambda}e^{-\lambda x} = \cdots = \frac{1}{\lambda} \]
+    \[ Var(X) = \frac{1}{\lambda^{2}} \]
+\newpage
+    \item \textbf{Normali}: $X = N(m, \sigma^{2})$:
+    \[ m = 0, \: \: \sigma = 1 \:\:\:\: Z = N(0,1) \]
+    \[ E[Z] = \int_{-\infty}^{\infty} x \frac{1}{\sqrt{2\pi}}e^{\frac{-x^{2}}{2}} dx = 0\]
+    \[ E[Z^{2}] = Var(Z) = 1 \]
+    In generale però, per standardizzazione:
+    \[ X = \sigma Z + m \]
+    \[ E[X] = \sigma E[Z] + m = m \:\:\:\: \text{(per Linearità)} \]
+    \[ Var(X) = \sigma^{2} Var(Z) = \sigma^{2} \:\:\:\: \text{(per Scaling)}\]
+
+\end{enumerate}
+
+\section{Variabili Aleatorie Multivariate}
+
+Descriviamo le caratteristiche di variabili composte di più di una caratteristica:
+
+\subsection{Variabile Aleatoria Doppia} Dato uno spazio di probabilità $(\Omega, P)$ variabile rappresentata da una coppia $(X,Y)$ che corrisponde ad una funzione $(X,Y): \Omega \rightarrow \mathbb{R}^{2}$
+dove \[ \omega \in \Omega \mapsto (X(\omega), Y(\omega)) \in \mathbb{R}^{2} \]
+
+Questa variabile dunque è una coppia di caratteristiche quantitative degli esiti 
+
+dell'esperimento.
+
+\paragraph{Legge Congiunta di (X,Y)} 
+
+\[ P^{(X,Y)}: \mathbb{P}(\mathbb{R}^{2}) \rightarrow \mathbb{R} \:\: \text{data da} \:\: P^{(X,Y)}(C) = P((X,Y) \in C) \:\: \forall C \in \mathbb{R}^{2} \]
+\begin{center}
+    dove
+\end{center}
+\[ \{ (X,Y) \in C \} = (X,Y)^{-1} (C) \]
+
+\paragraph{Legge Marginale di X e di Y}
+
+\[ \text{Legge} \: \: P^{X} \: \text{di} \: X: P^{X}(A) = P(X \in A)  \]
+\[ \text{Legge} \: \: P^{Y} \: \text{di} \: Y: P^{Y}(B) = P(Y \in B)  \]
+
+\paragraph{Interpretazione della Conguinta/Marginale} La legge congiunta a differenza di quella marginale permette di mantenere informazioni riguardo le possibili
+relazioni tra le caratteristiche $X$ ed $Y$. Quindi dalla congiunta sarà possibile ricavare le marginali, ma non il contrario dato che non avremo le informazioni riguardo la relazione nelle marginali.
+
+\newpage
+
+\paragraph{Variabile Doppia Discreta} Una variabile aleatoria doppia è detta discreta se $(X,Y)$ assume un numero finito o numerabile di valori, cioè se $X$ ed $Y$ sono discrete.
+
+\paragraph{Funzione di Massa Congiunta di (X,Y)} Descriviamo la funzione di massa in questo contesto:
+
+\[ p^{(X,Y)}(a,b) = P(X=a,Y=b) \:\:\:\: (a,b) \in \mathbb{R}^{2} \]
+
+Da questa è possibile calcolare la legge congiunta come somma di funzioni di massa appartenenti a $C$:
+
+\[ P((X,Y) \in C) = \sum_{(a,b) \in C} P(X=a, Y=b) \:\:\:\: \forall C \in \mathbb{R}^{2} \]
+
+Definiamo cosa abbiamo prima accennato, ossia la possibilità di poter ricavare le funzioni di massa marginali dalla legge congiunta:
+
+\[ P(X = a) = \sum_{b \in \mathbb{R}} P(X=a, Y=b) \]
+\[ P(Y = b) = \sum_{a \in \mathbb{R}} P(X=a, Y=b) \]
+
 
 \newpage
 

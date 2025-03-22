@@ -1243,15 +1243,15 @@ Dimostriamo il teorema a pagina successiva.
         \[ \leq ||\:S\:||\:||\:S^{-1}\:||\:||\:e^{(0)}\:||\: \lim_{k \rightarrow \infty} ||\:D^{k}\:|| \]
         Dunque se tutti i $\lambda$ di $D^{k} = \begin{bmatrix}
             \lambda_{1} & & & \\
-            & \lambda_{1} & & \\
-            & & . & \\
+            & \ddots & & \\
+            & & \ddots & \\
             & & & \lambda_{n}
         \end{bmatrix} 
         $ se sono tutti $< 1$ allora per $k \rightarrow \infty$ convergono tutti i $\lambda$.
     \end{enumerate}
 \end{enumerate}
 
-\subsection{Th. Fa la Cosa Giusta* (con Dim.)}
+\subsection{Th. Fa la Cosa Giusta (con Dim.)}
 
 Se $\{ x^{(k)} \rightarrow x^{*} \}$ con $x^{(k+1)} = Px^{(k)} + q \Rightarrow x^{*} = Px^{*} + q$.
 
@@ -1263,6 +1263,271 @@ Se $\{ x^{(k)} \rightarrow x^{*} \}$ con $x^{(k+1)} = Px^{(k)} + q \Rightarrow x
     \[ x^{*} = (\lim_{k \rightarrow \infty} Px^{(k)}) + q \]
     \item Essendo continua tiro fuori $P$ dal limite:
     \[ x^{*} = P(\lim_{k \rightarrow \infty} x^{(k)}) + q = Px^{*} + q \:\: \boxed{} \]
+\end{enumerate}
+\vspace*{-20px}
+
+\paragraph{Interpretazione} Con questo teorema riusciamo dunque ad affermare che se un metodo converge, allora converge
+esattamente alla soluzione, appunto fa la cosa giusta.
+
+\vspace*{-10px}
+
+\paragraph{Piccolo Recap Pre-Metodi Iterativi}: Ricapitolando cosa visto fino ad ora, dato un sistema $Ax = b$, grazie ad una operazione di \textbf{splitting}
+scriviamo $A = M - N$ con $M$ invertibile, di conseguenza $det(M) \neq 0$. Riscrivendola abbiamo $(M-N)x = b \Leftrightarrow $ \\ $Mx = Nx + b \Leftrightarrow X = Px + q$ dove $P$ è
+la matrice di iterazione ed è definita \\ come $P = M^{-1}\:N$. Se non riuscissi a trovare una norma tale per cui $||P|| > 1$ allora non potrei affermare nulla sulla convergenza dei metodi. 
+Questo recap sarà utile durante l'introduzione dei due metodi iterativi presentati a pagina successiva.
+
+\newpage
+
+\subsection{Metodi Iterativi - Jacobi/Gauss-Seidel}
+
+Presentiamo due metodi di decomposizione additiva basati sulla scelta della matrice $M$ ed $N$ in due diversi modi:
+
+\[ \boxed{A = M - N} \]
+
+Entrambi i metodi richiedono che la matrice $M$ sia invertibile per essere applicati.
+
+\begin{enumerate}
+    \item \textbf{Metodo di Jacobi}:
+    \[
+        M =
+        \begin{bmatrix}
+        a_{11} & 0 & \cdots & 0 \\
+        0 & \ddots &  & \vdots \\
+        \vdots &  & \ddots & 0 \\
+        0 & \cdots & 0 & a_{nn}
+        \end{bmatrix},
+        \quad
+        N =
+        \begin{bmatrix}
+        0 & -a_{12} & \cdots & -a_{1n} \\
+        -a_{21} & \ddots & \ddots & -a_{2n} \\
+        \vdots & \ddots & \ddots & -a_{n-1,n} \\
+        -a_{n1} & \cdots & -a_{n,n-1} & 0
+        \end{bmatrix}
+    \]
+    Si sceglie come $M$ la \textbf{diagonale} di $A$, dunque $N$ sarà composta da tutti gli altri elementi negati.
+    \item \textbf{Metodo di Gauss-Seidel}:
+    \[
+        M =
+        \begin{bmatrix}
+        a_{11} & 0 & \cdots & 0 \\
+        a_{21} & \ddots &  & \vdots \\
+        \vdots &  & \ddots & 0 \\
+        a_{n1} & \cdots & a_{n,n-1} & a_{nn}
+        \end{bmatrix},
+        \quad
+        N =
+        \begin{bmatrix}
+        0 & -a_{12} & \cdots & -a_{1n} \\
+        0 & \ddots & \ddots & -a_{2n} \\
+        \vdots & \ddots & \ddots & -a_{n-1,n} \\
+        0 & \cdots & 0 & 0
+    \end{bmatrix}
+    \]
+    Si sceglie come $M$ la matrice \textbf{triangolare inferiore} di $A$, dunque $N$ sarà composta da tutti gli altri elementi negati.
+    
+\end{enumerate}
+    \subsubsection{Formulazione Metodo di Jacobi}
+    \begin{enumerate}
+        \item Riprendiamo la definizione vista nel recap della pagina precedente:
+        \[ x = M^{-1}(Nx^{(k)} + b) \Leftrightarrow \]
+        \vspace*{-12px}
+        \[ \Leftrightarrow Mx = (Nx^{(k)} + b)  = \]
+        \item Riscriviamo dunque tutto rispettando i formati di ciascun identificatore:
+        \vspace*{8px}
+        \[  \begin{bmatrix}
+            a_{11} & 0 & \cdots & 0 \\
+            0 & \ddots &  & \vdots \\
+            \vdots &  & \ddots & 0 \\
+            0 & \cdots & 0 & a_{nn}
+            \end{bmatrix}
+            \begin{bmatrix}
+                x^{(k+1)}_{1} \\
+                \vdots \\
+                \vdots \\
+                x^{(k+1)}_{n} 
+            \end{bmatrix} 
+            =
+            \begin{bmatrix}
+                b_{1} \\
+                \vdots \\
+                \vdots \\
+                b_{n} 
+            \end{bmatrix}
+            -
+            \begin{bmatrix}
+                0 & a_{12} & \cdots & a_{1n} \\
+                a_{21} & \ddots & \ddots & a_{2n} \\
+                \vdots & \ddots & \ddots & a_{n-1,n} \\
+                a_{n1} & \cdots & a_{n,n-1} & 0
+            \end{bmatrix}
+            \begin{bmatrix}
+                x^{(k)}_{1} \\
+                \vdots \\
+                \vdots \\
+                x^{(k)}_{n} 
+            \end{bmatrix}
+        \]
+        \item Consideriamo l'i-esima riga in modo tale da parametrizzare:
+        \[ a_{ii}x^{(k+1)}_{i} = b_{i} - ( a_{i1}x^{(k)}_{1} + a_{i2}x^{(k)}_{1} + \cdots + a_{i,i-1}x^{(k)}_{i-1} + a_{i,i+1}x^{(k)}_{i+1} + \cdots
+        + a_{in}x^{(k)}_{n} ) \]
+
+        \newpage
+
+        \item Generalizzo ulteriormente utilizzando sommatorie:
+        
+        \[ x_{i} = \frac{1}{a_{ii}} \left[ b_{i} - \sum_{j=1}^{i-1} a_{ij}x^{(k)}_{j} - \sum_{j=i+1}^{n} a_{ij}x^{(k)}_{j} \right] \]
+        \vspace*{3px}
+        \item Possiamo dunque ottenere delle stime sui costi in tempo ossia $O(n)$ per ciascuna componente, complessivamente il costo per iterazione sarà $O(n^{2})$.
+    \end{enumerate}
+
+\subsubsection{Formulazione Metodo di Gauss-Seidel}
+
+\begin{enumerate}
+    \item Riprendiamo la definizione vista nel recap della pagina precedente:
+        \[ x = M^{-1}(Nx^{(k)} + b) \Leftrightarrow \]
+        \vspace*{-12px}
+        \[ \Leftrightarrow Mx = (Nx^{(k)} + b)  = \]
+        \item Riscriviamo dunque tutto rispettando i formati di ciascun identificatore:
+        \vspace*{8px}
+        \[  \begin{bmatrix}
+            a_{11} & 0 & \cdots & 0 \\
+            a_{21} & \ddots &  & \vdots \\
+            \vdots &  & \ddots & 0 \\
+            a_{n1} & \cdots & a_{n,n-1} & a_{nn}
+            \end{bmatrix}
+            \begin{bmatrix}
+                x^{(k+1)}_{1} \\
+                \vdots \\
+                \vdots \\
+                x^{(k+1)}_{n} 
+            \end{bmatrix} 
+            =
+            \begin{bmatrix}
+                b_{1} \\
+                \vdots \\
+                \vdots \\
+                b_{n} 
+            \end{bmatrix}
+            -
+            \begin{bmatrix}
+                0 & a_{12} & \cdots & a_{1n} \\
+                0 & \ddots & \ddots & a_{2n} \\
+                \vdots & \ddots & \ddots & a_{n-1,n} \\
+                0 & \cdots & 0 & 0
+            \end{bmatrix}
+            \begin{bmatrix}
+                x^{(k)}_{1} \\
+                \vdots \\
+                \vdots \\
+                x^{(k)}_{n} 
+            \end{bmatrix}
+        \]
+        \item Consideriamo l'i-esima riga in modo tale da parametrizzare: 
+        \[ a_{i1}x^{(k+1)}_{1} = a_{i2}x^{(k+1)}_{2} + \cdots + a_{ii}x^{(k+1)}_{i} = b_{i} - a_{i,i-1}x^{(k)}_{i+1} + a_{i,i-2}x^{(k)}_{i+2} + a_{in}x^{(k)}_{n} \]
+        \item Generalizzo ulteriormente utilizzando sommatorie:
+        \[ x_{i} = \frac{1}{a_{ii}} \left[ b_{i} - \sum_{j=1}^{i-1} a_{ij}x^{(k+1)}_{j} - \sum_{j=i+1}^{n} a_{ij}x^{(k)}_{j} \right] \]
+        \item Anche in questo caso il costo per iterazione sarà $O(n^{2})$.
+    
+\end{enumerate}
+
+\newpage
+
+\subsubsection{Criterio d'Arresto e Bontà Approssimazione del Metodo Iterativo}
+
+Abbiamo già stabilito quali possono essere dei criteri d'arresto per un metodo iterativo, mostriamone uno:
+
+\[ ||\: x^{(k+1)} - x^{(k)} \:|| \leq tol \]
+
+Torniamo sulla definizione di $x$, $x^{(k)}$ e $x^{(k+1)}$:
+
+\[ \boxed{x = Px + q} \: \: \: \: \: \: \: \: \boxed{x^{(k+1)} = Px^{(k)}+q} \]
+
+Vogliamo dunque identificare un criterio d'arresto anche in base all'errore:
+
+\[ e^{(k)} = x^{(k)} - x^{(0)} \]
+
+Fermarsi secondo un arbitrario criterio d'arresto non implica aver prodotto una buona soluzione perchè la successione potrebbe star convergendo lentamente, producendo così una cattiva approssimazione.
+In ogni caso vogliamo definire oggettivamente come valutare un criterio d'arresto:
+
+\begin{enumerate}
+    \item Partiamo dal contenuto della norma citata sopra e sottraiamo e sommiamo $x$:
+    \[ x^{(k+1)} - x^{(k)} = x^{(k+1)} - x - ( x^{(k)} - x ) = e^{(k+1)} - e^{(k)}\]
+    \item Avevamo dimostrato che l'errore al passo $k+1$ era:
+    \[ e^{(k+1)} = Pe^{k} \]
+    \item Tornando quindi ad $(1.)$ e mettiamo in evidenza $e^{(k)}$:
+    \[ Pe^{(k)} - e^{(k)} = e^{(k)}[P - I] \]
+    \item Essendo che $e^{(k)} = x^{(k)} - x, \:\:\: e^{(k+1)} = x^{(k+1)} - x$, allora $ Pe^{(k)} - e^{(k)} = (x^{(k+1)} - x^{(k)} )$, possiamo quindi sostituire in $(3.)$:
+    \vspace*{10px}
+    \[ e^{(k)} = (P - I)^{-1} \: (x^{(k+1)} - x^{(k)} ) \:\:\: \Leftrightarrow \:\:\: \text{(Norme a sx e dx)} \]
+    \vspace*{5px}
+    \[ || \: e^{(k)} \:|| = ||\: (P - I)^{-1} \: x^{(k+1)} - x^{(k)} \: || \leq \:\:\: \Leftrightarrow \:\:\: \text{(Compatibilità Norme)} \]
+    \vspace*{5px}
+    \[ \leq ||\: (P - I)^{-1} \: || \: || \: x^{(k+1)} - x^{(k)} \: || \leq \:\:\: \Leftrightarrow \:\:\: ((x^{(k+1)} - x^{(k)}) = tol) \]
+    \vspace*{5px}
+    \[ \leq ||\: (P - I)^{-1} \: || \: tol \]
+    \newpage
+    \item Possiamo da questo analizzare la bontà del criterio d'arresto, grazie allo studio 
+    
+    dell'oggetto $||\: (P - I)^{-1} \: ||$, nello specifico vogliamo analizzare il suo raggio spettrale, ossia il più grande
+    in modulo tra gli autovalori:
+    \[ \frac{1}{\lambda p - 1} \]
+    Questo rapporto è dato dall'inversa della matrice $(P-I)$, di conseguenza un raggio spettrale $\rho(P)$ vicino ad $1$ produrrà una cattiva approssimazione, 
+    mentre un raggio spettrale $\rho(P)$ lontano da $1$ produrrà una buona approssimazione.
+    
+
+\end{enumerate}
+
+\subsubsection{Th. Condizioni Sufficienti per la Convergenza Metodi Jacobi e Gauss-Seidel (con Dim.)}
+
+Sia $A \in \mathbb{R}$ a predominanza diagonale (riga o colonna), allora:
+
+\begin{enumerate}
+    \item $A$ è invertibile.
+    \item I metodi di Jacobi e Gauss-Seidel sono applicabili.
+    \item I metodi di Jacobi e Gauss-Seidel sono convergenti.
+\end{enumerate}
+
+\paragraph{Dimostrazione} Dimostriamo tutte e tre le proprietà elencate sopra:
+
+\begin{enumerate}
+    \item Già visto, con i cerchi di Gershgorin ossia:
+    \[ |a_{ii}| > \sum_{j=1, j \neq i}^{n} |a_{ij}| \]
+    \item Lo dimostriamo utilizzando anche quello che abbiamo appena affermato, ma notando anche che deve essere $\geq 0$:
+    \[ |a_{ii}| > \sum_{j=1, j \neq i}^{n} |a_{ij}| \geq 0 \]
+    \item Supponiamo per assurdo che i metodi non siano convergenti $\Leftrightarrow \exists \lambda$ tale che $|\lambda| \geq 1$ con $\lambda$ autovalore di $P$ sia di Jacobi sia di Gauss-Seidel:
+    \begin{enumerate}
+        \item $\lambda$ verifica dunque nell'equazione caratteristica:
+        \[ 0 = det(P - \lambda I) = det(M^{-1}N - \lambda I ) = det(M^{-1}N - \lambda (M^{-1}M) ) = \]
+        \[ = det(-M^{-1}(\lambda M - N)) = det(-M^{-1}) \: det(\lambda M - N) = 0 \]
+        \item Osservando l'ultima espressione del punto precedente, dato che $M$ è invertibile, allora sicuramente dovrà essere l'altro termine della moltiplicazione
+        a causare l'uguaglianza con $0$. Di conseguenza:
+        \[ \lambda \:\: \text{è autovalore} \Longleftrightarrow H = \lambda M - N \:\: \text{è singolare} \]
+\newpage
+        \item Bisogna dunque dimostrare che questo è un assurdo dato che $H$ risulta essere a predominanza diagonale. Analizziamo da adesso in poi
+        in maniera distinta il comportamento di entrambi i metodi:
+        \begin{enumerate}
+            \item \textbf{Jacobi}: La matrice $H$ in questo caso corrisponde a:
+            \[ H = \begin{bmatrix}
+                \lambda a_{11} & a_{ij} & \cdots & a_{ij} \\
+                a_{ij} & \ddots & & \vdots \\
+                \vdots & & \ddots & a_{ij}\\
+                a_{ij} & \cdots & a_{ij} & \lambda a_{nn}
+            \end{bmatrix} \]
+        Ma questa matrice risulta essere a predominanza diagonale, di conseguenza è un assurdo, formalmente:
+        \[ |h_{ii}| = |\lambda a_{ii}| = |\lambda|\:|a_{ii}| \geq |a_{ii}| \geq \sum_{j=1, j \neq i}^{n} |a_{ij}| \]
+            \item \textbf{Gauss-Seidel}: La matrice $H$ in questo caso corrisponde a:
+            \[ H = \begin{bmatrix}
+                \lambda a_{11} & a_{ij} & \cdots & a_{ij} \\
+                \lambda a_{21} & \ddots & & \vdots \\
+                \vdots & & \ddots & a_{ij}\\
+                \lambda a_{n1} & \cdots & \lambda a_{n,n-1} & \lambda a_{nn}
+            \end{bmatrix} \]
+            Formalmente:
+            \[ |\lambda|\:|a_{ii}| = |\lambda| \: \sum_{j=1, j \neq i}^{n} |a_{ij}| = \sum_{j=1}^{i-1} |\lambda| \: |a_{ij}| + \sum_{j=i+1}^{n} |\lambda| \: |a_{ij}| \geq \sum_{j=1}^{i-1} |\lambda a_{ij}| + \sum_{j=i+1}^{n} |a_{ij}| \]
+            Quindi $H$ risulta essere a predominanza diagonale, di conseguenza è assurdo.
+        \end{enumerate}
+    \end{enumerate}
 \end{enumerate}
 
 \newpage
