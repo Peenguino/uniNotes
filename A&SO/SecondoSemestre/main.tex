@@ -1323,7 +1323,7 @@ In conclusione possiamo dunque affermare che la commutazione comporta un costo e
 
 \newpage
 
-\subsection{Sincronizzazioni}
+\section{Sincronizzazioni}
 
 La gestione multithread del flusso di un programma complica la situazione, dato che risulta necessario garantire consistenza dei risultati qualsiasi sia
 la schedulazione dei thread in gioco. Elenchiamo dunque tutti i punti fondamentali della sincronizzazione e le problematiche che bisogna gestire:
@@ -1345,7 +1345,7 @@ la schedulazione dei thread in gioco. Elenchiamo dunque tutti i punti fondamenta
 
 Analizziamo dunque tutti i tipi di \textbf{meccanismi di sincronizzazione} tra threads nelle pagine successive.
 
-\subsubsection{Spinlock}
+\subsection{Spinlock}
 
 Meccanismo di attesa attiva sullo stato locked di un mutex. A differenza dei meccanismi che vedremo successivamente
 non cerca di deschedulare un thread per poi risvegliarlo successivamente, ma lo lascia attendere attivamente in modo tale che
@@ -1365,7 +1365,7 @@ Semanticamente corrisponde a $ MEM[r1+r2] \rightleftarrows r0 $, settando dei va
 
 \newpage
 
-\subsubsection{Lock}
+\subsection{Lock}
 
 Il lock è un oggetto condiviso tra i vari thread, ciascuno di essi può effettuare due operazioni:
 
@@ -1409,7 +1409,7 @@ Vengono dunque effettuati questi \textbf{passi} nel caso in cui il \textbf{lock}
 
 \newpage
 
-\subsubsection{Condition Variables}
+\subsection{Condition Variables}
 
 Questo nuovo costrutto ci permette aggiungere un "layer" alla sincronizzazione vista con i lock. Sarà infatti necessario combinare queste variabili
 all'utilizzo dei lock per costruire un attesa condizionale basata su operazioni di \textbf{wait} e \textbf{signal}, elenchiamo tutto in dettaglio:
@@ -1454,7 +1454,7 @@ queste motivazioni:
     \item L'operazione di wait va sempre fatta in un loop, sia in semantica Mesa sia in Hoare.
 \end{enumerate}
 
-\subsubsection{Semafori}
+\subsection{Semafori}
 
 Ulteriore meccanismo di sincronizzazione, nello specifico definiremo i \textbf{semafori contatori}\footnote{Questo perchè se la variabile fosse binaria allora staremmo rappresentando veri e propri mutex.}, ossia oggetti che oltre alla sincronizzazione
 riescono anche a conservare uno stato interno a differenza delle condition variables. Descriviamo la composizione di un semaforo:
@@ -1991,6 +1991,129 @@ Esistono vari modi per gestire la schedulazione di task:
     \end{enumerate}
     \end{enumerate}
 \end{enumerate}
+
+\newpage
+
+\subsubsection{Multi Level Feedback Queue}
+
+Per rendere la \textbf{schedulazione} il più \textbf{fair} possibile è necessario che ogni tipologia
+di job nel workload (CPU Bounded o I/O Bounded) abbia la stessa possibilità di essere schedulato.
+Una normale applicazione di una politica di Round Robin potrebbe infatti causare una schedulazione non fair nei confronti
+dei processi I/O Bounded.
+
+\paragraph{Obiettivi} Questo approccio si basa su un insieme di code caratterizzate da priorità diverse. Questo meccanismo vuole garantire:
+
+\begin{enumerate}
+    \item Migliorare i tempi di risposta.
+    \item Bassa overhead.
+    \item Diminuzione di casi di starvation.
+    \item Possibilità di caratterizzare un task con un livello di priorità alta/bassa.
+    \item Essere il più fair possibile su task caratterizzati dallo stesso livello di priorità.
+\end{enumerate}
+
+\paragraph{Caratteristiche} Questo meccanismo si basa su questi elementi fondamentali:
+
+\begin{enumerate}
+    \item Struttura di code, ciascuna con priorità diversa.
+    \item Priorità più alte hanno quanti di tempo più brevi.
+    \item Schedulatore estrae task da eseguire sempre dalla coda con almeno un elemento e di priorità più alta disponibile.
+    \item Meccanismo di feedback che dia la possibilità di spostare un task da una coda ad un altra in base a specifici indici.
+    \item Uno schema di \textbf{posizionamento} di \textbf{task} nelle \textbf{code}:
+    \begin{enumerate}
+        \item Task in entrata vengono \textbf{posizionati} sempre a \textbf{priorità} più \textbf{alta}.
+        \item Task che si \textbf{sospendono} (come per yield o I/O) \textbf{restano} al loro \textbf{livello} oppure \textbf{crescono}.
+        \item Task che \textbf{esauriscono} il loro quanto di tempo passano al \textbf{livello sottostante}.
+    \end{enumerate}
+\end{enumerate}
+
+\paragraph{Esempio di Gestione a Code di Priorità - Windows}
+
+Windows posiziona i propri task in $32$ code di schedulazione suddivise in \textbf{system} e \textbf{user}:
+
+\begin{enumerate}
+    \item Viene data la priorità ai task lato system.
+    \item Ai task in entrata di tipo user viene dato un livello pari ad $8$:
+    \begin{enumerate}
+        \item Se questo appartiene ad operazione di I/O allora viene incrementata la priorità in base al tipo di I/O.
+        \item Se riattivata da una wait (operazione di sync) allora:
+        \[ \text{da Background} \: \mapsto +1 \:\:\:\:\: \text{da Foreground} \: \mapsto +2 \:\:\:\:\: \text{se usa tutto il quanto} \: \mapsto -1 \]
+    \end{enumerate}
+\end{enumerate}
+
+\newpage
+
+\paragraph{Inversione di Priorità} Potrebbe risultare utile menzionare questa condizione per cui un task appartenente ad una coda di priorità alta si metta in attesa di un task contenuto in una coda
+a priorità minore.
+
+\paragraph{Riepilogo Caratteristiche Politiche di Schedulazione} Piccolo riepilogo delle caratteristiche delle politiche descritte sopra:
+
+\begin{enumerate}
+    \item \textbf{FIFO}: Gestione semplice a coda:
+    \begin{enumerate}
+        \item Task di lunghezza variabile porta task brevi ad attendere task lunghi.
+        \item Task di lunghezza costante è un ottima politica di scheduling.
+    \end{enumerate}
+    \item \textbf{Shortest Job First}: Gestione a coda ordinata per tempo di esecuzione:
+    \begin{enumerate}
+        \item Ottima per la media di tempo di risposta.
+        \item Pessima per varianza di tempo di risposta.
+        \item Risulta necessario conoscere il tempo d'esecuzione di un task.
+    \end{enumerate}
+    \item \textbf{Round Robin}: Gestione "migliore" o più nello specifico gestione che ci permette di definire in maniera personalizzata i quanti di tempo. Abbiamo però visto
+    come risulti necessario utilizzare sistemi di code di priorità per rendere la politica fair.
+\end{enumerate}
+
+\subsubsection{Schedulazione Multi-Processor}
+
+Descriviamo le politiche di schedulazione su architetture Multi-Processor:
+
+\paragraph{Scheduling Oblivious} I thread che compongono i processi in questa politica vengono assegnati a core indipendentemente dal processo a cui appartengono. In questo modo lo scheduler non è a conoscenza della disponibilità di core diversi, semplicemente \textbf{schedula thread} su \textbf{core} in \textbf{maniera arbitraria}.
+Dunque thread dello stesso processo potrebbero essere schedulati su core diversi e questo potrebbe causare una gestione pesante dei dati tra le varie cache dei core, ma resta lo schema più semplice.
+Questo tipo di scheduling presenta diversi punti di debolezza:
+
+\begin{enumerate}
+    \item Produce delay in caso di utilizzi di BSP e Producer/Consumer.
+    \item Produce delay in casi di path critici.
+    \item Produce I/O delay su alcuni threads.
+\end{enumerate}
+
+\paragraph{Affinity Scheduling} Ogni core ha la propria MCQ, e di conseguenza si riposizionano i threads nella lista pronti da dove sono stati estratti più recentemente. I processori in idle possono fare \textbf{stealing} di task di altri core per bilanciare il workload tra i core. L'obiettivo è quello di bilanciare il workload mantenendo più affinità di cache possibile.
+
+\newpage
+
+\paragraph{Pattern di Programmazione Multithread} Nella programmazione multithread 
+
+riconosciamo dei pattern di utilizzo:
+
+\begin{enumerate}
+    \item \textbf{(BSP) - Bulk Synchronous Parallel}: Normalmente i thread comunicano durante il loro corso d'esecuzione. In questo pattern invece si crea una barriera che imposta un \textbf{momento} di \textbf{comunicazione sincronizzato}.
+    \begin{figure}[htbp]
+        \center
+        \includegraphics[scale=0.35]{img/BSP.png}
+    \end{figure}
+    Lo schema BSP si compone dunque di due fasi:
+    In generale quindi questo pattern crea la necessità di dover gestire i tempi di idle, magari deschedulando questi thread.
+    
+    \begin{enumerate}
+        \item \textbf{Fase Superstep}: I thread sono in esecuzione fino al loro completamento, tutti i thread che non sono quelli con il maggior tempo di completamento passano ad uno stato di idle in attesa del completamento del più lungo.
+        \item \textbf{Fase Comunicazione}: Tutti i thread comunicano tra loro in maniera sincrona.
+    \end{enumerate}
+    \item \textbf{Pipeline - Produttore/Consumatore}: La pipeline si basa su entità consecutive, ciascuna basa il proprio input sull'output di quello precedente, come nel processore pipeline appunto che
+    si basava su fasi come $FETCH, DECODE, EXEC$. Dunque il pattern si basa sui producer che pushano dati in un buffer ed i producer estraggono dati dal buffer.
+\end{enumerate}
+
+% Finisci di argomentare su pipeline poi:
+% - Problema del cammino critico
+% - Gang Scheduler vs Space Sharing
+
+\paragraph{Gang/Space Scheduling} Descriviamo questi tipi due tipi di scheduling:
+
+\begin{enumerate}
+    \item \textbf{Gang Scheduling}: Si tenta di schedulare tutti i thread appartenenti ad un processo, altrimenti non lo si manda in esecuzione.
+    \item \textbf{Space Scheduling}: Si schedulano diversi task di processi a diversi core.
+\end{enumerate}
+
+\paragraph{Problema del Cammino Minimo} Ogni nodo rappresenta un thread e un arco una dipendenza. Il cammino critico corrisponde al \textbf{cammino più lungo} in termini di tempo dalla radice alla foglia.
 
 \newpage
 
