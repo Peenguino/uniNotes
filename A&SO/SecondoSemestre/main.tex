@@ -1174,7 +1174,7 @@ Mostriamo pseudocodice C dell'utilizzo della syscall pipe e dei buffer che gener
 
 \vspace*{10px}
 \begin{lstlisting}[language = C]
-    int fd[2]; // fd[0] parte lettura, fd[0] parte scrittura
+    int fd[2]; // fd[0] parte lettura, fd[1] parte scrittura
     if (pipe(fd) == -1) { // Creazione della pipe
         perror("pipe failed");
         exit(1);
@@ -1350,7 +1350,7 @@ Analizziamo dunque tutti i tipi di \textbf{meccanismi di sincronizzazione} tra t
 Meccanismo di attesa attiva sullo stato locked di un mutex. A differenza dei meccanismi che vedremo successivamente
 non cerca di deschedulare un thread per poi risvegliarlo successivamente, ma lo lascia attendere attivamente in modo tale che
 quando la risorsa sarà liberata quest'ultimo potrà accedervi. In specifici contesti questo approccio risulta più economico in termini di tempo
-dato che con comporta nessuna commutazione di contesto. Spesso questo è implementabile in maniera abbastanza semplice dato che diverse architetture offrono
+dato che non comporta nessuna commutazione di contesto. Spesso questo è implementabile in maniera abbastanza semplice dato che diverse architetture offrono
 istruzioni specifiche che causano dei comportamenti corrispondenti ad una spinlock.
 
 \vspace*{5px}

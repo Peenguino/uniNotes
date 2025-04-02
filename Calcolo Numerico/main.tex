@@ -1532,4 +1532,252 @@ Sia $A \in \mathbb{R}$ a predominanza diagonale (riga o colonna), allora:
 
 \newpage
 
+\section{Metodi Numerici per l'Approssimazione degli Zeri di una Funzione}
+
+Definiamo gli \textbf{zeri di una funzione}, nello specifico data una funzione $f:[a,b] \rightarrow \mathbb{R}$ vogliamo determinare valori $\alpha \in (\alpha, \beta) : f(\alpha) = 0$ dove $\alpha$ sono gli zeri di funzione\footnote{Metodo di Newton si adatterà alle funzioni ad n variabili, mentre il Metodo delle Tangenti solo ad 1 variabile.} o soluzione dell'equazione $f(x)=0$, e questo graficamente corrisponde a trovare le intersezioni della funzione con l'asse delle x. 
+
+\subsection{Recall - Th. Esistenza degli Zeri e Metodo di Bisezione}
+
+Citiamo questi due elementi che ci permettono di osservare un primo metodo di approssimazione degli zeri di una funzione:
+
+\paragraph{Th. Esistenza degli Zeri} Data una funzione $f[a,b] \rightarrow \mathbb{R}$ con $f \in C^{0}(a,b)$ allora\footnote{L'esponente al intervallo C(a,b) indica l'esistenza della derivata continua della funzione corrente.}:
+
+\[ \boxed{f(a)f(b) \Rightarrow \exists \alpha : f(\alpha) = 0} \]
+
+Questo teorema viene utilizzato come discriminante nel metodo di bisezione che funziona proprio come una ricerca binaria: viene selezionato l'intervallo sx o dx in base a \\ se $f(a)f(c) < 0$ oppure $f(c)f(b) < 0$.
+
+\paragraph{Implementazione Matlab del Metodo di Bisezione} Mostriamo un implementazione in pseudo Matlab dell'implementazione del metodo di bisezione.
+
+\vspace*{8px}
+
+\begin{lstlisting}
+    function alfa = bisezione(f,a,b,epsilon)
+        f_a = f(a)
+        f_b = f(b)
+        if f_a * f_b > 0
+            error("Intervallo Sbagliato, prodotto > 0")
+        end
+        k = ceil(log2( (b-a) / epsilon + 1 ))
+        for iter = 1 : k
+            c = (a+b) / 2
+            f_c = f(c)
+            if f_a * f_c < 0
+                b = c
+                f_b = f_c
+            else
+                a = c
+                f_a = f_c
+            end
+        end
+        alfa = (a+b) / 2
+    end
+\end{lstlisting}
+
+\newpage
+
+\subsubsection{Th. Convergenza del Metodo di Bisezione (con Dim.)}
+
+Se $f \in C^{0}[a,b]$ con $f(a)f(b) < 0$ allora:
+
+\[ \lim_{k \rightarrow \infty} a_{k} = \lim_{k \rightarrow \infty} b_{k} = \lim_{k \rightarrow \infty} c_{k} = \alpha \]
+
+\paragraph{Dimostrazione} Dimostriamo il teorema:
+
+\begin{enumerate}
+    \item Bisogna dimostrare che $a_{k}, b_{k}, c_{k}$ sono successioni monotone e limitate, ossia:
+    \[ a_{k} \leq a_{k+1} \:\: \text{e} \:\: b_{k} \leq b_{k+1} \]
+    considerando che per ipotesi $c_{k}$ sta in mezzo a $a_{k}$ e $b_{k}$.
+    \item Consideriamo la k-esima iterazione, di conseguenza questo ci causa il denominatore al terzo termine, stiamo dividendo in due parti ad ogni iterazione:
+    \[ 0 \leq b_{k} - a_{k} = \frac{b - a}{2^{k}-1} \]
+    \item Consideriamo il limite ad ogni termine:
+    \[ 0 \leq \lim_{k \rightarrow \infty} b_{k} - a_{k} = \lim_{k \rightarrow \infty} \frac{b - a}{2^{k}-1} \]
+    Riusciamo dunque ad ottenere che $\epsilon = \lim_{k \rightarrow \infty} a_{k} = \lim_{k \rightarrow \infty} b_{k}$ dato che la loro differenza è pari a $0$.
+    \item Passiamo al limite del prodotto della funzione nei due estremi:
+    \[ \Leftrightarrow \:\:\: \lim_{k \rightarrow \infty} f(a_{k})f(b_{k}) = f(\lim_{k \rightarrow \infty}a_{k})f(\lim_{k \rightarrow \infty}b_{k}) \:\:\: \Leftrightarrow \:\:\: \epsilon = \lim_{k \rightarrow \infty} a_{k} = \lim_{k \rightarrow \infty} b_{k} \]
+    \[ \Leftrightarrow \:\:\: f^{2}(\epsilon) \:\: \text{e quindi} f^{2}(\epsilon) \geq 0 \Rightarrow \boxed{f(\epsilon) = 0} \:\:\: \boxed{} \]
+\end{enumerate}
+
+\subsubsection{Criterio d'Arresto per Metodo di Bisezione}
+
+Assumendo che $b_{k} - a_{k} \leq \epsilon$ posso approssimare $\alpha$ con il punto di mezzo dell'intervallo, in questo modo $| \tilde{x} - x | < \epsilon$ non è una semplice stima ma l'effettivo errore commesso, nello specifico $| \tilde{\alpha} - \alpha | < \frac{\epsilon}{2}$.
+Di conseguenza otteniamo:
+
+\[ b_{k} - a_{k} = \frac{b-a}{2^{k-1}} < \epsilon \:\:\: \Leftrightarrow \:\:\: b-a < \epsilon(2^{k-1}) \]
+\[ \Leftrightarrow \:\:\: \frac{b-a}{\epsilon} < 2^{k-1} \:\:\: \Leftrightarrow \:\:\: log(\frac{b-a}{\epsilon}) < k-1 \:\:\:  \Leftrightarrow \:\:\: k > log(\frac{b-a}{\epsilon})\]
+\[ \text{Istanziando quindi al nostro} \:\:\: 2^{-16} = \epsilon \:\:\: \Leftrightarrow \:\:\: k > 17 \]
+
+\paragraph{Osservazioni sul Metodo di Bisezione} E' un metodo semplice, ha bisogno solo della continuità e converge ad un numero finito di passi. In parallelo però non ha interessi nei confronti delle caratteristiche della funzione in input, dunque se questa dovesse essere lenta allora farà comunque un numero arbitrario di passi, anche se l'intervallo fosse piccolo.  
+
+\newpage
+
+\subsection{Metodo di Punto Fisso}
+
+Questo metodo si basa sull'utilizzo di espressioni equivalenti:
+
+\[ f(x) = 0 \:\:\: \text{è equivalente a} \:\:\: \boxed{x = g(x)} \:\:\: \Leftrightarrow \:\:\: f(\alpha) = 0 \: \Leftrightarrow \: \alpha = g(\alpha) \]
+
+La parte boxata causerà l'utilizzo della bisettrice primo-terzo quadrante.
+
+\paragraph{Definizione di Punto Fisso} Un punto $\alpha$ è \textbf{punto fisso} per $g(x)$ se $\alpha = g(\alpha)$:
+
+\[ \left\{ \begin{array}{rcl}
+    x_{0} \in (a,b) \\
+    x_{k+1} = g(x_{k})
+    \end{array}\right.
+    \:\:\:\: \text{(Metodo di Punto Fisso)}
+\]
+
+\subsubsection{Th. Fa la Cosa Giusta (in questo contesto)}
+
+Anche in questo caso se la successione converge allora converge alla soluzione:
+
+\[ \lim_{k \rightarrow \infty} x_{k} = \alpha \:\: \Rightarrow \:\: \alpha = g(\alpha) \:\: \text{con} \:\: x_{k} \in [a,b] \]
+
+\subsubsection{Convergenza Locale}
+
+Date $g:[a,b] \rightarrow \mathbb{R}$ sia $\alpha$ tale che $\alpha \in (a,b)$ e $\alpha = g(\alpha)$ allora il metodo
+
+\[ 
+\left\{ \begin{array}{rcl}
+    x_{0} \in (a,b) \\
+    x_{k+1} = g(x_{k})
+    \end{array}\right.
+    \:\:\:\: \text{(Metodo di Punto Fisso)} 
+\]
+
+è detto \textbf{localmente convergente} se:
+
+\vspace*{-8px}
+
+\[ \exists \rho > 0 \: : \: \forall x_{0} \in [x_{0}-\rho,x_{0}+\rho] \:\:\: \text{tale che:} \]
+
+\begin{enumerate}
+    \item $x_{k} \in [x_{0}-\rho,x_{0}+\rho]$
+    \item $\lim_{k \rightarrow \infty} x_{k} = \alpha$
+\end{enumerate}
+
+\subsubsection{Th. del Punto Fisso (con Dim.)}
+
+Sia $g:[a,b] \rightarrow \mathbb{R}$, $g \in C^{1}(a,b)$, $\alpha = g(\alpha)$ con $\alpha \in (a,b)$:
+
+\begin{enumerate}
+    \item \textbf{Ipotesi}: Se $\exists \rho > 0 \: : \: |g'(x)| < 1 \:\:\: \forall x \in I_{\alpha} = [x_{0}-\rho,x_{0}+\rho]$
+    \item \textbf{Tesi}: $\forall x_{0} \in I_{\alpha}$ con $x_{k+1} = g(x_{k})$ valgono:
+    \begin{enumerate}
+        \item $x_{k} \in I_{\alpha}$
+        \item $\lim_{k \rightarrow \infty} x_{k} = \alpha$
+    \end{enumerate}
+\end{enumerate}
+
+\paragraph{Dimostrazione} Dimostriamo il seguente teorema:
+
+\begin{enumerate}
+    \item Per ipotesi sappiamo che in $I_{\alpha}$ abbiamo che $|g'(x)| < 1 \: \forall x$, allora prendiamo il massimo e lo chiamiamo $\lambda$:
+    \[ \lambda = max_{x \in I_{\alpha}} |g'(x)| < 1 \]
+    In particolare è per Weiestrass che so che esiste massimo dato che $g'(x)$ è continua e quindi $|g'(x)|$ è una composizione di continue ed ammette massimo.
+    
+\newpage
+
+    \item Vogliamo dimostrare questa maggiorazione sull'errore al passo k-esimo:
+    \[ |x_{k} - \alpha| \leq \lambda^{k}\rho \:\:\:\: \text{(STATEMENT 1)} \]
+    Se vale (STATEMENT 1) allora sicuramente $x_{k} \in I_{\alpha}$.
+    \item In particolare, se (STATEMENT 1) fosse vero avremmo:
+    \begin{enumerate}
+        \item $|x_{k} - \alpha| \leq \lambda^{k}\rho \leq \rho \Rightarrow x_{k} \in I_{k}$
+        \item $x_{k} \rightarrow \alpha \:\:\:\: 0 \leq |x_{k} - \alpha| \leq \lambda^{k}\rho$ dove tutti e tre i termini in questa disequazione tendono a 0, quello centrale grazie al teorema del confronto.
+    \end{enumerate}
+    \item Dimostriamo (STATEMENT 1) per induzione:
+    \begin{enumerate}
+        \item \textbf{Caso Base}: $k=0$, $|x_{0} - \alpha | \leq \lambda^{0}\rho \leq \rho$ sapendo che per ipotesi $x_{0} \in I_{\alpha}$.
+        \item \textbf{Caso Induttivo}: Assumiamo che sia valida $|x_{k}-\alpha| \leq \lambda^{k}\rho$ per la k-esima iterazione e dimostriamo che questo implica la validità di k+1 (IPOTESI INDUTTIVA).
+        \begin{enumerate}
+            \item Considero il passo $k+1$:
+            \[ |x_{k+1} - \alpha | \leq \lambda^{k+1}\rho  \]
+            \item Utilizzo $g$ per esprimere $x_{k+1}$:
+            \[ |x_{k+1} - \alpha| = |g(x_{k}) - g(\alpha) | \]
+            \item Applico Lagrange al primo termine del punto precedente:
+            \[ |g(x_{k}) - g(\alpha)| = |g'(\epsilon) (x_{k} - \alpha)| = |g'(\epsilon)|\:|x_{k} - \alpha| \]
+            \item Maggiorazione utilizzando l'ultimo termine del punto precedente, sapendo per hp. induttiva che $x_{k} - \alpha \leq \lambda^{k}\rho$:
+            \[ |g'(\epsilon)|\:|x_{k} - \alpha| \leq |g'(\epsilon)|\:\lambda^{k}\:\rho \]
+            \item Si conclude la dimostrazione dato che:
+            \[ \epsilon \in I_{\alpha} \:\:\: \text{perchè} \:\:\: |\epsilon - \alpha| \leq |x_{k} - \alpha| \leq \rho \]
+        \end{enumerate}
+    \end{enumerate}
+\end{enumerate}
+
+\newpage
+
+\subsubsection{Corollario Th. del Punto Fisso (con Dim.)}
+
+Sia $g:[a,b] \rightarrow \mathbb{R}$, $g \in C^{1}(a,b)$, $\alpha = g(\alpha)$ con $\alpha \in (a,b)$, allora:
+
+\[ \text{Se} \:\:\: |g'(\alpha)| < 1 \:\:\: \Rightarrow \:\:\: \text{Il metodo converge localmente}\]
+
+\paragraph{Dimostrazione} Consideriamo una funzione $h$:
+
+\begin{enumerate}
+    \item $h(x)$ sarà la differenza tra $1$ e $|g'(x)|$:
+    \[ h(x) = 1 - |g'(x)| \]
+    \item Dato che stiamo rimuovendo ad $1$ qualcosa di minore di $1$ allora:
+    \[ h(x) = 1 - |g'(x)| > 0 \]
+    \item Applicando la permanenza del segno ottengo:
+    \[ \exists \rho : h(x) > 0 \:\:\:\: \forall x \in [\alpha - \rho,\alpha + \rho] \]
+    ossia che
+    \[ |g'(x)| < 1 \:\:\:\: \forall x \in [\alpha - \rho,\alpha + \rho] \]
+    e dunque il metodo risulta convergente per ogni $x_{0} \in [\alpha - \rho,\alpha + \rho]$ per il teorema del punto fisso.
+\end{enumerate}
+
+\paragraph{Schema Conseguenze Corollario} Schematizziamo dunque le informazioni enunciate fino ad ora:
+
+\vspace*{10px}
+
+\[ \boxed{ \text{Se} \:\:\: |g'(\alpha)| > 1 \:\:\: \text{allora NON converge localmente} } \]
+\vspace*{5px}
+\[ \boxed{ \text{Se} \:\:\: |g'(\alpha)| < 1 \:\:\: \text{allora converge localmente} } \]
+\vspace*{5px}
+\[ \boxed{ \text{Se} \:\:\: |g'(\alpha)| = 1 \:\:\: \text{può sia convergere che divergere} } \]
+\vspace*{5px}
+
+Graficamente $|g'(\alpha)|$ rappresenta la pendenza della tangente alla funzione data \\ nel punto $\alpha$.
+
+\newpage
+
+\subsubsection{Ordine di Convergenza di Metodi}
+
+In questo sottocapitolo cerchiamo di stabilire un modo per determinare la velocità di convergenza di un metodo. Siano dati
+$\alpha = g(\alpha)$ e $|g'(\alpha)| < 1$ con $x_{k} \rightarrow \alpha$, se $x_{k} \neq \alpha, \: \forall k \geq 0 $ allora
+
+\[ \lim_{k \rightarrow \infty} \frac{|x_{k+1} - \alpha|}{|x_{k} - \alpha |} = \gamma \in \mathbb{R}, \:\:\: \gamma \neq 0 \]
+
+Riusciamo grazie a $\gamma$ a ricavare un ordine $P$ di convergenza del metodo, infatti:
+
+\[
+\left\{
+\begin{array}{rl}
+    P = 1 & \text{se } 0 < \gamma \leq 1 \mapsto \text{ (Convergenza Lineare)} \\
+    P = 2 & \text{se } 1 < \gamma \mapsto \text{ (Convergenza Quadratica)} 
+\end{array}
+\right.
+\]
+
+In generale una convergenza è detta \textbf{sublineare} se $P=1$ e $\gamma = 1$, questo corrisponde a convergere molto lentamente. Al contrario se $P>1$ la convergenza
+è detta anche \textbf{superlineare}.
+
+\[ \lim_{k \rightarrow \infty} \gamma = \frac{|x_{k+1} - \alpha|}{|x_{k} - \alpha|} = \lim_{k \rightarrow \infty} \frac{|g(x_{k+1}) - g(\alpha)|}{|x_{k} - \alpha|} = \lim_{k \rightarrow \infty} |g'(\epsilon_{k})| = |g'(\alpha)| \]
+
+Passiamo dal primo al secondo termine ed il terzo applicando il teorema di Lagrange. Grazie a questo possiamo affermare che:
+
+\[ \text{Se } |g'(\alpha) < 1| \text{ e } g'(\alpha) \neq 0 \Rightarrow \text{ ordine 1} \]
+\[ \text{Se } |g'(\alpha) < 1| \text{ e } g'(\alpha) = 0 \Rightarrow \text{ ordine } > 1 \]
+
+\paragraph{Nota sull'Annullamento di Derivate fino all'Ordine P} Se si annullano in $\alpha$ tutte le derivate di $g$ fino all'ordine P:
+
+\[ 0 = g'(\alpha) = g''(\alpha) = \cdots = g^{p-1}(\alpha) \text{ e } g^{p}(\alpha) = 0 \]
+
+allora possiamo affermare che
+
+\[ x_{k+1} = g(x_{k}) \text{ converge con ordine P} \]
+
+\newpage
+
 \end{document}
