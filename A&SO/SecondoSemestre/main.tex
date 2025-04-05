@@ -2117,4 +2117,40 @@ riconosciamo dei pattern di utilizzo:
 
 \newpage
 
+\section{Traduzione Indirizzi}
+
+I punti fondamentali di questo capitolo saranno: concetto di \textbf{Traduzione di Indirizzi}, \textbf{Traduzione Flessibile di Indirizzi} (Virtual Base and Bound, Segmentazione, Paginzazione e Traduzione Multilivello) e \textbf{Traduzione di Indirizzi Efficiente}.
+
+\paragraph{Proprietà del Mapping} La gestione della memoria basata su mapping virtuale-fisico offre queste proprietà:
+
+\begin{enumerate}
+    \item Protezione grazie all'isolamento di specifiche zone della zona di memoria.
+    \item Sharing di memoria.
+    \item Flessibilità.
+    \item Indirizzi sparsi su spazio fisico e loro gestione.
+    \item Portabilità.
+    \item Efficienza.
+\end{enumerate}
+
+Oltre a questo la virtualizzazione della memoria permette:
+
+\begin{enumerate}
+    \item Isolamento della memoria.
+    \item Inter Process Comunicate.
+    \item Shared Memory tra Processi.
+\end{enumerate}
+
+L'unità che si occuperà della traduzione degli indirizzi è l'MMU. Questa unità dato un indirizzo logico lo tradurrà in uno fisico in base ad uno schema seguito. Elenchiamo delle possibili gestioni di traduzione di indirizzi.
+
+\subsection{Base and Bound, Segmentazione, Paginazione}
+
+\paragraph{Base and Bound} Si definisce una base ed un offset 
+
+\begin{figure}[htbp]
+    \center
+    \includegraphics[scale=0.3]{img/base_and_bound.png}
+\end{figure}
+
+\newpage
+
 \end{document}

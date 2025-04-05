@@ -603,7 +603,7 @@ Elenchiamo delle definizioni base:
     \[ P^{X}(A) = P(X \in A) = P(\#\text{teste in A}) \:\:\:\: A \subseteq \{0,1, ...,n\} \]
     Nello specifico possiamo anche definirla come probabilità $P^{X}$ su $\mathbb{R}$ data da 
     \[ \{\omega \in \Omega \:|\: X(\omega) \in A\} \]
-    \item \textbf{Equidistribuzione}: Due variabili aleatore $X$ ed $Y$ sono dette equidistribuite se \[P^{X} = P^{Y}\].
+    \item \textbf{Equidistribuzione}: Due variabili aleatorie $X$ ed $Y$ sono dette equidistribuite se \[P^{X} = P^{Y}\].
 \end{enumerate}
 
 \subsection{Variabili Aleatorie Discrete}
@@ -992,10 +992,6 @@ Stiamo quindi cercando di capire la probabilità che un valore stia fuori da un 
 
 \end{enumerate}
 
-\section{Variabili Aleatorie Multivariate}
-
-Descriviamo le caratteristiche di variabili composte di più di una caratteristica:
-
 \subsection{Variabile Aleatoria Doppia} Dato uno spazio di probabilità $(\Omega, P)$ variabile rappresentata da una coppia $(X,Y)$ che corrisponde ad una funzione $(X,Y): \Omega \rightarrow \mathbb{R}^{2}$
 dove \[ \omega \in \Omega \mapsto (X(\omega), Y(\omega)) \in \mathbb{R}^{2} \]
 
@@ -1035,6 +1031,221 @@ Definiamo cosa abbiamo prima accennato, ossia la possibilità di poter ricavare 
 
 \[ P(X = a) = \sum_{b \in \mathbb{R}} P(X=a, Y=b) \]
 \[ P(Y = b) = \sum_{a \in \mathbb{R}} P(X=a, Y=b) \]
+
+\subsection{Indipendenza di Variabili Aleatorie}
+
+Date $(\Omega, P)$ spazio di probabilità, $X,Y,X_{i}: \Omega \rightarrow \mathbb{R}$ variabili aleatorie.
+
+\paragraph{Def. Di Indipendenza di Variabili Aleatorie} $X: \Omega \rightarrow \mathbb{R}$ e $Y: \Omega \rightarrow \mathbb{R}$ sono dette variabili indipendenti se
+
+\[ \forall A \subseteq \mathbb{R}, \: \forall B \subseteq \mathbb{R} \text{ gli eventi } \{ X \in A \}, \:\{ Y \in B \} \text{ sono indipendenti, cioè } \]
+\[ P(X \in A, Y \in B) = P(X \in A) P(Y \in B) \]
+
+\paragraph{Def. Di Famiglia di Variabili Aleatorie Indipendenti} Date $X_{1} : \Omega \rightarrow \mathbb{R}, \cdots, X_{n} : \Omega \rightarrow \mathbb{R}$ sono una famiglia di variabili aleatorie indipendenti se:
+\[ \forall A_{1}, \cdots, A_{n} \subseteq \mathbb{R} \text{ gli eventi  } \{ X_{1} \in A_{1} \} \cdots \{ X_{n} \in A_{n}\} \text{ sono indipendenti }  \]
+\begin{center}
+    ed equivalentemente
+\end{center}
+\[ \forall A_{1}, \cdots, A_{n} \subseteq \mathbb{R}, \: P(X_{1} \in A_{1}, \cdots,X_{n} \in A_{n}) = P(X_{1} \in A_{1} * \cdots * P(X_{n} \in A_{n}))  \]
+
+Ciascuna $X_{i}$ sono indipendenti, ossia ciascuna informazione di una $X_{i}$ non modifica le probabilità relative alle altre.
+
+\paragraph{Criterio d'Indipendenza per Variabili Aleatorie Discrete} Date due variabili aleatorie discrete $X,Y$:
+
+\[ X,Y \text{ sono indipendenti } \Leftrightarrow \:\:p^{(X,Y)}(a,b) = p^{X}(a) \: p^{Y}(b) \:\:\:\: \forall (a,b) \]
+
+\newpage
+
+\paragraph{Stabilità dell'Indipendenza per Composizione}
+
+Se $X_{1}, \cdots, X_{n}, X_{n+1}, \cdots, X_{n+m} $ \\ sono indipendenti e $g:\mathbb{R}^{n} \rightarrow \mathbb{R}, h:\mathbb{R}^{m} \rightarrow \mathbb{R}$ allora
+$g(X_{1}, \cdots, X_{n}): \Omega \rightarrow \mathbb{R}$, \\ $h(X_{n+1}, \cdots, X_{n+m}): \Omega \rightarrow \mathbb{R}$ sono variabili indipendenti. 
+
+Per prove ripetute di un esperimento, le variabili aleatorie associate a ripetizioni distinte sono indipendenti.
+
+\paragraph{Caso importante di Utilizzo} Estrazione di un campione da una popolazione:
+
+Siano $S$ uan popolazione, $X$ un carattere della popolazione. Un estrazione di un campione di $n$ elementi corrisponde ad $n$ ripetizioni dell'esperimento
+"estrazione di un individuo a caso", ammettendo il rimpiazzo.
+
+\[ \Omega = S^{n} = \{ (\omega_{1}, \cdots, \omega_{n}) \:|\: \omega_{i} \in S \} \text{ con probabilità uniforme su } \Omega \]
+\[ X_{i}(\omega_{1}, \cdots, \omega_{n}) = X(\omega_{i}) \: : \: \text{carattere dell'i-esimo individuo del campione} \]
+
+In questo schema $X_{i}$ sono indipendenti ed ogni $X_{i}$ ha la stessa distribuizione \\ ossia $P(X_{i} = a)$ corrisponde alla frequenza relativa di $\{ X = a \}$ sulla popolazione.
+
+\subsubsection{Riproducibilità data l'Indipendenza}
+
+Elenchiamo queste proprietà definibili su specifiche densità:
+
+\begin{enumerate}
+    \item \textbf{Binomiale}: $X,Y$ variabili aleatorie con $X \sim B(m,f), Y \sim B(n,f)$ indipendenti, allora:
+    \[ X + Y = B(m+n,p) \]
+    \item \textbf{Poisson}: $X,Y$ variabili aleatorie con $X \sim P(\lambda), Y \sim P(\mu)$ indipendenti, allora:
+    \[ X + Y = P(\lambda + \mu) \]
+    \item \textbf{Normale}: $X,Y$ variabili aleatorie con $X \sim N(m_{1}, \sigma^{2}_{1}), Y \sim N(m_{2}, \sigma^{2}_{2})$ indipendenti, allora:
+    \[ X + Y = N(m_{1} + m_{2}, \sigma^{2}_{1} + \sigma^{2}_{2}) \]
+\end{enumerate}
+
+\subsection{Covarianza e Correlazione}
+
+Date $X,Y: \Omega \rightarrow \mathbb{R}$ variabili aleatorie, $g: \mathbb{R}^{2} \rightarrow \mathbb{R}$ e $g(X,Y): g \:o\:(X,Y): \Omega \rightarrow \mathbb{R}$ è una variabile aleatoria.
+
+\subsubsection{Valore Atteso e Prodotto di v.a Indipendenti}
+
+Se $X,Y$ sono variabili aleatorie discrete, allora:
+
+\[ \mathbb{E}[g(X,Y)] = \sum_{(a,b)} g(a,b) \: P(X = a, Y = b) \]
+
+\paragraph{Valore Atteso di Variabili Aleatorie Indipendenti}
+
+Date $X,Y$ variabili aleatorie indipendenti che ammettano valore atteso, allora:
+
+\[ \mathbb{E}[XY] = \mathbb{E}[X] \mathbb{E}[Y] \]
+
+\paragraph{Covarianza di Variabili Aleatorie}
+
+Date $X,Y$ variabili aleatorie con momento secondo, la covarianza di $X$ ed $Y$:
+
+\[ Cov(X,Y) = \mathbb{E}[(X - \mathbb{E}[X])(Y - \mathbb{E}[Y])] = \mathbb{E}[XY] - \mathbb{E}[X] \mathbb{E}[Y]  \]
+
+\paragraph{Coefficiente di Correlazione di Variabili Aleatorie}
+
+Date $X,Y$ variabili aleatorie con momento secondo, con $Var(X) \neq 0$, $Var(Y) \neq 0$ allora il coefficiente di correlazione tra $X$ ed $Y$:
+
+\[ \rho = \frac{Cov(X,Y)}{\sqrt{Var(X) Var(Y) }} \]
+
+Quando $\rho = 0$, con $ Cov(X,Y) = 0$ le variabili $X$, $Y$ si dicono scorrelate.
+
+\[ \text{Indipendenza } \Rightarrow \text{ Non Correlazione} \]
+
+Nello specifico la \textbf{non correlazione} corrisponde all'\textbf{indipendenza lineare}. Per questo non vale il verso opposto.
+
+\paragraph{Proprietà della Covarianza} $X,Y,Z$ variabili aleatorie con momento secondo e $a,b,c \in \mathbb{R}$, allora:
+
+\begin{enumerate}
+    \item $Cov(aX + bY + c, Z) = a\:Cov(X,Z) + b\:Cov(Y,Z) \text{ ( Bilinearità ) } $
+    \item $ Cov(X,Y) = Cov(Y,X) \text{ Simmetria } $
+\end{enumerate}
+
+\paragraph{Varianza della Somma} Date $X_{1}, \cdots, X_{n}$ variabili aleatorie con momento secondo:
+
+\[ Var(X_{1} + \cdots + X_{n}) = \sum_{i=1}^{n} Var(X_{i}) + 2 \sum_{1 \leq i \leq j \leq n} Cov(X_{i}, Y_{j}) \]
+
+\begin{center}
+    dove per $n = 2$ corrisponde a:
+\end{center}
+
+\vspace*{-10px}
+
+\[ Var(X_{1} + X_{2}) = Var(X_{1}) + Var(X_{2}) + 2 Cov(X_{1}, X_{2}) \]
+
+\paragraph{Teorema} Date $X,Y$ variabili aleatorie con momento secondo finito e $Var(X) > 0$ e $Var(Y) > 0$, allora:
+
+\begin{enumerate}
+    \item $|\rho(X,Y)| \leq 1 $
+    \item $min_{(a,b) \in \mathbb{R}} \mathbb{E}[(y - (a+bX))^{2}] = Var(Y) (1 - \rho(X,Y)^{2})$
+    \item Il minimo si realizza per:
+    \[ b^{*} = \frac{Cov(X,Y)}{Var(X)} \:\:\:\: a^{*} = \mathbb{E}[Y] - b^{*}\mathbb{E}[X] \]
+\end{enumerate}
+
+\newpage
+
+\paragraph{Retta di Regressione per Variabili Aleatorie} La retta $ x \mapsto a^{*} + b^{*}x $ è detta retta di regressione per le variabili aleatorie $(X,Y)$.
+
+Elenchiamo dei punti che definiscono il significato di dipendenza ed approssimazione lineare:
+
+\begin{enumerate}
+    \item La retta di regressione è la migliore approssimazione lineare tra $X$ ed $Y$.
+    \item $\rho(X,Y)$ è una misura della dipendenza lineare tra $X$ ed $Y$.
+    \begin{enumerate}
+        \item Più $\rho$ è vicino a $\pm 1$ tanto più l'approssimazione lineare sarà buona.
+        \item Più $\rho$ è vicino a $0$ tanto meno l'approssimazione lineare sarà buona.
+    \end{enumerate}
+    \item Se $X$ ed $Y$ sono caratteri di individui sulla popolazione, allora $\rho$ è il coefficiente di correlazione empirico su tutta la popolazione.
+\end{enumerate}
+
+\subsection{Teoremi Limite in Probabilità}
+
+Forniamo una \textbf{serie} di \textbf{definizioni} e successivamente definiamo la \textbf{legge dei grandi numeri} ed il \textbf{teorema centrale del limite}.
+
+\paragraph{Definizione v.a I.I.D.} Date $X_{1}, \cdots, X_{n}$ variabili aleatorie, queste sono dette \textbf{indipendenti} ed \textbf{identicamente distribuite} se:
+
+\begin{enumerate}
+    \item Sono indipendenti.
+    \item Hanno la stessa distribuzione (ossia $P^{X_{i}}$ è la stessa $\forall i$).
+\end{enumerate}
+
+\paragraph{Definizione Convergenza a Variabile Aleatoria} Data una successione $(Y_{n})_{n}$ di variabili aleatorie, $(Y_{n})_{n}$ converge in probabilità
+ad una variabile aleatoria $Y$ se:
+
+\[ \lim_{n \rightarrow \infty} P(|Y_{n} - Y| > \epsilon ) = 0 \:\:\:\: \forall \epsilon > 0 \]
+
+Che vuol dire che per n grande, $Y_{n}$ è vicina ad $Y$ con alta probabilità.
+
+\subsubsection{Teorema - Legge dei Grandi Numeri}
+
+Sia $X_{1}, X_{2}, \cdots$ una successione di variabili aleatorie i.i.d con momento secondo finito e sia $m = \mathbb{E}[X_{i}]$. Allora:
+
+\[ \overline{X}_{n} = \frac{1}{n} \sum_{i=1}^{n} X_{i} \text{ per } n \rightarrow \infty \text{ converge ad m } \]
+
+\newpage
+
+\paragraph{Esempio Importante} Probabilità di un evento $A$ è circa la frequenza relativa di $A$ in n prove con un grande. Formalmente:
+
+\begin{enumerate}
+    \item $n$ prove, $A$ evento di successo.
+    \item $X_{i} = 1$ se accade $A$ alla i-esima prova, $0$ altrimenti.
+    \item $ X_{i} \sim B(p) $ indipendente, $p = P(A)$.
+    \item $ X_{1} + \cdots + X_{n} = n \overline{X}_{n} $ corrispondono ai numeri di successi $B(n,p)$.
+    \item $ \overline{X}_{n} = $  frequenza relativa del successo $A$ in $n$ prove. 
+    \item Per LGN, $\overline{X}_{n} \rightarrow \mathbb{E}[X_{1}] = p = P(A) $ è la probabilità di $A$.
+\end{enumerate}
+
+\paragraph{Ripresa Varianza Campionaria} Dato un campione $X_{1}, \cdots, X_{n}$, allora la sua varianza campionaria sarà:
+
+\[ S^{2} = S^{2}_{n} = \frac{1}{n-1} \sum_{i=1}^{n} (X_{i} - \overline{X}_{n}) \]
+
+\paragraph{Proposizione Convergenza da Varianza Campionaria a Varianza} Siano \\ $X_{1}, \cdots, X_{n}$ i.i.d. con momento quarto finito, e sia $\sigma^{2} = Var(X_{1})$ allora
+$S^{2}_{n}$ converge in probabilità a $\omega^{2}$ per $n \rightarrow \infty$.
+
+\subsubsection{Teorema Centrale del Limite - Limite Centrale (TCL/TLC)}
+
+Siano $X_{1}, \cdots, X_{n}, \cdots$ i.i.d. con momento secondo finito, e $m = \mathbb{E}[X_{i}]$ $\sigma^{2} = Var(X_{i})$ e supponiamo $\sigma^{2} = Var(X_{i})$ supponiamo
+$\sigma^{2} > 0$ (cioè $X_{i}$ non costanti). Allora per $n \rightarrow \infty$ vale che:
+
+\[ \sqrt{n} \frac{\overline{X}_{n} - m}{\sigma} \rightarrow Z \sim N(0,1) \]
+
+dove la convergenza è in legge, ossia:
+
+\[ \forall - \infty \leq a < b \leq + \infty \]
+
+\[ \lim_{n \rightarrow \infty} P( a \leq \sqrt \frac{\overline{X}_{n} - m}{\sigma} \leq b ) = P(a \leq Z \leq b) = \Phi(b) - \Phi(a)  \]
+
+con $\Phi$ che corrisponde alla FdR di $N(0,1)$.
+
+\vspace*{10px}
+
+In questo contesto vale l'\textbf{universalità}, ossia la legge di $X_{i}$ può essere qualunque, purchè con momento finito, $\overline{X}_{n}$ riscalata è distribuita approssimativamente come una
+gaussiana per $n$ grande.
+
+La n indicativamente, seguendo una regola empirica, dovra essere circa $n \geq 50$.
+
+\newpage
+
+\paragraph{Utilizzo Comune del Teorema} Utilizzo pratico di questo teorema, ossia le oscillazioni della frequenza relativa:
+
+\[ A \text{ evento successo } X_{i} = 
+\begin{cases} 
+1 & \text{se A avviene alla i-esima prova} \\
+0 & \text{altrimenti}
+\end{cases}
+\]
+
+\[ i.i.d \sim B(p) \:\:\: p = P(A) \]
+
+\[ Y_{n} = \#\text{successi} \text{ (frequenza assoluta di A) in n prove } = X_{1} + \cdots + X_{n} \sim B(n,p) \]
+
+\[ TCL : \frac{Y_{n} - np}{\sqrt{np(1-p)}} \text{ ha distribuzione approssimata a } N(0,1) \text{ per n grande } \]
 
 
 \newpage
