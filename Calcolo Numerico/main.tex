@@ -1778,6 +1778,130 @@ allora possiamo affermare che
 
 \[ x_{k+1} = g(x_{k}) \text{ converge con ordine P} \]
 
+\subsubsection{Criterio d'Arresto del Metodo del Punto Fisso}
+
+Se considerassimo l'errore al passo k-esimo:
+
+\[ |x_{k+1} - x_{k}| < tol \]
+
+Ma dato che $\alpha = g(\alpha)$ allora non è ancora noto il suo valore e di conseguenza non posso valutare $|x_{k} - \alpha|$ ma come nei metodi iterativi
+posso eseguire questa serie di uguaglianze:
+
+\[ |x_{k+1} - x_{k}| \Leftrightarrow \text{ (Sommo e sottraggo alpha)} \]
+\[ |x_{k+1} - \alpha - x_{k} + \alpha| \Leftrightarrow (x_{k+1} = g(x), \: \alpha = g(\alpha)) \]
+\[ |g(x_{k}) - g(\alpha) - (x_{k} - \alpha ) | \Leftrightarrow \text{ (Applico Lagrange)} \]
+\newpage
+Nello specifico, grazie al teorema di Lagrange possiamo affermare che per un intervallo $[\alpha, x_{k}]$ esiste un punto $\epsilon_{k}$ tale che vale:
+\[ g(x_{k}) - g(\alpha) = g'(\epsilon_{k})(x_{k} - \alpha ) \]
+Di conseguenza utilizziamo questa equivalenza nell'espressione sopra:
+\[ g'(\epsilon_{k})(x_{k} - \alpha ) = |(g'(\epsilon_{k}) - 1)(x_{k} - \alpha)| < tol \Rightarrow |x_{k} - \alpha| < \frac{tol}{g'(\epsilon_{k}-1)} \]
+Da questo riesco ad affermare che il valore di $g'(\epsilon_{k}-1)$ deve essere diverso da 1, in questo modo ottengo una buona soluzione.
+
+\subsection{Metodo delle Tangenti/di Newton}
+
+Prima ancora di definire formalmente il metodo ricordiamo che è necessario che la funzione a cui lo si applica deve \textbf{necessariamente} essere \textbf{derivabile}.
+
+\[
+\left\{
+\begin{array}{ll}
+    y - f(x_{0}) = f'(x_{0})(x-x_{0}) & \text{ Equazione della Retta Tangente ad f in } x_{0} \\
+    y = 0 & 
+\end{array}
+\right.
+\]
+
+Risolvendo questo sistema ottengo il punto d'intersezione con l'asse delle x:
+
+\[ f(x_{0}) + f'(x_{0})(x_{1} - x_{0}) = 0 \:\: \Leftrightarrow \:\: f'(x_{0}) + x_{1}f'(x_{0}) - x_{0}f'(x_{0}) = 0 \:\: \Leftrightarrow\]
+
+\[ \Leftrightarrow \:\: x_{1} = x_{0} - \frac{f(x_{0})}{f'(x_{0})} \:\: \Leftrightarrow \]
+\[ \Leftrightarrow \:\: \boxed{x_{k+1} = x_{k} - \frac{f(x_{k})}{f'(x_{k})} }\:\: \text{ con } f'(x_{0}) \neq 0 \:\: \forall k \]
+
+Risulta dunque essere uno \textbf{specifico metodo di punto fisso} con $g(x) = x - \frac{f(x)}{f'(x)}$ con dominio ristretto ad uno dove $f'(x) = 0$ \textbf{non è ammesso}.
+
+\subsubsection{Th. Convergenza Locale del Metodo delle Tangenti (con Dim.)}
+
+Sia $f:[a,b] \rightarrow \mathbb{R}$, $f \in C^{2}(a,b)$, sia $\alpha \in (a,b) \::\: f(\alpha) = 0$ ed $\alpha$ è una \textbf{radice semplice}, ossia 
+$f'(\alpha) = 0$, allora:
+
+\begin{enumerate}
+    \item Il \textbf{metodo} delle \textbf{tangenti} è \textbf{localmente convergente}, ossia:
+    \[ \exists \rho > 0: \forall x_{0} \in [\alpha-\rho, \alpha+\rho] = I_{\alpha} \text{ con } x_{k} \in I_{\alpha} \text{ e } x_{k} \rightarrow \alpha \]
+    \item La convergenza è almeno quadratica:
+    \[ \lim_{k \rightarrow \infty} \frac{x_{k+1} - \alpha}{|x_{k} - \alpha |^{2}} = l \]
+\end{enumerate}
+
+Dimostriamo il teorema a pagina successiva.
+
+\newpage
+
+\paragraph{Dimostrazione} Dimostriamo entrambi i punti della tesi del teorema di convergenza locale del metodo delle tangenti:
+
+\begin{enumerate}
+    \item \textbf{Prima Proprietà}:
+    \begin{enumerate}
+        \item Se $f'(\alpha) \neq 0$ allora per la permanenza del segno:
+        \[ f'(x) \neq 0 \:\:\: \forall x \in [\alpha - \rho, \alpha + \rho] \]
+        e su tale insieme vale che
+        \[ g(x) = x - \frac{f(x)}{f'(x)} \text{è ben definita}\]
+        \item Grazie al punto sopra so che $g \in C^{1}(\alpha - \rho, \alpha + \rho)$, quindi sicuramente esiste $g'(x)$:
+        \[ g'(x) = 1 - \frac{f'(x)f'(x) - f''(x)f(x)}{[f'(x)]^{2}} = \frac{f''(x)f(x)}{[f'(x)]} \:\: \rightarrow \:\: \boxed{g'(\alpha) = 0} \]
+        \item Dall'espressione boxata al punto precedente posso utilizzare il corollario del punto fisso e concludo la dimostrazione del primo punto:
+        \[ g'(\alpha) > 0 \: \Rightarrow \: \text{ converge } \]
+    \end{enumerate}
+    \item \textbf{Seconda Proprietà}:
+    \begin{enumerate}
+        \item Prendo $\lim_{k \rightarrow \infty} \frac{x_{k+1} - \alpha}{|x_{k} - \alpha |^{2}} = l$ per vedere a cosa converge.
+        \item Sviluppo di Taylor di $f(\alpha) = 0$ centrato in $x_{k}$:
+        \[ 0 = f(\alpha) = f(x_{k}) + f'(x_{k})(\alpha - f(x_{k})) + f''(\epsilon_{k})\frac{(\alpha - x_{k})^{2}}{2}  \]
+        \item Porto ad sx i primi due termini dello sviluppo:
+        \[ (x_{k} - \alpha)f(x_{k}) - f(x_{k}) = f''(\epsilon_{k})\frac{(\alpha - x_{k})^{2}}{2} \]
+        \item Dal punto precedente possiamo scrivere $f''(\epsilon_{k})\frac{(\alpha - x_{k})^{2}}{2} = f''(\epsilon_{k})\frac{(x_{k} - \alpha)^{2}}{2}$ e successivamente divido sx e dx per $f'(x_{k})$, quindi:
+        \[ x_{k} - \frac{f(x_{k})}{f'(x_{k})} - \alpha = \frac{f''(\epsilon_{k})}{f'(x_{k})} \frac{(x_{k} - \alpha)^{2}}{2} \]
+        \item Dal punto precedente possiamo scrivere $x_{k} - \frac{f(x_{k})}{f'(x_{k})} = x_{k+1}$ e dividiamo tutto per $|x_{k} - \alpha|^{2}$:
+        \[ \frac{|x_{k+1} - \alpha|}{|x_{k} - \alpha|^{2}} = \frac{|f''(\epsilon_{k})|}{2|f'(x_{k})|} \]
+\newpage
+        \item Applichiamo il limite a sx e dx:
+        \[ \lim_{k \rightarrow \infty} \frac{|x_{k+1} - \alpha|}{|x_{k} - \alpha|^{2}} = \lim_{k \rightarrow \infty} \frac{|f''(\epsilon_{k})|}{2|f'(x_{k})|} = \frac{|f''(\alpha)|}{|2f'(\alpha)|} \]
+        Concludiamo quindi la dimostrazione osservando che: 
+        %se $f''(\alpha) \neq 0$ allora il m.d.T ha ordine 2 mentre se $f''(\alpha) = 0$ m.d.T ha ordine maggiore di 2.
+        \[
+        \left\{
+        \begin{array}{lll}
+            f''(\alpha) \neq 0 & \Rightarrow & \text{ Metodo delle Tangenti ha ordine 2 } \\
+            f''(\alpha) = 0 & \Rightarrow & \text{ Metodo delle Tangenti ha ordine maggiore di 2 } 
+        \end{array}
+        \right.
+        \]
+    \end{enumerate}
+\end{enumerate}
+
+\subsubsection{Numero di Iterazioni per la Convergenza del Metodo delle Tangenti}
+
+Definiamo in quante iterazioni converge il metodo di Newton.
+
+\[ |x_{k} - \alpha | = e_{k} \leq 10^{-1} \]
+Quindi per il limite $(l = \lim_{k \rightarrow \infty } \frac{|x_{k+1} - \alpha|}{|x_{k} - \alpha|})$ definito prima:
+\[ e_{k+1} \approx l \: e^{2}_{k} < l \: 10^{-2} \]
+\[ e_{k+2} \approx l \: e^{2}_{k+1} < l^{3} \: 10^{-4} \]
+\[ e_{k+3} \approx l\:l^{6} \: 10^{-8} \]
+\[ e_{k+4} \approx l\:l^{14} \: 10^{-16} \]
+
+Converge dunque in quattro iterazioni assumendo che la nostra precisione di macchina sia nell'ordine di $10^{-16}$.
+
+\subsubsection{Th. di Convergenza in Largo}
+
+Sia $f:[a,b] \rightarrow \mathbb{R}$, $f \in C^{2}(a,b)$, $\alpha : f(\alpha) = 0$ allora:
+
+\begin{enumerate}
+    \item \textbf{Ipotesi}: Se $\exists \delta > 0 \::\: S = (\alpha, \alpha + \delta]$ tale che:
+    \begin{enumerate}
+        \item $f'(x) \neq 0 \:\:\: \forall x \in S$
+        \item $f(x)f''(x) > 0\:\:\: \forall x \in S$
+    \end{enumerate}
+    \item \textbf{Tesi}: Allora $\forall x_{0} \in S \:\: \{ x_{k} \} \rightarrow \alpha$ in modo \textbf{monotono}.
+\end{enumerate}
+
 \newpage
 
 \end{document}
