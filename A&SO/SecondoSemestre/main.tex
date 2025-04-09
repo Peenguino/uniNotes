@@ -960,7 +960,7 @@ Nello specifico queste modalità avranno un vettore con locazioni contenenti cia
 
 \vspace*{5px}
 
-In questo vettore \textbf{non saranno presenti} i puntatori alle routine delle modalità, infatti saranno presenti \textbf{direttamente} le routine da eseguire sottoforma di istruzioni ASM.
+In questo vettore \textbf{non saranno presenti} i puntatori alle routine delle modalità, infatti saranno presenti \textbf{direttamente} le routine da eseguire sotto forma di istruzioni ASM.
 
 \newpage
 
@@ -2102,10 +2102,6 @@ riconosciamo dei pattern di utilizzo:
     si basava su fasi come $FETCH, DECODE, EXEC$. Dunque il pattern si basa sui producer che pushano dati in un buffer ed i producer estraggono dati dal buffer.
 \end{enumerate}
 
-% Finisci di argomentare su pipeline poi:
-% - Problema del cammino critico
-% - Gang Scheduler vs Space Sharing
-
 \paragraph{Gang/Space Scheduling} Descriviamo questi tipi due tipi di scheduling:
 
 \begin{enumerate}
@@ -2140,16 +2136,274 @@ Oltre a questo la virtualizzazione della memoria permette:
     \item Shared Memory tra Processi.
 \end{enumerate}
 
-L'unità che si occuperà della traduzione degli indirizzi è l'MMU. Questa unità dato un indirizzo logico lo tradurrà in uno fisico in base ad uno schema seguito. Elenchiamo delle possibili gestioni di traduzione di indirizzi.
+L'unità che si occuperà della traduzione degli indirizzi è l'MMU. Questa unità dato un indirizzo logico lo tradurrà in uno fisico in base ad uno schema seguito. Fondamentale sarà anche il posizionamento dell'MMU, infatti il posizionamento (prima o dopo il primo livello di cache) influisce fortemente sulla tipologia di approccio seguito.
 
 \subsection{Base and Bound, Segmentazione, Paginazione}
 
-\paragraph{Base and Bound} Si definisce una base ed un offset 
+\paragraph{Virtual Base and Bound} Si definisce una base ed un offset nell'MMU che ricevuto un indirizzo virtuale controllerà se questo è contenuto nell'intervallo definito, formalmente: 
+
+\vspace*{-10px}
+
+\[ indirizzo + base < base + bound \]
 
 \begin{figure}[htbp]
     \center
     \includegraphics[scale=0.3]{img/base_and_bound.png}
 \end{figure}
+
+\newpage
+
+\paragraph{Partizioni Variabili e Base and Bound} Questo schema forma partizioni variabili nel tempo, e questo causa un fenomeno di \textbf{frammentazione esterna}, 
+ossia spazio non ancora allocato "più piccolo" posizionato esternamente alle zone di memoria fisiche allocate per i processi. Questo spreco di spazio in memoria fisica è risolvibile grazie ad una \textbf{traslazione} di tutti i \textbf{blocchi allocati} per i processi. Questo fenomeno è detto \textbf{deframmentazione}.
+
+\paragraph{Segmentazione}
+
+Si suddividono gli \textbf{indirizzi logici} in \textbf{segmenti}, mantenendo per ciascun segmento una coppia di valori $(base, bound)$. Quindi avremo ad esempio un segmento codice, un segmento dati ed uno dati dinamici che andranno gestiti \textbf{ciascuno} con una \textbf{specifica coppia} di $(base, bound)$.
+
+\begin{figure}[htbp]
+    \center
+    \includegraphics[scale=0.35]{img/segmentazione.png}
+\end{figure}
+
+Questo approccio ha dei pro come potenziale condivisione di segmenti tra processi, protezione, crescita fino alla dimensione necessaria dello stack/heap, però causa una gestione più complessa dato che va cercato durante ogni allocazione di segmento una dimensione specifica di memoria libera ed oltre a questo causa \textbf{frammentazione esterna}.
+
+\paragraph{Paginazione} In questo approccio si suddivide tutto lo spazio d'indirizzamento di un processo in unità di pari dimensioni.
+
+\begin{figure}[htbp]
+    \center
+    \includegraphics[scale=0.3]{img/paginazione.png}
+\end{figure}
+
+Questo schema non presenta problemi di frammentazione esterna ma di frammentazione interna (ossia spazio perso all'interno delle pagine), la gestione della MMU risulta però semplice, dato che corrisponderà solo ad una somma di indirizzi logici come multipli di $2$.
+
+\newpage
+
+\paragraph{Translation Lookaside Buffer (TLB) in una MMU in Paginazione} Nel caso della gestione a paginazione della traduzione di indirizzi è necessaria una rete che dato in input un indirizzo (composto da numero di pagina logica ed offset) sia in grado di restituire in maniera completamente associativa il corrispondente indirizzo fisico. Questa rete è chiamata \textbf{TLB}
+e nello schema di paginazione è molto simile ad una cache completamente associativa.
+
+\subsection{Segmentazione Paginata}
+
+Questo schema di traduzione cerca di sfruttare i pro di entrambe le tipologie di traduzione viste prima, cercando un \textbf{compromesso} tra le due. Lo \textbf{spazio d'indirizzamento} di un \textbf{processo} sarà diviso in \textbf{segmenti} che saranno a loro volta \textbf{divisi} in \textbf{pagine}.
+
+\begin{figure}[htbp]
+    \center
+    \includegraphics[scale=0.3]{img/segmentazione_paginata.png}
+\end{figure}
+
+Vediamo in questo modo come si compone un vero e proprio albero di tabelle di \\ traduzione.
+Questo permette un allocazione della memoria più efficiente. Questo caso rappresentato è tra i più semplici, infatti potrebbero esserci $k$ livelli di tabelle di pagine.
+
+\paragraph{Interpretazione degli Indirizzi} Mostriamo in che modo vengono interpretati gli indirizzi e quali sono le caratteristiche di ciascuna tipologia:
+
+\[ IND\_LOG \:\: = \:\: < PAG\_LOG, OFFSET> \]
+
+\vspace*{-15px}
+
+\[ IND\_FIS \:\: = \:\: TAB\_PAG[PAG\_LOG] * AMPIEZZA\_PAG + OFFSET \]
+
+Quindi un indirizzo logico sarà composto da pagina logica e offset, la pagina logica viene utilizzata per indicizzare nella tabella delle pagine e di conseguenza
+l'indirizzo fisico sarà la dereferenziazione in tabella delle pagine dell'indice dato dal numero di pagina logica più l'offset copiato dall'indirizzo logico. 
+\vspace*{5px}
+
+
+La scelta di quanti bit dedicare al numero di pagina e all'offset nel indirizzo logico porta a due vie:
+
+\begin{enumerate}
+    \item \textbf{Pochi bit per pagina logica, tanti per offset}: Causa frammentazione interna.
+    \item \textbf{Pochi bit per offset, tanti per pagina logica}: Causa tabelle di pagine molto grandi.
+\end{enumerate}
+
+\newpage
+
+\subsubsection{Gestione a più Tabelle di Pagine e Commutazione di Contesto} Analizziamo queste due specifiche condizioni che possono presentarsi nella gestione della traduzione degli indirizzi:
+
+\paragraph{Gestione Multi Tabella di Pagine} Se nell'interpretazione di un indirizzo logico considerassimo non un singolo blocco dedicato all'indice di tabella di pagine bensì due allora avremmo una gestione multipagina che utilizzerà
+questi due campi come indici nelle tabelle. Come nello schema classico il resto bit saranno dedicati all'offset utilizzato per spostarsi nella pagina fisica finale.
+
+\paragraph{Commutazione di Contesto} Ipotizziamo una condizione per cui si verifica una commutazione di contesto. La CPU dovrà quindi passare dall'esecuzione del Processo A a quella del Processo B. In qualche modo quindi sarà necessario cambiare le informazioni contenute nella TLB, esistono due diversi approcci con caratteristiche diverse:
+
+\begin{enumerate}
+    \item Si effettua il flush della TLB, rimuovendo quindi tutte le informazioni di traduzione di indirizzi riguardanti il Processo A. Questo è semplice da implementare ma non cerca di preservare informazioni di traduzione che potrebbero risultare utili dopo.
+    \item Nella TLB si mantiene una coppia di informazioni, ossia numero di pagina logica e pid a cui appartiene. In questo modo si fornisce una possibilità riguardo il mantenimento di pagine "vecchie" durante una commutazione, questo comporta allo stesso tempo un implementazione un po' più complessa nella logica della TLB.
+\end{enumerate}
+
+\subsubsection{Cache Virtuale/Fisica}
+
+Non abbiamo definito ancora formalmente dove viene posizionata l'MMU, se dopo o prima il primo livello di cache. Questa scelta risulta infatti importante
+nell'interpretazione degli indirizzi. Esistono questi due tipi di gestione:
+
+\begin{enumerate}
+    \item \textbf{Cache Fisica}: Dato un \textbf{indirizzo logico} generato dalla CPU, questo verrà \textbf{prima tradotto} dall'MMU (con relativa TLB) e \textbf{successivamente} dato in \textbf{input} alla cache \textbf{sotto forma} di \textbf{indirizzo fisico}.
+    
+    Questa implementazione causa un costo di traduzione.
+    \item \textbf{Cache Virtuale}: Dato un \textbf{indirizzo logico} generato dalla CPU, questo lo si usa \textbf{direttamente} in cache, ma va interpretato nel modo corretto, assumendo che ogni entry abbia specifici campi come $\{tag, pid, p, m, b parole\}$ e dunque la chiave utilizzata nel confrontatore della cache sarà definita da entrambi i campi $\{tag, pid\}$. Questa gestione causa un costo inferiore ma delle complicazioni causate dalla gestione del pid, dato che non esiste nessuna istruzione
+    primitiva che permetta la sua gestione diretta.
+\end{enumerate}
+
+Di conseguenza il \textbf{tipo} di \textbf{cache} è definito dal \textbf{tipo} di indirizzo \textbf{che acquisisce} in \textbf{input}.
+
+\newpage
+\subsubsection{Core Map e Gestione Tabelle di Pagine}
+
+Seguendo lo schema mostrato fino ad ora, risulterebbe necessario mantenere nella tabella delle pagine un numero di indirizzi a pagine pari a quante sono la somma di tutte le pagine logiche di tutti i processi. Vorremmo
+però mantenere solo le reali pagine, ossia gli indirizzi delle pagine fisiche. 
+
+
+
+Immaginiamo dunque una hashtable di pagine con i seguenti campi per riga:
+
+\begin{enumerate}
+    \item Numero di pagina.
+    \item Pid del processo a cui appartiene.
+    \item Puntatore al next (gestione della collisione per questa hashtable).
+\end{enumerate}
+
+\begin{figure}[htbp]
+    \center
+    \includegraphics[scale=0.25]{img/coreMap.png}
+\end{figure}
+
+
+In questo modo, dato in input un indirizzo, questo viene dato alla funzione di hash e il suo output verrà utilizzato per indicizzare l'accesso alla tabella.
+Grazie all'utilizzo del PID contenuto nella riga riusciamo a stabilire se quella pagina appartiene o meno al corrente processo, infatti se il PID non corrispondesse a quello atteso si dereferenzierebbe il campo next fino all'ultima riga caratterizzata da quel valore di hash.
+
+\subsection{Elementi in Dettaglio di Gestione di Memoria Virtuale}
+
+Dopo aver definito la gestione a paginazione della memoria virtuale, analizziamo in dettaglio alcuni elementi e fenomeni che la caratterizzano.
+
+\paragraph{Descrittore di Pagina} Un descrittore di pagina permette di mantenere una serie di informazioni riguardanti una pagina:
+
+\begin{enumerate}
+    \item Numero di pagina fisica in memoria o info riguardanti la posizione su disco.
+    \item Permessi d'accesso (Bit Read e Write).
+    \item Bit Modifica (M) utile nella gestione del page fault.
+    \item Bit Utilizzo (U) utile nella gestione del page fault.
+    \item Bit Presenza (P), ossia $1$ se la pagina è in memoria e $0$ se è sul disco. 
+\end{enumerate}
+
+Questo oggetto permetterà alcune operazioni (come la paginazione On-Demand, ossia la richiesta in memoria di una pagina su disco) in maniera regolare, seguendo i parametri che descrivono la pagina stessa nel suo descrittore.
+
+\newpage
+
+\subsubsection{Page Fault e Page Replacement}
+
+Seguendo lo schema impostato fino ad ora, la memoria principale fa da vera e propria cache al disco, di conseguenza possono occorrere anche dei fault.
+
+\paragraph{Page Fault} Descriviamo in fasi il page fault:
+
+\[ Proc_{A} \text{ riferisce a } < pag\_logica, offset > \:\: \rightarrow \:\: \nexists \: pag\_fisica \text{ in memoria} \]
+
+\begin{enumerate}
+    \item La CPU genera un indirizzo logico.
+    \item Si da in input l'indirizzo logico alla MMU ed al relativo TLB.
+    \item Il TLB trova il bit di presenza relativo all'indirizzo passato pari a $0$ (passando prima per la tabella delle pagine e poi per la memoria effettiva), di conseguenza genera un fault.
+\end{enumerate}
+
+Questo fault però implica che se la pagina non è stata trovata allora la si vuole caricare dal disco alla memoria, di conseguenza vengono effettuati questi ulteriori passaggi per il \textbf{caricamento} di \textbf{pagina} \textbf{dal disco alla memoria}:
+
+\begin{enumerate}
+    \item Si trova un indirizzo in core map che sia libero (free).
+    \item Si prende dal disco la pagina $PL$ che ha causato il fault in memoria e la si carica all'indirizzo indicato come (free) nella core map.
+    \item Si posiziona in memoria fisica la pagina presa dal disco.
+    \item Va aggiornata la tabella delle pagine.
+    \item Si modifica la core map, indicando che la posizione non è più (free).
+\end{enumerate}
+
+Tutta questa procedura sarà effettuata come un vero e proprio \textbf{handling} di \textbf{eccezione} causato dal \textbf{fault}. Di conseguenza dopo la sua esecuzione sarà necessario poter tornare all'istruzione successiva a quella che ha causato il fault stesso (LDR/STR/FETCH).
+
+\vspace*{10px}
+
+\paragraph{Page Replacement}
+
+Nel caso in cui non sia presente abbastanza spazio tra le pagine allocate in memoria, si effettua un \textbf{operazione} di \textbf{rimpiazzamento} di pagina
+basata sulla \textbf{rimozione} di una \textbf{specifica pagina} indicizzata, ad esempio, da $y$ nella Core Map.
+
+\vspace*{10px}
+
+Elenchiamo a pagina successiva le fasi di questa procedura.
+
+\newpage
+
+\begin{enumerate}
+    \item Si identifica l'indice $y$ nella Core Map della $pagina_{z}$ vittima che \\ appartiene ad un $processo_{A}$.
+    \item Si prende rispettiva pagina fisica in memoria, appunto $pagina_{z}$.
+    \item Questa pagina avrà una relativa posizione sul disco, allora:
+    \begin{enumerate}
+        \item Se il bit $M$ nel descrittore di pagina è $1$ allora porto la pagina vittima sul disco, dato che sono state apportate modifiche rispetto alla sua versione originale.
+        \item Se il bit $M$ nel descrittore di pagina è $0$ allora rimuovo semplicemente la pagina.
+    \end{enumerate}
+    \item Nella tabella delle pagine del $processo_{A}$ si inserisce ad indice $z$ il bit di presenza $P=0$, dato che è stata rimossa.
+    \item Nella Core Map viene settata a $free$ l'indice $y$.
+\end{enumerate}
+
+Questo fenomeno di Page Replacement può essere causato dal fenomeno di Page Fault descritto prima nel momento in cui, a tempo di caricamento di pagina, non fosse disponibile spazio in memoria.
+
+\paragraph{Implementazione dei Bit M ed U} Esistono due modi per implementare i bit $M$ ed $U$ nel descrittore, l'implementazione può essere infatti \textbf{Hardware} o \textbf{Software}:
+
+\begin{enumerate}
+    \item \textbf{Implementazione Hardware}: I bit $M$ ed $U$ vengono mantenuti nel descrittore di pagina, dunque saranno attributi di ciascuna entry della TLB. Questa implementazione risulta meno costosa rispetto a quella proposta dopo.
+    \item \textbf{Implementazione Software}: Non è presente il meccanismo degli attributi delle entry della TLB, di conseguenza risulterà necessario emulare il comportamento dei due bit.
+    Elenchiamo un paio di possibili casistiche ed emulazione dei due bit:
+    \begin{enumerate}
+        \item Se avessi una pagina con $R=1$ e $W=0$ allora tentare una $STR$ causerebbe un eccezione a causa dei meccanismi di protezione. Di conseguenza bisogna emulare $M$ settando ad esempio tutti i $W=0$ per fare in modo che l'handling della prima eccezione mi setta $W=1$ e $M=1$.
+        \item Allo stesso modo potrei gestire anche il bit $U$, settando tutte le pagine di default come non valide ($P=0$), dunque tutte le operazioni come $LDR, \: STR, \: FETCH$ causeranno delle eccezioni il cui handler si occuperà del setting delle flag $P=1, \: U=1$.
+    \end{enumerate}
+    Questo può causare un costo leggermente più alto nella gestione di questi due bit dato che sarà necessario utilizzare il meccanismo di handling delle eccezioni qualora siano necessari i bit $M$ ed $U$.
+\end{enumerate}
+
+\newpage
+
+\subsubsection{Politiche di Selezione dell'Indice di Pagina Vittima}
+
+Durante il Page Replacement abbiamo menzionato un indice $y$ arbitrario, che indicava la pagina identificata come vittima nella Core Map. Stabiliamo in questo capitolo le politiche di selezione di questo indice:
+
+\begin{enumerate}
+    \item \textbf{Politica Random}: Selezione casuale dell'indice, questo può risultare semplice da implementare ma poco efficiente in quanto a prestazioni.
+    \item \textbf{Politica FIFO}: Si segue un ordine FIFO rispetto al accesso di pagina logica:
+    \begin{center}
+        \begin{tabular}{ |c|c|c|c|c|c|c|c|c|c|c| } 
+         \hline
+           & A & B & C & D & E & A & B & C & D & E \\ 
+         \hline
+         1 & A &  &  &  & E &  &  &  & D &  \\ 
+         \hline
+         2 &  & B &  &  &  & A &  &  &  &  E \\ 
+         \hline
+         3 &  &  & C &  &  &  & B &  &  &  \\ 
+         \hline
+         4 &  &  &  & D &  &  &  & C &  &  \\ 
+         \hline
+        \end{tabular}
+        \end{center}
+    Questa politica in questo caso non è molto efficiente data la bassa disponibilità di pagine fisiche disponibili. Nella tabella infatti la prima colonna rappresenta le pagine fisiche disponibili e la prima riga l'accesso alle pagine logiche.
+    \item \textbf{Politica Min}: In caso di mancanza di pagine fisiche sostituisco quella che riferirò nel futuro più tardi:
+    \begin{center}
+        \begin{tabular}{ |c|c|c|c|c|c|c|c|c|c|c| } 
+         \hline
+           & A & B & C & D & E & A & B & C & D & E \\ 
+         \hline
+         1 & A &  &  &  &  &  &  &  &  &  \\ 
+         \hline
+         2 &  & B &  &  &  &  &  &  &  &   \\ 
+         \hline
+         3 &  &  & C &  &  &  &  &  & D &  \\ 
+         \hline
+         4 &  &  &  & D & E &  &  &  &  &  \\ 
+         \hline
+        \end{tabular}
+        \end{center}
+    Questo algoritmo è ottimo ma allo stesso tempo ideale dato che si suppone di conoscere a priori quando verrà richiesta una pagina logica.
+    \item \textbf{Politica LRU}: Come definito dalla sigla, questa politica sceglie il criterio Least Recently Used, sul lungo termine può assomigliare molto ad una FIFO.
+    \item \textbf{Politica NRU}: Come già visto nel capitolo delle cache, la politica Not Recently Used sfrutta dei bit d'uso settati a $0$ di default e messi ad $1$ in caso di accesso alla pagina, effettando dei periodici refresh di tutte le pagine a $0$. Questo ci permette di tenere traccia delle pagine verso cui si effettuano più accessi, in modo tale da scegliere vittime che non causino futuri caricamenti di pagine appena rimosse.
+    \item \textbf{Algoritmi di Approssimazione di LRU}: Elenchiamo una serie di algoritmi che puntano ad approssimare l'LRU descritto prima:
+    \begin{enumerate}
+        \item \textbf{Algoritmo Second Chance}: Ad ogni pagina è associato un contatore ed ogni ricerca di pagina vittima passa in "senso circolare" su tutte le $pagine_{i}$ controllando il valore del contatore:
+        \begin{enumerate}
+            \item Se $contatore_{i} > 0$ allora $contatore_{i} = contatore_{i} - 1 $.
+            \item Se $contatore_{i} = 0$ allora $pagina_{i}$ è scelta come vittima.
+        \end{enumerate}
+    \end{enumerate}
+\end{enumerate}
 
 \newpage
 

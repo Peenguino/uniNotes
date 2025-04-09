@@ -1542,7 +1542,7 @@ Citiamo questi due elementi che ci permettono di osservare un primo metodo di ap
 
 \paragraph{Th. Esistenza degli Zeri} Data una funzione $f[a,b] \rightarrow \mathbb{R}$ con $f \in C^{0}(a,b)$ allora\footnote{L'esponente al intervallo C(a,b) indica l'esistenza della derivata continua della funzione corrente.}:
 
-\[ \boxed{f(a)f(b) \Rightarrow \exists \alpha : f(\alpha) = 0} \]
+\[ \boxed{f(a)f(b) < 0 \Rightarrow \exists \alpha : f(\alpha) = 0} \]
 
 Questo teorema viene utilizzato come discriminante nel metodo di bisezione che funziona proprio come una ricerca binaria: viene selezionato l'intervallo sx o dx in base a \\ se $f(a)f(c) < 0$ oppure $f(c)f(b) < 0$.
 
@@ -1588,9 +1588,9 @@ Se $f \in C^{0}[a,b]$ con $f(a)f(b) < 0$ allora:
     \[ a_{k} \leq a_{k+1} \:\: \text{e} \:\: b_{k} \leq b_{k+1} \]
     considerando che per ipotesi $c_{k}$ sta in mezzo a $a_{k}$ e $b_{k}$.
     \item Consideriamo la k-esima iterazione, di conseguenza questo ci causa il denominatore al terzo termine, stiamo dividendo in due parti ad ogni iterazione:
-    \[ 0 \leq b_{k} - a_{k} = \frac{b - a}{2^{k}-1} \]
+    \[ 0 \leq b_{k} - a_{k} = \frac{b - a}{2^{k-1}} \]
     \item Consideriamo il limite ad ogni termine:
-    \[ 0 \leq \lim_{k \rightarrow \infty} b_{k} - a_{k} = \lim_{k \rightarrow \infty} \frac{b - a}{2^{k}-1} \]
+    \[ 0 \leq \lim_{k \rightarrow \infty} b_{k} - a_{k} = \lim_{k \rightarrow \infty} \frac{b - a}{2^{k-1}} \]
     Riusciamo dunque ad ottenere che $\epsilon = \lim_{k \rightarrow \infty} a_{k} = \lim_{k \rightarrow \infty} b_{k}$ dato che la loro differenza è pari a $0$.
     \item Passiamo al limite del prodotto della funzione nei due estremi:
     \[ \Leftrightarrow \:\:\: \lim_{k \rightarrow \infty} f(a_{k})f(b_{k}) = f(\lim_{k \rightarrow \infty}a_{k})f(\lim_{k \rightarrow \infty}b_{k}) \:\:\: \Leftrightarrow \:\:\: \epsilon = \lim_{k \rightarrow \infty} a_{k} = \lim_{k \rightarrow \infty} b_{k} \]
@@ -1661,7 +1661,7 @@ Date $g:[a,b] \rightarrow \mathbb{R}$ sia $\alpha$ tale che $\alpha \in (a,b)$ e
 Sia $g:[a,b] \rightarrow \mathbb{R}$, $g \in C^{1}(a,b)$, $\alpha = g(\alpha)$ con $\alpha \in (a,b)$:
 
 \begin{enumerate}
-    \item \textbf{Ipotesi}: Se $\exists \rho > 0 \: : \: |g'(x)| < 1 \:\:\: \forall x \in I_{\alpha} = [x_{0}-\rho,x_{0}+\rho]$
+    \item \textbf{Ipotesi}: Se $\exists \rho > 0 \: : \: |g'(x)| < 1 \:\:\: \forall x \in I_{\alpha} = [\alpha-\rho,\alpha+\rho]$
     \item \textbf{Tesi}: $\forall x_{0} \in I_{\alpha}$ con $x_{k+1} = g(x_{k})$ valgono:
     \begin{enumerate}
         \item $x_{k} \in I_{\alpha}$
@@ -1815,14 +1815,14 @@ Risolvendo questo sistema ottengo il punto d'intersezione con l'asse delle x:
 \[ f(x_{0}) + f'(x_{0})(x_{1} - x_{0}) = 0 \:\: \Leftrightarrow \:\: f'(x_{0}) + x_{1}f'(x_{0}) - x_{0}f'(x_{0}) = 0 \:\: \Leftrightarrow\]
 
 \[ \Leftrightarrow \:\: x_{1} = x_{0} - \frac{f(x_{0})}{f'(x_{0})} \:\: \Leftrightarrow \]
-\[ \Leftrightarrow \:\: \boxed{x_{k+1} = x_{k} - \frac{f(x_{k})}{f'(x_{k})} }\:\: \text{ con } f'(x_{0}) \neq 0 \:\: \forall k \]
+\[ \Leftrightarrow \:\: \boxed{x_{k+1} = x_{k} - \frac{f(x_{k})}{f'(x_{k})} }\:\: \text{ con } f'(x_{k}) \neq 0 \:\: \forall k \]
 
 Risulta dunque essere uno \textbf{specifico metodo di punto fisso} con $g(x) = x - \frac{f(x)}{f'(x)}$ con dominio ristretto ad uno dove $f'(x) = 0$ \textbf{non è ammesso}.
 
 \subsubsection{Th. Convergenza Locale del Metodo delle Tangenti (con Dim.)}
 
 Sia $f:[a,b] \rightarrow \mathbb{R}$, $f \in C^{2}(a,b)$, sia $\alpha \in (a,b) \::\: f(\alpha) = 0$ ed $\alpha$ è una \textbf{radice semplice}, ossia 
-$f'(\alpha) = 0$, allora:
+$f'(\alpha) \neq 0$, allora:
 
 \begin{enumerate}
     \item Il \textbf{metodo} delle \textbf{tangenti} è \textbf{localmente convergente}, ossia:
