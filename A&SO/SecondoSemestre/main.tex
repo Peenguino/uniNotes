@@ -2402,7 +2402,394 @@ Durante il Page Replacement abbiamo menzionato un indice $y$ arbitrario, che ind
             \item Se $contatore_{i} > 0$ allora $contatore_{i} = contatore_{i} - 1 $.
             \item Se $contatore_{i} = 0$ allora $pagina_{i}$ è scelta come vittima.
         \end{enumerate}
+\newpage
+        \item \textbf{Algoritmo del Working Set}: Viene definito un tempo $T$ che definisce \\ l'intervallo in cui se una specifica pagina non viene riferita allora è fuori dal Working Set. Ogni pagina si porta dietro tre specifici attributi:
+        \begin{enumerate}
+            \item \textbf{Bit di Riferimento}: definisce se la pagina è stata riferita o meno.
+            \item \textbf{TLR}: Tempo approssimato dall'ultimo riferimento.
+            \item \textbf{AGE}: $\text{Tempo Corrente} - \text{TLR}$.
+        \end{enumerate}
+        Questo algoritmo segue questi passi:
+        \begin{enumerate}
+            \item Per ogni pagina:
+            \begin{enumerate}
+                \item Se $R=0$ allora $AGE = \text{Tempo Corrente} - \text{TLR} $
+                \item Se $R=1$ allora $AGE = \text{Tempo Corrente}$ e $R = 0$.
+            \end{enumerate}
+            \item Se una pagina:
+            \begin{enumerate}
+                \item Ha $AGE < T$ allora è nel Working Set.
+                \item Ha $AGE \geq T$ allora è candidata per la rimozione.
+            \end{enumerate}
+        \end{enumerate}
+        Questi due \textbf{passi} vengono \textbf{eseguiti} in \textbf{maniera sequenziale} per ciascuna pagina in senso circolare per identificare delle pagine vittime. Questo algoritmo può essere utilizzato anche per mantenere un pool di pagine libere correlate alla dimensione attesa del Working Set, in modo tale da garantire sempre spazio per la pagina da caricare. Questa \textbf{politica} del \textbf{pool} va però gestita perchè può portare anche a svantaggi di overhead se di dimensioni troppo estese.
     \end{enumerate}
+\end{enumerate}
+
+\subsubsection{File Memory Mapped}
+
+Astrazione caratteristica del mondo UNIX, che ci permette di rendere un file la virtualizzazione di segmenti di memoria condivisa. Nello specifico immaginiamo questi specifici passi:
+
+\begin{enumerate}
+    \item Viene aperto un file, tramite una \textbf{open}, da \textbf{due diversi processi}.
+    \item \textbf{Non vogliamo} un \textbf{apertura} di \textbf{due zone di memoria fisica diverse} ma come stesse zone di memoria fisica. Questo effetto è generato dal \textbf{mapping virtuale} da due indirizzi logici diversi ad uno stesso indirizzo fisico.
+    \item Questa virtualizzazione permette comportamenti di tipo \textbf{zero copy}, dato che \textbf{non vengono creati} dei \textbf{buffer intermedi} di lettura e scrittura \textbf{per l'interazione} con quella zona di memoria.
+\end{enumerate}
+
+Questa tecnica nel mondo UNIX è molto utilizzata dato che permette di caricare in parte o interamente un file dal disco in memoria centrale e successivamente abilita i processi alla scrittura su queste zone di memoria, e questo risulta molto efficiente dato che eviterà continui caricamenti e scaricamenti tra disco e memoria causati dai vari processi. 
+
+\newpage
+
+\subsubsection{Accenni di Gestione di UNIX della Memoria}
+
+I sistemi UNIX based si avvalgono di questi tre elementi:
+
+\begin{enumerate}
+    \item \textbf{Core Map}.
+    \item \textbf{Algoritmo di Second Chance}.
+    \item \textbf{Page Daemon}: Tentativo di mantenimento di spazio libero necessario all'esecuzione dei correnti processi, identificando questi tre parametri di spazio libero:
+    \begin{enumerate}
+        \item \textbf{Lotsfree}: Massimo numero di pagine libere.
+        \item \textbf{Desfree}: Numero di pagine libere desiderate.
+        \item \textbf{Minfree}: Numero minimo di pagine necessarie per non provocare trashing.
+    \end{enumerate}
+    Grazie a questi tre parametri si stabilisce l'\textbf{algoritmo} seguito dal \textbf{Page Daemon}:
+    \begin{lstlisting}[language=C]
+        // Primo Caso:
+        if(freeblocks >= lotsfree) {
+            //nessun problema, presente abbastanza spazio
+        }
+        // Secondo Caso:
+        if(minfree <= freeblocks <= lotsfree || freeblocks < minfree &&      average(freeblocks,intervalloTempo) > desfree){
+            //effettua replacement fino a quando 
+            //il numero di freeblocks in modo tale
+            //da mettersi nella condizione di 
+            //averne abbastanza in futuro
+        }
+        // Terzo Caso:
+        if(freeblocks <= minfree 
+        && average(freeblocks,intervalloTempo) < desfree){
+            //rimozione dalla memoria principale del processo corrente
+        }
+    \end{lstlisting}
+    \vspace*{-10px}
+    Questo permette di effettuare quindi un monitoring periodico della disponibilità della memoria rispetto ai tre parametri stabiliti sopra.
+\end{enumerate}
+
+\newpage
+
+\section{File System e Gestione Dischi}
+
+In questo capitolo descriviamo la gestione della memoria di massa, dai dispositivi che la mantengono alla sua gestione logica.
+
+\subsection{Caratteristiche di Dischi ed SSD}
+
+Descriviamo i due tipi di supporti di memoria di massa più comuni:
+
+\begin{enumerate}
+    \item \textbf{Disco}: E' composto da $4$ \textbf{piatti} e $6$ \textbf{facce}, la prima e l'ultima non vengono utilizzate. Questi elementi si suddividono a loro volta in
+    \textbf{settori} separati tra loro da \textbf{gap}. Ciascun settore sarà letto o scritto da una testa che grazie ad una carica riesce a ottenere positivo o negativo magneticamente, oppure con un po' di carica
+    in più scrivere tale informazione. Può esistere un numero molteplice di teste. Per una buona norma e \textbf{per i tempi di flush} si scrive a \textbf{settori alternati}. I tempi per operazione lunghi, caratteristici dei dischi, sono causati proprio dalla scrittura a settori alternati, il \textbf{Seek Time} infatti è una delle caratteristiche negative dei dischi, ossia il \textbf{tempo impiegato} dalla testina per \textbf{posizionarsi} nella \textbf{locazione corretta}.
+    \item \textbf{SSD}: Tipo di \textbf{memoria flash}, basata sulla \textbf{carica} e \textbf{scarica} di \textbf{transistor} che permette/non permette il passaggio di corrente. Questa gestione causa, durante una scrittura, la modifica di un intero blocco di posizioni e non solo della posizione singola. Uno degli interessi maggiori durante la scrittura su SSD è quello di mantenere omogeneità nella scrittura sui blocchi che compongono il supporto. Per garantire questa proprietà si utilizza una \textbf{Tabella di Indirezione} che grazie ad un numero di blocco logico in input \textbf{riesce a prevenire} la \textbf{scrittura massiva} su un \textbf{singolo blocco} di SSD.
+\end{enumerate}
+
+\paragraph{Caratteristiche Tecniche a Confronto - HDD vs SSD}
+
+\begin{enumerate}
+    \item \textbf{Hard Disk}: Elenchiamo delle caratteristiche:
+    \begin{enumerate}
+        \item \textbf{Dimensione}: Ordine del TByte.
+        \item \textbf{Dimensione Pagina}: $1$ K.
+        \item \textbf{Dimensione Banda}: $200/400$ Mb/s.
+        \item \textbf{Seek Time}: $5/10$ ms.
+        \item \textbf{Consumo}: $\approx 10$ W
+    \end{enumerate}
+    \item \textbf{SSD}: Elenchiamo delle caratteristiche:
+    \begin{enumerate}
+        \item \textbf{Dimensione}: Ordine del $\frac{1}{2}$ TByte.
+        \item \textbf{Dimensione Pagina}: $4/8$ K.
+        \item \textbf{Dimensione Banda}: $200/400$ Mb/s.
+        \item \textbf{Seek Time}: $10/100 \: \mu s$.
+        \item \textbf{Consumo}: $\approx O(1)$ W
+    \end{enumerate}
+\end{enumerate}
+
+La differenza sostanziale è il Seek Time (che è più una latenza lato SSD) che varia sensibilmente. Questo causa un evidente differenza in velocità di operazioni tra i due supporti.
+
+\newpage
+
+\subsection{Caratteristiche di un File System}
+
+Da un \textbf{punto di vista logico}, grazie ai \textbf{driver} dei vari dispositivi descritti, il disco/SSD verrà visto come un \textbf{vettore di blocchi}. Vogliamo fornire un organizzazione a questo vettore in modo tale da garantire le \textbf{seguenti proprietà}:
+
+\begin{enumerate}
+    \item \textbf{Persistenza}: Dopo la scrittura del dato, voglio che questo perduri nel tempo.
+    \item \textbf{Naming}: Vogliamo assegnare dei nomi, non utilizzare un indicizzazione numerica.
+    \item \textbf{Performance}: Garantire buone prestazioni.
+    \item \textbf{Accessi Controllati}.
+\end{enumerate}
+
+Solitamente questa organizzazione sarà definita ad albero, dove tutte le foglie saranno file ed i nodi intermedi delle directory. Nello specifico:
+
+\begin{enumerate}
+    \item \textbf{Root}: conterrà gli indici dei figli, punto da cui si inizia.
+    \item \textbf{Directory}: manterranno gli indici dei sottofile.
+    \item \textbf{File}: foglie del File System.
+\end{enumerate}
+
+\paragraph{Tipi di Accesso ai File (R/W)} Possiamo avere due tipi di accesso ad un file:
+
+\begin{enumerate}
+\item \textbf{Accesso Sequenziale}: Ad esempio secondo un pattern del tipo:
+\begin{lstlisting}[language=C]
+    open();
+    read();
+    close();
+\end{lstlisting}
+\vspace*{-20px}
+\item \textbf{Accesso Diretto}: Ad esempio secondo un pattern del tipo:
+\begin{lstlisting}[language=C]
+    open();
+    seek();
+    read();
+    seek();
+    close();
+\end{lstlisting}
+\end{enumerate}
+
+\paragraph{Dimensioni dei File}: Esistono indicativamente due tipi di file:
+
+\begin{enumerate}
+    \item \textbf{File Piccolo}: Richiede un paio di blocchi su disco, il FS potrebbe decidere di gestirlo direttamente (come nel caso dell'NTFS).
+    \item \textbf{File Grande}: Richiede migliaia di blocchi su disco.
+\end{enumerate}
+
+\paragraph{Riepilogo sulle Scelte di Progettazione di un File System} Ricapitolando, una progettazione di File System dovrà coprire questi punti:
+
+\begin{enumerate}
+    \item Struttura e Granularità dell'indice.
+    \item Gestione dello spazio libero.
+    \item Località delle informazioni.
+    \item Affidabilità e come tutelarla.
+\end{enumerate}
+
+\newpage
+
+\subsection{File System Noti}
+
+Ciascun File System deve gestire le meta-informazioni di ogni file, analizziamo il comportamento di questi File System noti:
+
+\subsubsection{FAT - File Allocation Table}
+
+Le informazioni sulla distribuzione del file sui vari blocchi del disco sono \textbf{mantenute in una tabella} (appunto, la FAT). Il primo indice da utilizzare nella \textbf{FAT} è mantenuto nelle meta-info associate al filename. Dopo aver trovato la prima
+si \textbf{seguono} i \textbf{puntatori} come in una \textbf{linked list} che indicheranno gli indici delle entry nella FAT relative ai \textbf{successivi blocchi} del \textbf{file}.
+
+\paragraph{FAT32} Specifico tipo di FAT in cui sono dedicati $30$ bit per numero di blocco successivo e $2$ bit saranno per delle flag. Di conseguenza:
+
+\begin{enumerate}
+    \item \textbf{Numero Entry della FAT32}: $2^{30}$ entry.
+    \item \textbf{Dimensione Complessiva Disco}: $2^{30} * \text{dimensione blocco del disco}$.
+\end{enumerate}
+
+\paragraph{Caratteristiche della FAT} Analizziamo i Pro ed i Contro dell'utilizzo di questo File System:
+
+\begin{enumerate}
+    \item \textbf{Pro}: Elenchiamo i vantaggi:
+    \begin{enumerate}
+        \item Troviamo facilmente il primo blocco di un file.
+        \item Risulta facile effettuare operazioni di append.
+        \item Risulta semplice cancellare dei file.
+    \end{enumerate}
+    \item \textbf{Contro}: Elenchiamo gli svantaggi:
+    \begin{enumerate}
+        \item La dimensione della FAT, esiste una entry della FAT per ogni blocco presente sul disco. Ricordiamo che la FAT sarà mantenuta in memoria principale.
+        \item Limita la dimensione del File System.
+        \item Metadati/Protezione vanno memorizzati da qualche altra parte esterna e non nella FAT.
+        \item Accessi non sequenziali risultano essere lenti a causa della gestione a linked list.
+        \item Frammentazione alta sia nella FAT sia su Disco, dato che l'organizzazione risulta molto sparpagliata. Di conseguenza non sarà ad esempio mantenuta nessuna vicinanza su disco tra file appartenenti alla stessa directory.
+    \end{enumerate}
+\end{enumerate}
+
+\newpage
+
+\subsubsection{FFS - Fast File System}
+
+Detto anche File System UNIX, si basa sull'utilizzo di \textbf{I-Nodes} per il mantenimento di dati riguardo ogni file. Nello specifico:
+
+\paragraph{Composizione di un I-Node} Descriviamo un I-Node:
+
+\begin{enumerate}
+    \item \textbf{Metadati}:
+    \begin{enumerate}
+        \item Nome file.
+        \item Proprietario.
+        \item Tempi di ultimo accesso.
+        \item Diritti d'accesso.
+    \end{enumerate}
+    \item \textbf{Puntatori a Blocchi}:
+    \begin{enumerate}
+        \item $12$ puntatori diretti.
+        \item $1$ puntatore indiretto.
+        \item $1$ puntatore indiretto doppio.
+        \item $1$ puntatore indiretto triplo.
+    \end{enumerate}
+\end{enumerate}
+
+Questa gestione permette \textbf{accessi non sequenziali più efficienti}, infatti i puntatori a blocchi degli I-Node punteranno appunto alle zone del disco del file stesso. \textbf{Maggiore} è la \textbf{dimensione} del file \textbf{più saranno i livelli di indirizzamento} dei puntatori a blocchi.
+
+\paragraph{Locazione degli I-Node e Bitmap}
+
+Basandoci sull'astrazione del disco visto come \\ \textbf{vettore di blocchi}, \textbf{dopo} i \textbf{primi blocchi} dedicati al \textbf{boot} ed al \textbf{superblocco} \textbf{avremo} quelli dedicati agli \textbf{I-Nodes}. Oltre a questo, nel momento in cui risulta necessario trovare un I-Node vuoto si utilizza una \textbf{Bitmap} per identificare più rapidamente blocchi/I-Nodes vuoti, evitando così il check lineare di una serie di I-Nodes.
+
+\paragraph{Gestione Disco e Frammentazione del FFS}
+
+Analizziamo due ulteriori caratteristiche del FFS:
+
+\begin{enumerate}
+    \item \textbf{Organizzazione Disco}: Si cerca di mantenere correlazione tra file appartenenti alla stessa directory, posizionando appunto i file negli stessi blocchi. Questa logica dovrebbe garantire che file "vicini logicamente" siano il meno possibile sparpagliati sul disco.
+    \item \textbf{Gestione Frammentazione}: Si seguono due criteri in base alla dimensione del file durante una scrittura:
+    \begin{enumerate}
+        \item \textbf{First Fit}: Criterio seguito durante la scrittura di un file piccolo.
+        \item \textbf{Best Fit}: Criterio seguito durante la scrittura di un file grande.
+    \end{enumerate}
+\end{enumerate}
+
+\newpage
+
+\paragraph{Caratteristiche del FFS} Analizziamo i Pro ed i Contro dell'utilizzo di questo File System:
+
+\begin{enumerate}
+    \item \textbf{Pro}: Elenchiamo i vantaggi:
+    \begin{enumerate}
+        \item Efficiente sia su file piccoli sia su file grandi.
+        \item Da più garanzie sulla località.
+        \item Esiste località tra metadati e dati stessi.
+    \end{enumerate}
+    \item \textbf{Contro}: Elenchiamo gli svantaggi:
+    \begin{enumerate}
+        \item Molto inefficiente su microfile.
+        \item Molto inefficiente su blocchi contigui, data la gestione a puntatori.
+        \item Va mantenuto $\approx 10/20 \%$ di spazio libero per la gestione della frammentazione e della località.
+    \end{enumerate}
+\end{enumerate}
+
+\subsubsection{NTFS - New Technology File System}
+
+File System basato su una \textbf{Master File Table} caratterizzata da un \textbf{entry} molto \textbf{grande} ($1kb$), e la stessa tabella è trattata come un file. Le \textbf{entry} della tabella \textbf{si basano} sul concetto di \textbf{extend}, ossia una coppia:
+
+\[ \text{EXTEND} \: = \: < \#\text{BLOCCO}, \text{LEN} > \]
+
+Oltre a questo vengono anche effettuati dei processi di \textbf{journaling}, che \textbf{permettono} il \textbf{ripristino} in \textbf{caso di fallimento imprevisto}.
+
+\paragraph{Entry nella Master File Table e Dimensioni File}
+
+Una delle caratteristiche di questo tipo di File System è quella di gestire le entry della tabella in base alla dimensione del file che descrive:
+
+\begin{enumerate}
+    \item \textbf{File Piccolo}: L'entry è composta da:
+    \begin{enumerate}
+        \item Meta-informazioni.
+        \item Nome del file.
+        \item Dati effettivi (direttamente nella Master File Table).
+    \end{enumerate}
+    \item \textbf{File Medio}: L'entry è composta da:
+    \begin{enumerate}
+        \item Meta-informazioni.
+        \item Nome del file.
+        \item Una serie di extends del tipo $\text{EXTEND} \: = \: < \#\text{BLOCCO}, \text{LEN} >$ che "puntano" alla locazione effettiva dei dati su disco.
+    \end{enumerate}
+    \item \textbf{File Grande}: L'\textbf{entry} è identica al caso del file medio, solo che sono \textbf{molteplici per} la descrizione di un \textbf{singolo file}.
+\end{enumerate}
+
+\newpage
+
+\subsection{RAID - Redundant Array of Inexpensive Disk}
+
+Gestione di blocchi di dischi tale da garantire proprietà come capacità o affidabilità. 
+
+\paragraph{Striping} Rappresentazione a blocchi di un file, dove ciascun blocco può essere posizionato su dischi diversi. Questa distribuzione di blocchi di file su dischi diversi permette idealmente di leggere contemporaneamente su più dischi (velocizzando la parte più lenta delle letture su disco),
+ anche se la bufferizzazione in chiusura risulterebbe in ogni caso sequenziale.
+
+\paragraph{Rilevazione d'Errore} Esistono degli schemi che ci permettono di identificare errori, ne è un esempio il \textbf{bit di parità}, che mantiene l'informazione sulla parità del dato, di conseguenza se dovesse variare avremmo un modo semplice per accorgercene. Questo schema è detto anche \textbf{hamming}, dato che possiamo notare se il dato sia o meno da pari a dispari.
+
+\paragraph{Mirroring} Tecnica per cui ogni scrittura su un disco viene specchiata anche sugli altri. Questa tecnica è spesso utilizzata in contesti in cui l'affidabilità ha una priorità alta.
+
+\paragraph{Versioni Note di RAID} Elenchiamo alcune versioni note di RAID:
+
+\begin{enumerate}
+    \item \textbf{RAID 0}: Si utilizzano $n$ dischi in \textbf{striping}:
+    \begin{figure}[htbp]
+        \center
+        \includegraphics[scale=0.3]{img/RAID0.png}
+    \end{figure}
+    \paragraph{Caratteristiche} Analizziamo le caratteristiche di questa gestione:
+    \begin{enumerate}
+        \item Aumento della banda.
+        \item Nessuna garanzia sull'affidabilità, anzi la peggioro, dato che il fault di un disco comprometterebbe tutto data la distribuzione dei file data dallo striping.
+    \end{enumerate}
+    \vspace*{10px}
+    \item \textbf{RAID 1}: Si utilizza il \textbf{mirroring} \textbf{senza} alcun tipo di \textbf{correzione}:
+    \begin{figure}[htbp]
+        \center
+        \includegraphics[scale=0.3]{img/RAID1.png}
+    \end{figure}
+
+\newpage
+
+    \paragraph{Caratteristiche} Analizziamo le caratteristiche di questa gestione:
+    \begin{enumerate}
+        \item Posso risolvere un fault di disco "facilmente", ipotizziamo ad esempio il fault di $disk1$, potrei sostituire quest'ultimo con un $disk1'$ e
+        riportare tutto in mirroring.
+        \item Diminuzione della banda, questo varia in base al tipo di gestione di RAID 1:
+        \begin{enumerate}
+            \item \textbf{Soluzione Hardware + Software}: L'operazione costerebbe i tempi di $2$ init ed $1$ exec.
+            \item \textbf{Soluzione solo Hardware}: Un componente specifico RAID si occuperebbe della gestione delle operazioni, di conseguenza
+            il costo corrisponderebbe ad i tempi di $1$ init, $2$ init HW ed $1$ exec.
+            \item \textbf{Soluzione solo Software}: Un operazione corrisponderebbe a due operazioni su due File System diversi.
+        \end{enumerate}
+        \item Un fault verrebbe dunque così gestito:
+        \begin{enumerate}
+            \item \textbf{Soluzione solo Hardware}: Tutte le locazioni contrassegnate come "BAD" in un disco vengono specchiate anche sugli altri.
+            \begin{figure}[htbp]
+                \center
+                \includegraphics[scale=0.35]{img/fault_RAID1.png}
+            \end{figure}
+            \item \textbf{Soluzione solo Software}: Il problema del mirroring delle locazioni contrassegnate come "BAD" non occorre, dato che tutto viene gestito da specifico FS.
+        \end{enumerate}
+    \end{enumerate}
+    \item \textbf{RAID 2/3}: Si basano sull'utilizzo dello \textbf{striping} a livello di \textbf{bit} e \textbf{byte}, seguono uno schema di \textbf{scrittura circolare} (utilizzo del modulo) su disco e usano codici di correzione di errori con \textbf{Hamming}. 
+    \item \textbf{RAID 4}: Si basa sull'utilizzo di \textbf{block striping} e \textbf{dedicated parity}.
+    \item \textbf{RAID 5}: Si basa sull'utilizzo di striping di blocco e codici d'errore:
+    
+    \begin{figure}[htbp]
+        \center
+        \includegraphics[scale=0.3]{img/RAID5.png}
+    \end{figure}
+
+    Questi codici di \textbf{correzione} si basano sull'utilizzo dello $xor$, se l'ipotesi della distribuzione omogenea è mantenuta allora nel caso in cui occorresse il fault di un disco saremmo in grado di \textbf{riottenere facilmente le informazioni perse}. Ad esempio, assumendo che nel $disk3$ avvenga un fault:
+    \[ A_{1} \: xor \: A_{2} \: xor \: A_{3} = CA_{123} \Leftrightarrow A_{3} = A_{1} \: xor \: A_{2} \: xor \: CA_{123} \]
+
+\newpage
+
+    \paragraph{Caratteristiche} Analizziamo le caratteristiche di questa gestione:
+    \begin{enumerate}
+        \item \textbf{Performance}: Peggiora la banda $\approx 33\%$ dato che le info sono tutte in $xor$.
+        \item \textbf{Affidabilità}: Ho un buon livello di affidabilità garantita.
+    \end{enumerate}
+
+    \item \textbf{RAID 6}: Come nello schema precedente vengono utilizzati codici di controllo in $xor$, che però in questo caso vengono duplicati e collocati
+    su dischi diversi. Di conseguenza si otterrà un ulteriore perdita di banda ma ottime garanzie sull'affidabilità.
+
+    \item \textbf{RAID 1-0}: Schema basato su un RAID0 di blocchi in RAID1. Questa combinazione ci permette di garantire una buona capacità grazie al RAID 0 ed una buona affidabilità grazie al RAID 0.
+    Un esempio potrebbe essere:
+    
+    \begin{enumerate}
+        \item \textbf{Blocco 1}: $disk1$ e $disk2$ tra loro in RAID1, dunque gestiti tra loro in mirroring.
+        \item \textbf{Blocco 2}: $disk3$ e $disk4$ tra loro in RAID1, dunque gestiti tra loro in mirroring. 
+    \end{enumerate}
+    
+    Questi due blocchi $Blocco1$ e $Blocco2$ sono tra loro in RAID0, dunque in gestiti tra loro in striping.
+
 \end{enumerate}
 
 \newpage
