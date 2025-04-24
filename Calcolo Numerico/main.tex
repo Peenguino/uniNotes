@@ -2068,20 +2068,23 @@ Sia $f:[a,b] \rightarrow \mathbb{R}$, $f \in C^{2}(a,b)$, $\alpha : f(\alpha) = 
                 \[ \lim_{k \rightarrow \infty} \frac{x_{k+1} - \alpha}{|x_{k} - \alpha |^{2}} = l \]
             \end{enumerate}
         \end{enumerate}
+
+        Nello specifico l'\textbf{ordine di convergenza} può essere stabilito grazie ad $f''(\alpha)$:
+
+        \vspace*{-15px}
+
+        \[
+        \left\{
+        \begin{array}{lll}
+            f''(\alpha) \neq 0 & \Rightarrow & \text{ Metodo delle Tangenti ha ordine 2 } \\
+            f''(\alpha) = 0 & \Rightarrow & \text{ Metodo delle Tangenti ha ordine maggiore di 2 } 
+        \end{array}
+        \right.
+        \]
+
     \end{tcolorbox}
 
-    \begin{tcolorbox}\subsubsection{Th. di Convergenza in Largo}
-
-        Sia $f:[a,b] \rightarrow \mathbb{R}$, $f \in C^{2}(a,b)$, $\alpha : f(\alpha) = 0$ allora:
-        
-        \begin{enumerate}
-            \item \textbf{Ipotesi}: Se $\exists \delta > 0 \::\: S = (\alpha, \alpha + \delta]$ tale che:
-            \begin{enumerate}
-                \item $f'(x) \neq 0 \:\:\: \forall x \in S$
-                \item $f(x)f''(x) > 0\:\:\: \forall x \in S$
-            \end{enumerate}
-            \item \textbf{Tesi}: Allora $\forall x_{0} \in S \:\: \{ x_{k} \} \rightarrow \alpha$ in modo \textbf{monotono}.
-        \end{enumerate}
+    \begin{tcolorbox}
         \item \textbf{Th. di Convergenza in Largo}
         
         Sia $f:[a,b] \rightarrow \mathbb{R}$, $f \in C^{2}(a,b)$, $\alpha : f(\alpha) = 0$ allora:
