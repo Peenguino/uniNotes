@@ -338,9 +338,10 @@ Sia $x \in \mathbb{R}$, $x \neq 0$ e $\omega \leq |x| \leq \Omega$ allora:
     \[ x \: = \: \beta^{\rho} \: (\sum^{\infty}_{i=1} d_{i}\beta^{-i}) \:\:\: \text{con} \:\:\: \rho \in [-m,M] \]
     \item Assumiamo di star considerando i numeri di macchina in troncamento, dunque cambia l'indice della sommatoria in $t$ cifre:
     \[ x \: = \: \beta^{\rho} \: (\sum^{t}_{i=1} d_{i}\beta^{-i}) \:\:\: \text{con} \:\:\: \rho \in [-m,M] \]
-    \item ****
+    \item Dato che $\tilde{x}$ e $x$ sono comprese tra $a$ e $b$ allora sicuramente vale questa maggiorazione:
     \[ |\tilde{x} - x| < |b-a| \]
-    \item ***
+    In questo caso stiamo effettuando un approssimazione in troncamento, dunque $\tilde{x} = a$.
+    \item $\beta^{\rho-1}$ rappresenta la distanza minima in modulo rappresentabile, per questo motivo $|x|$ sarà sicuramente maggiore:
     \[ |x| \geq \beta^{\rho-1} \: = \: \beta^{\rho}(0.1)_{\beta} \]
     \item Dunque alla fine possiamo ricavare $\tilde{x}$ della nostra macchina:
     \[ \boxed{\tilde{x} \: = \: x(1+\epsilon_{x})} \]
@@ -530,8 +531,8 @@ La norma è una \textbf{funzione} che ci permette di ricavare un informazione qu
 \begin{enumerate}
     \item $f(x) \geq 0 $ e $f(x) = 0$ se e solo se $x = \begin{bmatrix}
 0 \\
-. \\
-. \\
+\vdots \\
+\vdots \\
 0
 \end{bmatrix}$
 
@@ -594,9 +595,11 @@ Contestualizziamo la norma alle matrici:
 
 \vspace*{10px}
 
-\[ \boxed{||A||_{F} = \sqrt{\sum^{n}_{i,j=1}|a_{ij}|^2} = traccia(A^{H}A)}\footnotemark \]
+\[ \boxed{||A||_{F} = \sqrt{\sum^{n}_{i,j=1}|a_{ij}|^2} = traccia(A^{H}A)} \]
 
-\footnotetext{La traccia in una matrice corrisponde alla somma degli elementi sulla diagonale principale. La matrice indicata con H è la trasposta coniugata, ossia matrice su cui abbiamo eseguito rispettivamente l'inversione tra righe e colonne e invertito i segni alle componenti immaginarie.}
+\vspace*{20px}
+
+\paragraph{Recall - Traccia e Matrice Coniugata} La traccia in una matrice corrisponde alla somma degli elementi sulla diagonale principale. La matrice indicata con H è la trasposta coniugata, ossia matrice su cui abbiamo eseguito rispettivamente l'inversione tra righe e colonne e invertito i segni alle componenti immaginarie.
 
 \newpage
 
@@ -717,21 +720,21 @@ Spesso questo teorema viene utilizzato "al contrario", ossia se un valore \textb
     \item Dalla definizione di autovalore:
     \[ A\:v = \lambda \: v \]
    \[ \begin{bmatrix}
-    a_{11} & a_{12} & ... & a_{1n}\\
-    a_{21} & a_{22} & ... & a_{2n}\\
-    . & . & . & . \\
-    a_{n1} & a_{n2} & ... & a_{nn}
+    a_{11} & a_{12} & \cdots & a_{1n}\\
+    a_{21} & a_{22} & \cdots & a_{2n}\\
+    \vdots & \vdots & \ddots & \vdots \\
+    a_{n1} & a_{n2} & \cdots & a_{nn}
     \end{bmatrix} 
     \begin{bmatrix}
         v_1 \\
         v_2 \\
-        . \\
+        \vdots \\
         v_n \\
     \end{bmatrix} \: = \: \lambda 
     \begin{bmatrix}
         v_1 \\
         v_2 \\
-        . \\
+        \vdots \\
         v_n \\
     \end{bmatrix} \]
     \vspace*{5px}
@@ -843,18 +846,18 @@ Assumiamo di avere $Ax = b, \: \: \: A\in \mathbb{R}^{nxn}, \: \: \: det(A)\neq0
     \item \textbf{Matrice Diagonale}: La matrice $A$ ha solo elementi sulla sua diagonale.
     \[ 
     \begin{bmatrix}
-    a_{11} & 0 & ...  & 0\\
-    0 & a_{22} &  & ...\\
-     ...&  & a_{33} &  0\\
-     0& ... & 0 & a_{nn}
+    a_{11} & 0 & \cdots  & 0\\
+    0 & \ddots &  & \vdots \\
+     \vdots &  & \ddots &  0\\
+     0 & \cdots & 0 & a_{nn}
     \end{bmatrix} 
     \]
     In questo caso possiamo ricavare le \textbf{soluzioni} in questo modo
     \[ x = A^{-1}b = \begin{bmatrix}
-    \frac{1}{a_{11}} & 0 & ...  & 0\\
-    0 & \frac{1}{a_{22}} &  & ...\\
-     ...&  & \frac{1}{a_{33}} &  0\\
-     0& ... & 0 & \frac{1}{a_{nn}}
+    \frac{1}{a_{11}} & 0 & \cdots  & 0\\
+    0 & \frac{1}{a_{22}} &  & \vdots \\
+     \vdots &  & \frac{1}{a_{33}} &  0\\
+     0& \cdots & 0 & \frac{1}{a_{nn}}
     \end{bmatrix}
     \begin{bmatrix}
     b_{1}\\    
@@ -867,11 +870,11 @@ Assumiamo di avere $Ax = b, \: \: \: A\in \mathbb{R}^{nxn}, \: \: \: det(A)\neq0
     \vspace*{10px}
     \[
     \begin{bmatrix}
-    a_{11} & ... & ...  & a_{1n}\\
-    0 & a_{22} &  & ...\\
-     ...&  & a_{33} &  ...\\
-     0 & ... & 0 & a_{nn}
-    \end{bmatrix}
+        a_{11} & \cdots & \cdots  & a_{1n} \\
+        0 & \ddots &  & \vdots \\
+            \vdots &  & \ddots &  \vdots \\
+        0 & \cdots & 0 & a_{nn}
+    \end{bmatrix} 
     \]
     \vspace*{5px}
     \[ det(A) = \prod_{i=1}^{n} a_{ii} \]
@@ -880,14 +883,14 @@ Assumiamo di avere $Ax = b, \: \: \: A\in \mathbb{R}^{nxn}, \: \: \: det(A)\neq0
     \item \textbf{Matrice Piena}: La matrice $A$ risulta piena:
     \[
     \begin{bmatrix}
-    a_{11} & ... & ...  & a_{1n}\\
-    ... & a_{22} &  & ...\\
-     ...&  & a_{33} &  ...\\
-     a_{n1} & ... & ... & a_{nn}
-    \end{bmatrix}
+        a_{11} & \cdots & \cdots  & a_{1n} \\
+        \vdots & \ddots &  & \vdots \\
+            \vdots &  & \ddots &  \vdots \\
+            a_{n1} & \cdots & \cdots & a_{nn}
+    \end{bmatrix} 
     \]
 
-    Non si conosce un algoritmo che sia aderente al limite inferiore $O(n^{2})$ del problema. Di conseguenza l'algoritmo favorito in queste circostanze è quello di \textbf{Gauss}, caratterizzato da un costo in tempo asintotico $O(n^{3})$, dato che bisogna, per ogni colonna, azzerare tutti gli elementi sotto la diagonale.
+    L'algoritmo favorito in queste circostanze è quello di \textbf{Gauss}, caratterizzato da un costo in tempo asintotico $O(n^{3})$, dato che bisogna, per ogni colonna, azzerare tutti gli elementi sotto la diagonale.
     
 \end{enumerate}
 
@@ -978,11 +981,11 @@ Definiamo la matrice $E$:
 
 \[ E = I -ve^{T}_{k} \:\:\: \text{con} \:\:\: e_{k} = \begin{bmatrix}
     0 \\
-    . \\
+    \vdots \\
     0 \\
     1 \\
     0 \\
-    . \\
+    \vdots \\
     0 \\
     
 \end{bmatrix}
@@ -1003,7 +1006,7 @@ $E$ è quindi definita come \textbf{Matrice di Gauss}.
     Questo statement si può dimostrare effettuando la moltiplicazione tra $E$ ed $E^{-1}$ ottenendo $I$.
     \item Sia $x \in \mathbb{R}^{n}$ con $x_{k} \neq 0$. Allora esiste una matrice elementare di Gauss tale che
     \[ Ex = {\begin{bmatrix}
-        x_{1} & ... & x_{k} & 0 & ... & 0
+        x_{1} & \cdots & x_{k} & 0 & \cdots & 0
     \end{bmatrix}}^{T} \]
     \newpage
     \item Assumendo di avere due matrici elementari di Gauss:
@@ -1035,9 +1038,9 @@ Assumiamo di avere un pivot pari a $0$, è necessario che si generi una \textbf{
 della corrente matrice per fare in modo che il pivot in questione non sia nullo.
 \[
     \begin{bmatrix}
-    a_{11} & * & *  & * \\
-    0 & 0_{k+1} &  & ...\\
-     ...& ... & ... &  ...\\
+    a_{11} & * & \cdots  & * \\
+    0 & 0_{k+1} &  & \vdots\\
+     \vdots & \vdots & \vdots &  \vdots\\
      0 & a_{nk} & 0 & *
     \end{bmatrix}
 \]
@@ -1066,9 +1069,9 @@ Perchè abbiamo la necessità di nuovi metodi oltre a quello di Gauss? Immaginia
 
 \[
 \begin{bmatrix}
-    1 & ... & ... & 1\\
-    . & .   & 0 & 0 \\
-    . & 0 & .& 0 \\
+    1 & \cdots & \cdots & 1\\
+    \vdots & \ddots   & 0 &  \\
+    \vdots & 0 & \ddots &  \\
     1 & & & 1
 \end{bmatrix}
 \]
@@ -1105,7 +1108,7 @@ Data $Ax = b$, assumiamo che $A = M - N$ con $M$ invertibile. Sostituiamo l'assu
     \vspace*{15px}
     \item Dato che $M$ invertibile per ipotesi allora moltiplichiamo sx e dx per $M^{-1}$:
     \[ x = M^{-1}Nx + M^{-1}b \]
-    \item Ponendo $P=M^{-1}N$ matrice di iterazioni e $p = M^{-1}b$, allora $x = Px + q$, quindi al passo k-esimo:
+    \item Ponendo $P=M^{-1}N$ matrice di iterazioni e $q = M^{-1}b$, allora $x = Px + q$, quindi al passo k-esimo:
     \vspace*{8px}
     \[ x^{k+1} = Px^{(k)} + q \:\:\:\: \text{con} \:\: x^{(0)} \in \mathbb{R}^{n} \]
     \item Quindi la \textbf{successione} è detta \textbf{convergente} se:
@@ -1189,7 +1192,7 @@ Dimostriamo il teorema a pagina successiva.
 
 \begin{enumerate}
     \item Per ipotesi (convergenza) sappiamo che:
-    \[ e^{(0)} = x^{(k)} - x^{(0)} = P^{(k)}e^{(0)} \:\: \text{e tale che} \:\: \forall \: x^{(0)} \: \: \lim_{k \rightarrow \infty} e^{(k)} = 0\]
+    \[ e^{(k)} = x^{(k)} - x^{(0)} = P^{(k)}e^{(0)} \:\: \text{e tale che} \:\: \forall \: x^{(0)} \: \: \lim_{k \rightarrow \infty} e^{(k)} = 0\]
     \item Sapendo che il metodo converge per ogni successione da ipotesi allora ne scelgo una particolare, in modo tale da far apparire il raggio spettrale:
     \[ x^{(0)} = x + v \]
     dove
@@ -1217,7 +1220,7 @@ Dimostriamo il teorema a pagina successiva.
     \Longleftrightarrow
     \:
     \rho(P) < 1
-    \]
+\]
 
 \paragraph{Dimostrazione} Dimostriamo il teorema per step, entrambi i versi d'implicazione:
 
@@ -1228,8 +1231,8 @@ Dimostriamo il teorema a pagina successiva.
         \item Se $P$ è diagonalizzabile e $\rho(P) < 1 \Rightarrow$ il metodo converge. Ma essendo diagonalizzabile:
         \[ \exists \: S \:\:\: \text{invertibile tale che} \:\:\: P = SDS^{-1} \:\: \text{dove} \:\: D = \begin{bmatrix}
             \lambda_{1} & & & \\
-            & \lambda_{1} & & \\
-            & & . & \\
+            & \ddots & & \\
+            & & \ddots & \\
             & & & \lambda_{n}
         \end{bmatrix} \]
         \newpage
@@ -1745,7 +1748,7 @@ Graficamente $|g'(\alpha)|$ rappresenta la pendenza della tangente alla funzione
 \subsubsection{Ordine di Convergenza di Metodi}
 
 In questo sottocapitolo cerchiamo di stabilire un modo per determinare la velocità di convergenza di un metodo. Siano dati
-$\alpha = g(\alpha)$ e $|g'(\alpha)| < 1$ con $x_{k} \rightarrow \alpha$, se $x_{k} \neq \alpha, \: \forall k \geq 0 $ allora
+$\alpha = g(\alpha)$ e $|g'(\alpha)| < 1$ con $x_{k} \rightarrow \alpha$, se $x_{k} \neq \alpha, \: \forall k \geq 0 $ allora:
 
 \[ \lim_{k \rightarrow \infty} \frac{|x_{k+1} - \alpha|}{|x_{k} - \alpha |} = \gamma \in \mathbb{R}, \:\:\: \gamma \neq 0 \]
 
@@ -1853,9 +1856,9 @@ Dimostriamo il teorema a pagina successiva.
     \begin{enumerate}
         \item Prendo $\lim_{k \rightarrow \infty} \frac{x_{k+1} - \alpha}{|x_{k} - \alpha |^{2}} = l$ per vedere a cosa converge.
         \item Sviluppo di Taylor di $f(\alpha) = 0$ centrato in $x_{k}$:
-        \[ 0 = f(\alpha) = f(x_{k}) + f'(x_{k})(\alpha - f(x_{k})) + f''(\epsilon_{k})\frac{(\alpha - x_{k})^{2}}{2}  \]
+        \[ 0 = f(\alpha) = f(x_{k}) + f'(x_{k})(\alpha - x_{k}) + f''(\epsilon_{k})\frac{(\alpha - x_{k})^{2}}{2}  \]
         \item Porto ad sx i primi due termini dello sviluppo:
-        \[ (x_{k} - \alpha)f(x_{k}) - f(x_{k}) = f''(\epsilon_{k})\frac{(\alpha - x_{k})^{2}}{2} \]
+        \[ - (\alpha - x_{k})f'(x_{k}) - f(x_{k}) = f''(\epsilon_{k})\frac{(\alpha - x_{k})^{2}}{2} \]
         \item Dal punto precedente possiamo scrivere $f''(\epsilon_{k})\frac{(\alpha - x_{k})^{2}}{2} = f''(\epsilon_{k})\frac{(x_{k} - \alpha)^{2}}{2}$ e successivamente divido sx e dx per $f'(x_{k})$, quindi:
         \[ x_{k} - \frac{f(x_{k})}{f'(x_{k})} - \alpha = \frac{f''(\epsilon_{k})}{f'(x_{k})} \frac{(x_{k} - \alpha)^{2}}{2} \]
         \item Dal punto precedente possiamo scrivere $x_{k} - \frac{f(x_{k})}{f'(x_{k})} = x_{k+1}$ e dividiamo tutto per $|x_{k} - \alpha|^{2}$:
@@ -1903,5 +1906,199 @@ Sia $f:[a,b] \rightarrow \mathbb{R}$, $f \in C^{2}(a,b)$, $\alpha : f(\alpha) = 
 \end{enumerate}
 
 \newpage
+
+
+\section{Syllabus - Metodi Iterativi Sistemi Lineari e Metodi Numerici per Approssimazione di Zeri Funzioni}
+
+\vspace*{5px}
+
+\subsection{Sezione Metodi Iterativi Sistemi Lineari}
+
+\vspace*{5px}
+
+\begin{enumerate}
+    
+    \begin{tcolorbox}    
+    \item \textbf{Th. Condizioni Sufficienti per la Convergenza di Metodo}
+    
+    \begin{enumerate}
+        \item \textbf{Ipotesi}: Se esiste una norma matriciale indotta in cui $||P|| < 1$, allora:
+        \item \textbf{Tesi}: Il metodo definito sotto converge.
+        \vspace*{10px}
+        \[ \left\{ \begin{array}{rcl}
+            x^{(0)} \in \mathbb{R}^{n} \\ 
+            x^{k+1} = Px^{(k+1)} + q 
+            \end{array}\right.
+                \]
+    \end{enumerate}
+    Questa può essere ad esempio una norma $||\:||_{\infty}$ oppure una $||\:||_{1}$.
+    \end{tcolorbox}
+    
+    \vspace*{5px}
+    
+    \begin{tcolorbox}
+        \item \textbf{Th. Condizioni Necessarie per la Convergenza di Metodo}
+        
+        \begin{enumerate}
+            \item \textbf{Ipotesi}: Se il metodo definito sotto è convergente, allora:
+            \item \textbf{Tesi}: Il raggio spettrale $\rho(P) < 1$.
+            \vspace*{10px}
+            \[ M = \left\{ \begin{array}{rcl}
+                x^{(0)} \in \mathbb{R}^{n} \\ 
+                x^{k+1} = Px^{(k+1)} + q 
+                \end{array}\right.
+                 \]
+        \end{enumerate}
+    \end{tcolorbox}
+
+    
+    \vspace*{5px}
+    
+    \begin{tcolorbox}[width=370px]
+        
+    \item \textbf{Th. Condizioni Sufficienti e Necessarie per la Convergenza di Metodo}
+    
+    \[ \text{Un metodo iterativo} \: M = \left\{ \begin{array}{rcl}
+        x^{(0)} \in \mathbb{R}^{n} \\ 
+        x^{k+1} = Px^{(k+1)} + q 
+        \end{array}\right.
+        \: \text{è convergente} \:
+        \Leftrightarrow
+        \:
+        \rho(P) < 1
+    \]
+    \end{tcolorbox}
+    
+    \vspace*{5px}
+    
+    \begin{tcolorbox}
+        \item \textbf{Th. Condizioni Sufficienti per la Convergenza Metodi Jacobi e Gauss-Seidel}
+        
+        Sia $A \in \mathbb{R}$ a predominanza diagonale (riga o colonna), allora:
+        
+        \begin{enumerate}
+            \item $A$ è invertibile.
+            \item I metodi di Jacobi e Gauss-Seidel sono applicabili.
+            \item I metodi di Jacobi e Gauss-Seidel sono convergenti.
+        \end{enumerate}
+    \end{tcolorbox}
+
+
+\end{enumerate}
+
+\newpage
+
+\subsection{Sezione Metodi Numerici per Approssimazione di Zeri Funzioni}
+
+\vspace*{5px}
+
+\begin{enumerate}
+
+    \begin{tcolorbox}
+        \item \textbf{Th. del Punto Fisso}
+        
+        Sia $g:[a,b] \rightarrow \mathbb{R}$, $g \in C^{1}(a,b)$, $\alpha = g(\alpha)$ con $\alpha \in (a,b)$:
+    
+        \begin{enumerate}
+            \item \textbf{Ipotesi}: Se $\exists \rho > 0 \: : \: |g'(x)| < 1 \:\:\: \forall x \in I_{\alpha} = [\alpha-\rho,\alpha+\rho]$
+            \item \textbf{Tesi}: $\forall x_{0} \in I_{\alpha}$ con $x_{k+1} = g(x_{k})$ valgono:
+            \begin{enumerate}
+                \item $x_{k} \in I_{\alpha}$
+                \item $\lim_{k \rightarrow \infty} x_{k} = \alpha$
+            \end{enumerate}
+        \end{enumerate}
+    \end{tcolorbox}
+
+    \vspace*{5px}
+
+    \begin{tcolorbox}
+        \item \textbf{Corollario Th. del Punto Fisso}
+        
+        Sia $g:[a,b] \rightarrow \mathbb{R}$, $g \in C^{1}(a,b)$, $\alpha = g(\alpha)$ con $\alpha \in (a,b)$, allora:
+
+        \[ \boxed{ \text{Se} \:\:\: |g'(\alpha)| > 1 \:\:\: \text{allora NON converge localmente} } \]
+        
+        \[ \boxed{ \text{Se} \:\:\: |g'(\alpha)| < 1 \:\:\: \text{allora converge localmente} } \]
+        
+        \[ \boxed{ \text{Se} \:\:\: |g'(\alpha)| = 1 \:\:\: \text{può sia convergere che divergere} } \]
+
+        Graficamente $|g'(\alpha)|$ rappresenta la pendenza della tangente alla funzione data \\ nel punto $\alpha$.
+
+    \end{tcolorbox}
+
+    \vspace*{5px}
+
+    \begin{tcolorbox}
+        \item \textbf{Ordine di Convergenza di Metodi}
+        
+        Siano dati
+        $\alpha = g(\alpha)$ e $|g'(\alpha)| < 1$ con $x_{k} \rightarrow \alpha$, se $x_{k} \neq \alpha, \: \forall k \geq 0 $ allora:
+    
+        \[ \lim_{k \rightarrow \infty} \frac{|x_{k+1} - \alpha|}{|x_{k} - \alpha |} = \gamma \in \mathbb{R}, \:\:\: \gamma \neq 0 \]
+    
+        Riusciamo grazie a $\gamma$ a ricavare un ordine $P$ di convergenza del metodo, infatti:
+    
+        \[
+        \left\{
+        \begin{array}{rl}
+            P = 1 & \text{se } 0 < \gamma \leq 1 \mapsto \text{ (Convergenza Lineare)} \\
+            P = 2 & \text{se } 1 < \gamma \mapsto \text{ (Convergenza Quadratica)} 
+        \end{array}
+        \right.
+        \]
+        
+        \[ \text{Se } |g'(\alpha) < 1| \text{ e } g'(\alpha) \neq 0 \Rightarrow \text{ ordine 1} \]
+        \[ \text{Se } |g'(\alpha) < 1| \text{ e } g'(\alpha) = 0 \Rightarrow \text{ ordine } > 1 \]
+
+    \end{tcolorbox}
+
+\newpage
+
+    \begin{tcolorbox}
+        \item \textbf{Th. Convergenza Locale del Metodo delle Tangenti}
+        
+        Sia $f:[a,b] \rightarrow \mathbb{R}$, $f \in C^{2}(a,b)$, sia $\alpha \in (a,b)$:
+        \begin{enumerate}
+            \item \textbf{Ipotesi}: $\alpha$ è una \textbf{radice semplice}, ossia $f'(\alpha) \neq 0$
+            \item \textbf{Tesi}: Vale che:
+            \begin{enumerate}
+                \item Il \textbf{metodo} delle \textbf{tangenti} è \textbf{localmente convergente}, ossia:
+                \[ \exists \rho > 0: \forall x_{0} \in [\alpha-\rho, \alpha+\rho] = I_{\alpha} \text{ con } x_{k} \in I_{\alpha} \text{ e } x_{k} \rightarrow \alpha \]
+                \item La \textbf{convergenza} è \textbf{almeno quadratica}:
+                \[ \lim_{k \rightarrow \infty} \frac{x_{k+1} - \alpha}{|x_{k} - \alpha |^{2}} = l \]
+            \end{enumerate}
+        \end{enumerate}
+    \end{tcolorbox}
+
+    \begin{tcolorbox}\subsubsection{Th. di Convergenza in Largo}
+
+        Sia $f:[a,b] \rightarrow \mathbb{R}$, $f \in C^{2}(a,b)$, $\alpha : f(\alpha) = 0$ allora:
+        
+        \begin{enumerate}
+            \item \textbf{Ipotesi}: Se $\exists \delta > 0 \::\: S = (\alpha, \alpha + \delta]$ tale che:
+            \begin{enumerate}
+                \item $f'(x) \neq 0 \:\:\: \forall x \in S$
+                \item $f(x)f''(x) > 0\:\:\: \forall x \in S$
+            \end{enumerate}
+            \item \textbf{Tesi}: Allora $\forall x_{0} \in S \:\: \{ x_{k} \} \rightarrow \alpha$ in modo \textbf{monotono}.
+        \end{enumerate}
+        \item \textbf{Th. di Convergenza in Largo}
+        
+        Sia $f:[a,b] \rightarrow \mathbb{R}$, $f \in C^{2}(a,b)$, $\alpha : f(\alpha) = 0$ allora:
+
+        \begin{enumerate}
+            \item \textbf{Ipotesi}: Se $\exists \delta > 0 \::\: S = (\alpha, \alpha + \delta]$ tale che:
+            \begin{enumerate}
+                \item $f'(x) \neq 0 \:\:\: \forall x \in S$
+                \item $f(x)f''(x) > 0\:\:\: \forall x \in S$
+            \end{enumerate}
+            \item \textbf{Tesi}: Allora $\forall x_{0} \in S \:\: \{ x_{k} \} \rightarrow \alpha$ in modo \textbf{monotono}.
+        \end{enumerate}
+    \end{tcolorbox}
+
+\end{enumerate}
+
+\newpage
+
 
 \end{document}
