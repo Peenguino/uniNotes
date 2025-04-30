@@ -1126,9 +1126,9 @@ Definiamo il teorema:
     \item \textbf{Ipotesi}: Se esiste una norma matriciale indotta in cui $||P|| < 1$, allora:
     \item \textbf{Tesi}: Il metodo definito sotto converge.
     \vspace*{10px}
-    \[ \left\{ \begin{array}{rcl}
+    \[ \left\{ \begin{array}{lll}
         x^{(0)} \in \mathbb{R}^{n} \\ 
-        x^{k+1} = Px^{(k+1)} + q 
+        x^{k+1} = Px^{(k)} + q 
         \end{array}\right.
          \]
 \end{enumerate}
@@ -1138,7 +1138,7 @@ Definiamo il teorema:
 \begin{enumerate}
     \item Prendo la successione:
     \[ x^{(k+1)} = Px^{(k)} + q \]
-    e voglio che questa converga ad $x=Px+q$, ossia che la distanza tra $x^{(k)}$ ed $x$ tende a $0$ per $x \rightarrow +\infty$.
+    e voglio che questa converga ad $x=Px+q$, ossia che la distanza tra $x^{(k)}$ ed $x$ tende a $0$ per $k \rightarrow +\infty$.
     \vspace*{15px}
     \item Consideriamo $e^{(k)}$ vettore errore alla k-esima iterazione:
     \[ e^{(k)} = x^{(k)} - x  \Leftrightarrow \]
@@ -1177,9 +1177,9 @@ Definiamo il teorema:
     \item \textbf{Ipotesi}: Se il metodo definito sotto è convergente, allora:
     \item \textbf{Tesi}: Il raggio spettrale $\rho(P) < 1$.
     \vspace*{10px}
-    \[ M = \left\{ \begin{array}{rcl}
+    \[ M = \left\{ \begin{array}{lll}
         x^{(0)} \in \mathbb{R}^{n} \\ 
-        x^{k+1} = Px^{(k+1)} + q 
+        x^{k+1} = Px^{(k)} + q 
         \end{array}\right.
          \]
 \end{enumerate}
@@ -1212,9 +1212,9 @@ Dimostriamo il teorema a pagina successiva.
 
 \vspace*{12px}
 
-\[ \text{Un metodo iterativo} \: M = \left\{ \begin{array}{rcl}
+\[ \text{Un metodo iterativo} \: M = \left\{ \begin{array}{lll}
     x^{(0)} \in \mathbb{R}^{n} \\ 
-    x^{k+1} = Px^{(k+1)} + q 
+    x^{k+1} = Px^{(k)} + q 
     \end{array}\right.
     \: \text{è convergente} \:
     \Longleftrightarrow
@@ -1448,7 +1448,7 @@ Torniamo sulla definizione di $x$, $x^{(k)}$ e $x^{(k+1)}$:
 
 Vogliamo dunque identificare un criterio d'arresto anche in base all'errore:
 
-\[ e^{(k)} = x^{(k)} - x^{(0)} \]
+\[ e^{(k)} = x^{(k)} - x \]
 
 Fermarsi secondo un arbitrario criterio d'arresto non implica aver prodotto una buona soluzione perchè la successione potrebbe star convergendo lentamente, producendo così una cattiva approssimazione.
 In ogni caso vogliamo definire oggettivamente come valutare un criterio d'arresto:
@@ -1623,7 +1623,7 @@ La parte boxata causerà l'utilizzo della bisettrice primo-terzo quadrante.
 
 \paragraph{Definizione di Punto Fisso} Un punto $\alpha$ è \textbf{punto fisso} per $g(x)$ se $\alpha = g(\alpha)$:
 
-\[ \left\{ \begin{array}{rcl}
+\[ \left\{ \begin{array}{lll}
     x_{0} \in (a,b) \\
     x_{k+1} = g(x_{k})
     \end{array}\right.
@@ -1641,7 +1641,7 @@ Anche in questo caso se la successione converge allora converge alla soluzione:
 Date $g:[a,b] \rightarrow \mathbb{R}$ sia $\alpha$ tale che $\alpha \in (a,b)$ e $\alpha = g(\alpha)$ allora il metodo
 
 \[ 
-\left\{ \begin{array}{rcl}
+\left\{ \begin{array}{lll}
     x_{0} \in (a,b) \\
     x_{k+1} = g(x_{k})
     \end{array}\right.
@@ -1925,9 +1925,9 @@ Sia $f:[a,b] \rightarrow \mathbb{R}$, $f \in C^{2}(a,b)$, $\alpha : f(\alpha) = 
         \item \textbf{Ipotesi}: Se esiste una norma matriciale indotta in cui $||P|| < 1$, allora:
         \item \textbf{Tesi}: Il metodo definito sotto converge.
         \vspace*{10px}
-        \[ \left\{ \begin{array}{rcl}
+        \[ \left\{ \begin{array}{lll}
             x^{(0)} \in \mathbb{R}^{n} \\ 
-            x^{k+1} = Px^{(k+1)} + q 
+            x^{k+1} = Px^{(k)} + q 
             \end{array}\right.
                 \]
     \end{enumerate}
@@ -1943,9 +1943,9 @@ Sia $f:[a,b] \rightarrow \mathbb{R}$, $f \in C^{2}(a,b)$, $\alpha : f(\alpha) = 
             \item \textbf{Ipotesi}: Se il metodo definito sotto è convergente, allora:
             \item \textbf{Tesi}: Il raggio spettrale $\rho(P) < 1$.
             \vspace*{10px}
-            \[ M = \left\{ \begin{array}{rcl}
+            \[ M = \left\{ \begin{array}{lll}
                 x^{(0)} \in \mathbb{R}^{n} \\ 
-                x^{k+1} = Px^{(k+1)} + q 
+                x^{k+1} = Px^{(k)} + q 
                 \end{array}\right.
                  \]
         \end{enumerate}
@@ -1958,9 +1958,9 @@ Sia $f:[a,b] \rightarrow \mathbb{R}$, $f \in C^{2}(a,b)$, $\alpha : f(\alpha) = 
         
     \item \textbf{Th. Condizioni Sufficienti e Necessarie per la Convergenza di Metodo}
     
-    \[ \text{Un metodo iterativo} \: M = \left\{ \begin{array}{rcl}
+    \[ \text{Un metodo iterativo} \: M = \left\{ \begin{array}{lll}
         x^{(0)} \in \mathbb{R}^{n} \\ 
-        x^{k+1} = Px^{(k+1)} + q 
+        x^{k+1} = Px^{(k)} + q 
         \end{array}\right.
         \: \text{è convergente} \:
         \Leftrightarrow
