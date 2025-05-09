@@ -721,7 +721,7 @@ Mappiamo in questo modo gli stati per rappresentarli nella tabella di verità:
     \begin{enumerate}
         \item $S_{1}' \: = \: \overline{S_{1}}\:S_{0}\:in $
         \item $S_{0}' \: = \: \overline{S_{1}}\:\overline{S_{0}}\:\overline{in} + \overline{S_{1}}\:S_{0}\:\overline{in} + \overline{S_{1}}\:\overline{in}$
-        \item $S_{1}' \: = \: \overline{S_{1}}\:S_{0}\:in $
+        \item $ z \: = \: S_{1} \: \overline{S_{0}} \: in $
     \end{enumerate}
 
     \item \textbf{Rete e Componenti}: Rappresentiamo prima i componenti singolarmente, rispettivamente stati di transizione e output, e successivamente mostriamo la complessiva rete generata.
@@ -1275,7 +1275,7 @@ Una volta definite le varie etichette (labels), possiamo descrivere i due comand
 
 \end{enumerate}
 
-\paragraph{Istruzioni Etichettate} Mostriamo come sia possibile, anche per altri tipi di istruzioni oltre a quelle di salto, come sia possibile essere etichettate. Mostriamo esempio sulle \textbf{LDM} e \textbf{STR} (load e store multiple).
+\paragraph{Istruzioni Etichettate} Mostriamo come sia possibile, anche per altri tipi di istruzioni oltre a quelle di salto, come sia possibile essere etichettate. Mostriamo esempio sulle \textbf{LDM} e \textbf{STM} (load e store multiple).
 
 \begin{enumerate}
     \item \textbf{Possibili Etichette}:
@@ -1645,7 +1645,7 @@ La parte di controllo è ancora una rete combinatoria.
   STR & $4\tau$ \\
   LDR & $5\tau$ \\
   BR & $4\tau$ \\
-  OP & $4\tau$ \\
+  OP & $3\tau$ \\
  \hline
 \end{tabular}
 \end{center}
@@ -1688,15 +1688,26 @@ Stabiliamo le dipendenze tra istruzioni consecutive grazie alle \textbf{Condizio
 
 Ossia, possiamo invertire l'ordine di due istruzioni generiche se queste non spezzano le Condizioni di Bernstein.
 
-\paragraph{Forwarding - Stalli in risoluzione alle dipendenze} Bisogna dunque gestire il problema delle dipendenze logiche nella pipeline. La più semplice delle soluzioni è quella di "distanziare" le istruzioni dipendenti tra loro, dando tempo alla prima istruzione di essere completamente elaborata. Mostriamo un implementazione fisica della rete che permette la creazione di questi stalli:
+Esistono due modi per risolvere queste tipologie di dipendenze:
 
-\begin{figure}[htbp]
-    \center
-    \includegraphics[scale=0.375]{img/forwarding.png}
-    \caption{L'esito dell'ALU viene portato in ingresso ad un MUX che decide o meno di portare in ingresso al registro non architetturale in base al segnale fornito.}
-\end{figure}
+\vspace*{20px}
 
-Grazie alla creazione di stalli ed alla scrittura o meno dei \textbf{write enable} riusciamo a risolvere la gran parte delle dipendenze logiche.
+\begin{enumerate}
+    \item \textbf{Forwarding}: Una delle soluzioni è fornire alla seconda istruzione in elaborazione i risultati della prima istruzione con la quale è presente dipendenza logica. Si tenta dunque di \textbf{inoltrare} i \textbf{risultati} della \textbf{prima istruzione} (disponibili nello stadio Memory o Write Back) \textbf{verso} la \textbf{seconda istruzione} dipendente (attualmente posizionata nello stadio Execute).
+    \begin{figure}[htbp]
+        \center
+        \includegraphics[scale=0.375]{img/forwarding.png}
+    \end{figure}
+
+
+    Questa soluzione ha delle limitazioni, infatti se un ipotetica seconda istruzione dovesse dipendere da una prima istruzione LDR (che impiega più tempo per scrivere i risultati) questa tecnica non risulterebbe sufficiente.
+
+    \vspace*{10px}
+
+    \item \textbf{Creazione Stalli}: In situazioni come quella appena descritta l'unico modo per risolvere la dipendenza logica è la creazione di tempi vuoti (\textbf{stalli}) che permettano la scrittura dei risultati necessari allo svolgimento della seconda operazione.
+\end{enumerate}
+
+\newpage
 
 \subsubsection{Dipendenze sul Controllo}
 
@@ -1707,17 +1718,15 @@ Anche le \textbf{istruzioni} di \textbf{salto} creano problemi alla pipeline, da
     \includegraphics[scale=0.45]{img/forwarding_controllo.png}
 \end{figure}
 
-Possiamo eseguire una \textbf{sorta di forwarding} tra l'uscita dell'Execute e l'entrata della Fetch per \textbf{stabilire o meno} l'\textbf{inserimento} nella \textbf{pipeline} delle nuove istruzioni. Questo permette la risoluzione delle dipendenze sul controllo. 
+Le dipendenze di controllo si verificano quando la decisione di quale sia la prossima istruzione da prelevare non sia ancora
+stata presa al momento del fetch; possono essere gestite prevedendo quale sia l’istruzione da leggere e svuotando la pipeline se la previsione si rivela errata,
+o mettendo in stallo la pipeline finché la decisione se saltare o meno non sia stata presa.
 
-\vspace*{-12px}
+\[ \boxed{\text{Tempi senza Dipendenze:} \;\;\; m\tau \: + \: 4\tau} \]
 
-\[ \text{Tempi senza Dipendenze:} \;\;\; m\tau \: + \: 4\tau \]
 
-\vspace*{-30px}
+\[ \boxed{\text{Tempi con Dipendenze:} \;\;\; m\tau \: + \: (\#stalli\_dip\_logiche)\tau \: + \: (\#salti\_presi)2\tau} \]
 
-\[ \text{Tempi con Dipendenze:} \;\;\; m\tau \: + \: (\#stalli\_dip\_logiche)\tau \: + \: (\#salti\_presi)2\tau\]
-
-\vspace*{-8px}
 
 In realtà tutti i segnali di controllo inviati ai \textbf{MUX} per regolare l'utilizzo dei forwarding vengono gestiti dall'\textbf{hazard unit}. 
 
