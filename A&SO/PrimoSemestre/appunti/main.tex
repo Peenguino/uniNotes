@@ -1621,7 +1621,7 @@ Questo tipo di processore mira a risolvere delle problematiche del processore si
 \end{enumerate}
 
 Questo tipo di \textbf{CPU} suddivide le operazioni principali in vari \textbf{"stadi"} grazie a dei registri non architetturali che permettono di preservare i dati durante la transizione da uno stadio all'altro. Questo approccio renderà il costo in $\tau$ dipendente dal tipo di operazione effettuata.
-La parte di controllo è ancora una rete combinatoria.
+La parte di controllo è una rete sequenziale.
 
 \begin{figure}[htbp]
         \center
@@ -1644,8 +1644,8 @@ La parte di controllo è ancora una rete combinatoria.
   \hline
   STR & $4\tau$ \\
   LDR & $5\tau$ \\
-  BR & $4\tau$ \\
-  OP & $3\tau$ \\
+  BR & $3\tau$ \\
+  OP & $4\tau$ \\
  \hline
 \end{tabular}
 \end{center}

@@ -370,7 +370,7 @@ Le due precedenti gestioni di cache offrivano pro e contro. Di conseguenza si pr
         
         \item L'\textbf{indirizzo} in ingresso è caratterizzato da \textbf{tag}, \textbf{numero} di \textbf{set} ed \textbf{offset}.
         \item Tutti i moduli contenenti \textbf{word} danno in input ad un \textbf{multiplexer} il loro contenuto, il cui segnale di controllo è rappresentato dall'\textbf{offset} dell'\textbf{indirizzo} in ingresso.
-        \item Viene utilizzato un numero di comparatori pari al numero di \textbf{set}, questi avranno in input il \textbf{tag} del primo modulo del corrente \textbf{set} ed il \textbf{tag} dell'\textbf{indirizzo} in \textbf{ingresso}.
+        \item Viene utilizzato un numero di comparatori pari al numero di \textbf{vie nel set}, questi avranno in input il \textbf{tag} del primo modulo del corrente \textbf{set} ed il \textbf{tag} dell'\textbf{indirizzo} in \textbf{ingresso}.
         \item Delle porte \textbf{AND} prendono in ingresso il \textbf{bit} di \textbf{presenza} e l'output dei \textbf{comparatori} per ogni \textbf{set} e producono un segnale di \textbf{hit/miss} entrando in una porta \textbf{OR}.
         \item Infine, l'output delle porte \textbf{AND} viene portato ad un multiplexer come segnale di controllo, permettendo la scelta tra le uscite dei \textbf{multiplexer} di \textbf{ciascun set}. In questo particolare caso non è necessario utilizzare un codificatore prima dell'ingresso di controllo sull'ultimo multiplexer in basso, essendo il caso di soli due set, altrimenti sarebbe stato necessario anche quel componente.
     \end{enumerate}
@@ -1395,7 +1395,7 @@ Vengono dunque effettuati questi \textbf{passi} nel caso in cui il \textbf{lock}
 \begin{enumerate}
     \item Si registra il TCB del corrente thread nella coda di attesa del lock.
     \item Si deschedula il thread modificando lo stato del thread da EXEC a WAIT.
-    \item Quando il lock si libera verrà schedulato il thread modificando lo stato da READY a EXEC.
+    \item Quando il lock si libera verrà schedulato il thread modificando lo stato da WAIT a READY.
 \end{enumerate}
 
 \paragraph{Regole di Utilizzo dei Lock} Per una corretta esecuzione in mutua esclusione vanno seguite queste regole:
