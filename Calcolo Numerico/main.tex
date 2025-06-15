@@ -343,6 +343,10 @@ Sia $x \in \mathbb{R}$, $x \neq 0$ e $\omega \leq |x| \leq \Omega$ allora:
     In questo caso stiamo effettuando un approssimazione in troncamento, dunque $\tilde{x} = a$.
     \item $\beta^{\rho-1}$ rappresenta la distanza minima in modulo rappresentabile, per questo motivo $|x|$ sarà sicuramente maggiore:
     \[ |x| \geq \beta^{\rho-1} \: = \: \beta^{\rho}(0.1)_{\beta} \]
+    \item $\beta^{\rho - t}$ rappresenta l'errore massimo introducibile in troncamento, quindi:
+    \[ |\tilde{x} - x| < \beta^{\rho - t} \:\: \text{e} \:\: |x| \geq \beta^{\rho - 1} \]
+    \item Quindi raccogliendo tutte le informazioni trovate:
+    \[ |\epsilon_{x}| = |\frac{\tilde{x} - x}{x}| \leq \frac{\beta^{\rho - t}}{\beta^{\rho - 1}} = \beta^{1-t} = u \]
     \item Dunque alla fine possiamo ricavare $\tilde{x}$ della nostra macchina:
     \[ \boxed{\tilde{x} \: = \: x(1+\epsilon_{x})} \]
 \end{enumerate}
@@ -406,21 +410,15 @@ Calcolo dell'errore totale $\epsilon_{TOT}$:
 
 \[ \boxed{\epsilon_{TOT} = \epsilon_{IN} + \epsilon_{ALG}} \]
 
-dove:
+Le definizioni degli errori sono:
 
-\begin{enumerate}
-    \item L'\textbf{Errore Inerente} dipende esclusivamente dal problema:
-    \[ \boxed{\epsilon_{IN} = \frac{f(\tilde{x}) - f(x)}{f(x)}} \]
-    \item L'\textbf{Errore Algoritmico} dipende dalla scelta della funzione scelta:
-    \[ \boxed{\epsilon_{ALG} = \frac{g(\tilde{x}) - f(\tilde{x})}{f(x)}} \]
-\end{enumerate}
+\[ \boxed{\epsilon_{IN} = \frac{f(\tilde{x}) - f(x)}{f(x)}} \:\:\:\: \boxed{\epsilon_{ALG} = \frac{g(\tilde{x}) - f(\tilde{x})}{f(\tilde{x})}} \:\:\:\: \boxed{\epsilon_{TOT} = \frac{g(\tilde{x}) - f(x)}{f(x)}}\]
 
 \paragraph{Dimostrazione}
 
 \begin{enumerate}
-    \item Prendendo $\epsilon_{TOT}$ (inteso come somma di $\epsilon_{IN}$ e $\epsilon_{ALG}$) sommiamo e sottraiamo $f(\tilde{x})$:
-    \[ \epsilon_{TOT} = \epsilon_{IN} + \epsilon_{ALG} =\]
-    \[ = \: \frac{g(\tilde{x})-f(x)+f(\tilde{x})-f(\tilde{x})}{f(x)} \]
+    \item Prendendo $\epsilon_{TOT}$ sommiamo e sottraiamo $f(\tilde{x})$ al numeratore:
+    \[ \epsilon_{TOT} = \frac{g(\tilde{x})-f(x)+f(\tilde{x})-f(\tilde{x})}{f(x)} \]
     \item Distribuisco in modo tale da poter ricavare l'\textbf{errore inerente} (secondo operando):
     \[ \epsilon_{TOT} = \frac{g(\tilde{x})-f(\tilde{x})}{f(x)} \: + \: \frac{f(\tilde{x})-f(x)}{f(x)}  \]
     \item Moltiplico e divido per $f(\tilde{x})$ e scambio tra loro i due denominatori:
