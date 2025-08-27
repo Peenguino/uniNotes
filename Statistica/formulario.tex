@@ -1,0 +1,305 @@
+\documentclass{article}
+
+\usepackage{amsmath, amsthm, amssymb, amsfonts}
+\usepackage{thmtools}
+\usepackage{graphicx}
+\usepackage{setspace}
+\usepackage{geometry}
+\usepackage{float}
+\usepackage{hyperref}
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\usepackage{framed}
+\usepackage[dvipsnames]{xcolor}
+\usepackage{tcolorbox}
+
+%Define the listing package
+\usepackage{listings} %code highlighter
+\usepackage{color} %use color
+\definecolor{mygreen}{rgb}{0,0.6,0}
+\definecolor{mygray}{rgb}{0.5,0.5,0.5}
+\definecolor{mymauve}{rgb}{0.58,0,0.82}
+ 
+%Customize a bit the look
+\lstset{ %
+backgroundcolor=\color{white}, % choose the background color; you must add \usepackage{color} or \usepackage{xcolor}
+basicstyle=\footnotesize, % the size of the fonts that are used for the code
+breakatwhitespace=false, % sets if automatic breaks should only happen at whitespace
+breaklines=true, % sets automatic line breaking
+captionpos=b, % sets the caption-position to bottom
+commentstyle=\color{mygreen}, % comment style
+deletekeywords={...}, % if you want to delete keywords from the given language
+escapeinside={\%*}{*)}, % if you want to add LaTeX within your code
+extendedchars=true, % lets you use non-ASCII characters; for 8-bits encodings only, does not work with UTF-8
+frame=single, % adds a frame around the code
+keepspaces=true, % keeps spaces in text, useful for keeping indentation of code (possibly needs columns=flexible)
+keywordstyle=\color{blue}, % keyword style
+% language=Octave, % the language of the code
+morekeywords={*,...}, % if you want to add more keywords to the set
+numbers=left, % where to put the line-numbers; possible values are (none, left, right)
+numbersep=5pt, % how far the line-numbers are from the code
+numberstyle=\tiny\color{mygray}, % the style that is used for the line-numbers
+rulecolor=\color{black}, % if not set, the frame-color may be changed on line-breaks within not-black text (e.g. comments (green here))
+showspaces=false, % show spaces everywhere adding particular underscores; it overrides 'showstringspaces'
+showstringspaces=false, % underline spaces within strings only
+showtabs=false, % show tabs within strings adding particular underscores
+stepnumber=1, % the step between two line-numbers. If it's 1, each line will be numbered
+stringstyle=\color{mymauve}, % string literal style
+tabsize=2, % sets default tabsize to 2 spaces
+title=\lstname % show the filename of files included with \lstinputlisting; also try caption instead of title
+}
+%END of listing package%
+ 
+\definecolor{darkgray}{rgb}{.4,.4,.4}
+\definecolor{purple}{rgb}{0.65, 0.12, 0.82}
+ 
+%define Javascript language
+\lstdefinelanguage{JavaScript}{
+keywords={typeof, new, true, false, catch, function, return, null, catch, switch, var, if, in, while, do, else, case, break},
+keywordstyle=\color{blue}\bfseries,
+ndkeywords={class, export, boolean, throw, implements, import, this},
+ndkeywordstyle=\color{darkgray}\bfseries,
+identifierstyle=\color{black},
+sensitive=false,
+comment=[l]{//},
+morecomment=[s]{/*}{*/},
+commentstyle=\color{purple}\ttfamily,
+stringstyle=\color{red}\ttfamily,
+morestring=[b]',
+morestring=[b]"
+}
+ 
+\lstset{
+language=JavaScript,
+extendedchars=true,
+basicstyle=\footnotesize\ttfamily,
+showstringspaces=false,
+showspaces=false,
+numbers=left,
+numberstyle=\footnotesize,
+numbersep=9pt,
+tabsize=2,
+breaklines=true,
+showtabs=false,
+captionpos=b
+}
+
+\lstdefinelanguage{C}{
+keywords={typeof, new, true, false, catch, function, return, null, catch, switch, var, if, in, while, do, else, case, break},
+keywordstyle=\color{blue}\bfseries,
+ndkeywords={class, export, boolean, throw, implements, import, this},
+ndkeywordstyle=\color{darkgray}\bfseries,
+identifierstyle=\color{black},
+sensitive=false,
+comment=[l]{//},
+morecomment=[s]{/*}{*/},
+commentstyle=\color{purple}\ttfamily,
+stringstyle=\color{red}\ttfamily,
+morestring=[b]',
+morestring=[b]"
+}
+
+\colorlet{LightGray}{White!90!Periwinkle}
+\colorlet{LightOrange}{Orange!15}
+\colorlet{LightGreen}{Green!15}
+
+\newcommand{\HRule}[1]{\rule{\linewidth}{#1}}
+
+\NewEnviron{NORMAL}{% 
+    \scalebox{2}{$\BODY$} 
+} 
+
+\declaretheoremstyle[name=Theorem,]{thmsty}
+\declaretheorem[style=thmsty,numberwithin=section]{theorem}
+\tcolorboxenvironment{theorem}{colback=LightGray}
+
+\declaretheoremstyle[name=Proposition,]{prosty}
+\declaretheorem[style=prosty,numberlike=theorem]{proposition}
+\tcolorboxenvironment{proposition}{colback=LightOrange}
+
+\declaretheoremstyle[name=Principle,]{prcpsty}
+\declaretheorem[style=prcpsty,numberlike=theorem]{principle}
+\tcolorboxenvironment{principle}{colback=LightGreen}
+
+\setstretch{1.2}
+\geometry{
+    textheight=9in,
+    textwidth=5.5in,
+    top=1in,
+    headheight=12pt,
+    headsep=25pt,
+    footskip=30pt
+}
+
+% ------------------------------------------------------------------------------
+
+\begin{document}
+
+% ------------------------------------------------------------------------------
+% Cover Page and ToC
+% ------------------------------------------------------------------------------
+
+\title{ \normalsize \textsc{}
+		\\ [2.0cm]
+		\HRule{1.5pt} \\
+		\LARGE \textbf{\uppercase{Formulario Statistica}
+		\HRule{2.0pt} \\ [0.6cm] \LARGE{Corso A} \vspace*{10\baselineskip}}
+		}
+\author{\textbf{Autore} \\ 
+		Giuseppe Acocella \\
+		2024/25\\}
+
+\maketitle
+\newpage
+
+\tableofcontents
+
+\newpage
+
+\section{Statistiche Riassuntive}
+
+/
+
+\section{Dati Multivariati}
+
+\begin{enumerate}
+    \item \textbf{Media Campionaria}:
+    \[ \boxed{\overline{x} = \frac{1}{n} \: \sum_{i=n}^{n} x_{i} } \]
+    \item \textbf{Varianza}:
+    \[ \boxed{var(x) = \frac{1}{n-1} \sum_{i=1}^{n} (x_{i} - \overline{x})^{2} } \]
+    \item \textbf{Deviazione Standard}:
+    \[ \boxed{\sigma(x) = \sqrt{var(x)}} \]
+    \item \textbf{Covarianza}:
+    \[ \boxed{cov(x,y) = \sum_{i=1}^{n} \frac{(x_{i} - \overline{x})(y_{i} - \overline{y})}{n-1} } \:\:\:\: \text{con} \:\:\:\: \boxed{\sum_{i=1}^{n} (x_{i} - \overline{x})(y_{i} - \overline{y}) = \sum_{i=1}^{n} x_{i}y_{i} - n \overline{x}\overline{y} }\]
+    \begin{center}
+        quindi
+    \end{center}
+    \[ \boxed{cov(x,y) = \frac{1}{n-1} \left( \sum_{i=1}^{n} x_{i}y_{i} - n\:\overline{x}\:\overline{y} \right)} \]
+    \item \textbf{Coefficiente di Correlazione}:
+    \[ \boxed{r(x,y) = \frac{cov(x,y)}{\sigma(x)\sigma(y)}} \]
+    \begin{center}
+        dunque se $|r(x,y)| < 1$ è considerata una buona regressione lineare, quindi può essere calcolata la retta.
+    \end{center}
+    \item \textbf{Retta di Regressione}:
+    \[ \boxed{b^{*} = \frac{cov(x,y)}{\sigma(x)^{2}}} \:\: \text{e} \:\: \boxed{a^{*} = \overline{y} - b^{*}\overline{x}} \]
+    \begin{center}
+        l'equazione della retta di regressione sarà quindi
+    \end{center}
+    \[ \boxed{y = a^{*}x + b^{*}} \]
+\end{enumerate}
+
+\newpage
+
+\section{Probabilità e Indipendenza}
+
+\begin{enumerate}
+    \item \textbf{Fattorizzazione Probabilità}
+    \[ \boxed{\sum_{i=1}^{n} P(A | B_{i}) P(B_{i}) } \]
+    \item \textbf{Bayes Semplice}
+    \[ \boxed{P(B|A) = \frac{P(A|B)P(B)}{P(A)} = \frac{P(A \cap B)}{P(A)}} \]
+    \item \textbf{Bayes e Sistema di Alternative}
+    \[ \boxed{P(B_{i}|A) = \frac{P(A|B_{i})P(B_{i})}{\sum_{j=1}^{max}P(A|B_{j})P(B_{j})}} \]
+    \item \textbf{Logica e Probabilità}
+    \[ \boxed{P(A \cup B) = 1 - P(A \cap B)}\]
+    \[ \boxed{P(A \cup B) = P(A) + P(B) - P(A \cap B)} \]
+    \[ \boxed{P(A \setminus B)= P(A) - P(A \cap B) } \]
+\end{enumerate}
+
+\section{Variabili Aleatorie}
+
+\begin{enumerate}
+    \item \textbf{Valore Atteso}
+    \begin{enumerate}
+        \item \textbf{Discreto}
+        \[ \boxed{E[X] = \sum_{i} x_{i}p(x_{i})} \]
+        \item \textbf{Continuo}
+        \[ \boxed{E[X] = \int_{-\infty}^{+\infty} x f(x)} \]
+    \end{enumerate}
+    \item \textbf{Varianza}
+    \[ \boxed{Var(X) =  E[X^{2}] - E[X]^{2} }\]
+    \item \textbf{Momento n-esimo di Valore Atteso}
+    \[ \boxed{E[X^{n}] = \int_{-\infty}^{+\infty} x^{n}f(x) dx} \]
+    \item \textbf{Formula di Inversione Funzione}
+    \[ \boxed{f_{y}(y) = f_{x}(h^{-1}(y))(\frac{d}{dy} h^{-1}(y))} \]
+
+\newpage
+    \item \textbf{Approssimazione a Gaussiana}
+    \[ \boxed{Z = \frac{x-\text{media}}{\sqrt{\text{varianza}}} \approx X} \]
+    \item \textbf{Densità Probabilità Variabili Note}
+    \begin{enumerate}
+        \item \textbf{Binomiale}
+        \[ \boxed{P(X=h) = \binom{n}{h} p^h (1-p)^{n-h}} \]
+        \item \textbf{Esponenziale}
+        \[ \boxed{\int_{0}^{+\infty} \lambda e^{-\lambda x}dx = - e^{-\lambda x} = 1} \]
+        \item \textbf{Poisson}
+        \[ \boxed{P(X=h) = e^{-\lambda}\frac{\lambda^h}{h!}} \]
+        \item \textbf{Geometrica}
+        \[ \boxed{P(X=h) = (1-p)^{h-1}p} \]
+        \item \textbf{Gaussiana}
+        \begin{enumerate}
+            \item \textbf{Densità della Gaussiana}
+            \[ \boxed{\phi(x) = \frac{1}{\sqrt{2\pi}} e^{\frac{-x^2}{2}} } \]
+            \item \textbf{Funzione di Ripartizione}
+            \[ \boxed{\Phi(x) = \frac{1}{\sqrt{2\pi}} \int_{-\infty}^{x} e^{\frac{-t^2}{2}}} \]
+        \end{enumerate}
+
+    \end{enumerate}
+
+\end{enumerate}
+
+\section{Variabili Aleatorie Multivariate}
+
+\begin{enumerate}
+    \item \textbf{Valore Atteso Doppia Variabile}
+    \[ \boxed{E[X_1X_2] = \sum_{a,b \in \{ 0,1 \}} (ab)P(X_1 = a, X_2 = b)} \]
+    \item \textbf{Covarianza}
+    \[ \boxed{Cov(X_1,X_2) = E[X_1X_2] - E[X_1]E[X_2]} \]
+    \begin{center}
+        Se $X_1$ e $X_2$ sono indipendenti allora $Cov(X_1,X_2) = 0$
+    \end{center}
+    \item \textbf{Coefficiente di Correlazione}
+    \[ \boxed{\gamma(X_1X_2) = \frac{Cov(X_1,X_2)}{\sqrt{Var(X_1)Var(X_2)}}} \]
+\newpage
+    \item \textbf{Normalizzazione Comune in Probabilità di Normale}
+    \[ \boxed{P(X > k) = P \left( Z \geq \frac{k - \text{media}}{\text{deviazione std}} \right)} \]
+
+\end{enumerate}
+
+\section{Campioni e Stimatori}
+
+\begin{enumerate}
+    \item \textbf{Funzione di Massima Verosomiglianza}
+    \[ \boxed{L(\lambda; x_1, \cdots, x_n) = \prod_{i=1}^{n} p_{\lambda}(x_i) } \]
+    \begin{center}
+        Solitamente viene calcolata la derivata di $log L$ studiandone il segno ed elaborando le produttorie/sommatorie con le proprietà del logaritmo.
+    \end{center}
+    \item \textbf{Verifica Densità}
+    
+    Data una densità espressa come $f(x)$ si verifica che sia una densità con due passi:
+    \begin{enumerate}
+        \item La densità deve essere positiva nell'intervallo dato.
+        \item Bisogna calcolare $\boxed{\int f(x)dx = 1}$
+    \end{enumerate}
+\end{enumerate}
+
+\section{Intervalli di Fiducia}
+
+\begin{enumerate}
+    \item \textbf{I.F. Media di Popolazione Gaussiana}
+    \begin{enumerate}
+        \item \textbf{I.F. per la Media, Varianza Nota}
+        \[ \boxed{I = \left[ \overline{x_n} \pm \frac{\rho}{\sqrt{n}}q_{1 - \frac{\alpha}{2}} \right]} \]
+        \item \textbf{I.F. per la Media, Varianza Non Nota}
+        \[ \boxed{I = \left[ \overline{x_n} \pm \frac{S_n}{\sqrt{n}}\tau_{1-\frac{\alpha}{2}, n - 1} \right] } \]
+    \end{enumerate}
+\end{enumerate}
+
+\newpage
+
+%\begin{figure}[htbp]
+    %\center
+    %\includegraphics[scale=0.4]{img/classiComplessita2.png}
+%\end{figure}
+
+
+\end{document}
