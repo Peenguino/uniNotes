@@ -1,0 +1,355 @@
+\documentclass{article}
+
+\usepackage{amsmath, amsthm, amssymb, amsfonts}
+\usepackage{thmtools}
+\usepackage{graphicx}
+\usepackage{setspace}
+\usepackage{geometry}
+\usepackage{float}
+\usepackage{hyperref}
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\usepackage{framed}
+\usepackage[dvipsnames]{xcolor}
+\usepackage{tcolorbox}
+
+%Define the listing package
+\usepackage{listings} %code highlighter
+\usepackage{color} %use color
+\definecolor{mygreen}{rgb}{0,0.6,0}
+\definecolor{mygray}{rgb}{0.5,0.5,0.5}
+\definecolor{mymauve}{rgb}{0.58,0,0.82}
+ 
+%Customize a bit the look
+\lstset{ %
+backgroundcolor=\color{white}, % choose the background color; you must add \usepackage{color} or \usepackage{xcolor}
+basicstyle=\footnotesize, % the size of the fonts that are used for the code
+breakatwhitespace=false, % sets if automatic breaks should only happen at whitespace
+breaklines=true, % sets automatic line breaking
+captionpos=b, % sets the caption-position to bottom
+commentstyle=\color{mygreen}, % comment style
+deletekeywords={...}, % if you want to delete keywords from the given language
+escapeinside={\%*}{*)}, % if you want to add LaTeX within your code
+extendedchars=true, % lets you use non-ASCII characters; for 8-bits encodings only, does not work with UTF-8
+frame=single, % adds a frame around the code
+keepspaces=true, % keeps spaces in text, useful for keeping indentation of code (possibly needs columns=flexible)
+keywordstyle=\color{blue}, % keyword style
+% language=Octave, % the language of the code
+morekeywords={*,...}, % if you want to add more keywords to the set
+numbers=left, % where to put the line-numbers; possible values are (none, left, right)
+numbersep=5pt, % how far the line-numbers are from the code
+numberstyle=\tiny\color{mygray}, % the style that is used for the line-numbers
+rulecolor=\color{black}, % if not set, the frame-color may be changed on line-breaks within not-black text (e.g. comments (green here))
+showspaces=false, % show spaces everywhere adding particular underscores; it overrides 'showstringspaces'
+showstringspaces=false, % underline spaces within strings only
+showtabs=false, % show tabs within strings adding particular underscores
+stepnumber=1, % the step between two line-numbers. If it's 1, each line will be numbered
+stringstyle=\color{mymauve}, % string literal style
+tabsize=2, % sets default tabsize to 2 spaces
+title=\lstname % show the filename of files included with \lstinputlisting; also try caption instead of title
+}
+%END of listing package%
+ 
+\definecolor{darkgray}{rgb}{.4,.4,.4}
+\definecolor{purple}{rgb}{0.65, 0.12, 0.82}
+ 
+%define Javascript language
+\lstdefinelanguage{JavaScript}{
+keywords={typeof, new, true, false, catch, function, return, null, catch, switch, var, if, in, while, do, else, case, break},
+keywordstyle=\color{blue}\bfseries,
+ndkeywords={class, export, boolean, throw, implements, import, this},
+ndkeywordstyle=\color{darkgray}\bfseries,
+identifierstyle=\color{black},
+sensitive=false,
+comment=[l]{//},
+morecomment=[s]{/*}{*/},
+commentstyle=\color{purple}\ttfamily,
+stringstyle=\color{red}\ttfamily,
+morestring=[b]',
+morestring=[b]"
+}
+ 
+\lstset{
+language=JavaScript,
+extendedchars=true,
+basicstyle=\footnotesize\ttfamily,
+showstringspaces=false,
+showspaces=false,
+numbers=left,
+numberstyle=\footnotesize,
+numbersep=9pt,
+tabsize=2,
+breaklines=true,
+showtabs=false,
+captionpos=b
+}
+
+\lstdefinelanguage{C}{
+keywords={typeof, new, true, false, catch, function, return, null, catch, switch, var, if, in, while, do, else, case, break},
+keywordstyle=\color{blue}\bfseries,
+ndkeywords={class, export, boolean, throw, implements, import, this},
+ndkeywordstyle=\color{darkgray}\bfseries,
+identifierstyle=\color{black},
+sensitive=false,
+comment=[l]{//},
+morecomment=[s]{/*}{*/},
+commentstyle=\color{purple}\ttfamily,
+stringstyle=\color{red}\ttfamily,
+morestring=[b]',
+morestring=[b]"
+}
+
+\colorlet{LightGray}{White!90!Periwinkle}
+\colorlet{LightOrange}{Orange!15}
+\colorlet{LightGreen}{Green!15}
+
+\newcommand{\HRule}[1]{\rule{\linewidth}{#1}}
+
+\NewEnviron{NORMAL}{% 
+    \scalebox{2}{$\BODY$} 
+} 
+
+\declaretheoremstyle[name=Theorem,]{thmsty}
+\declaretheorem[style=thmsty,numberwithin=section]{theorem}
+\tcolorboxenvironment{theorem}{colback=LightGray}
+
+\declaretheoremstyle[name=Proposition,]{prosty}
+\declaretheorem[style=prosty,numberlike=theorem]{proposition}
+\tcolorboxenvironment{proposition}{colback=LightOrange}
+
+\declaretheoremstyle[name=Principle,]{prcpsty}
+\declaretheorem[style=prcpsty,numberlike=theorem]{principle}
+\tcolorboxenvironment{principle}{colback=LightGreen}
+
+\setstretch{1.2}
+\geometry{
+    textheight=9in,
+    textwidth=5.5in,
+    top=1in,
+    headheight=12pt,
+    headsep=25pt,
+    footskip=30pt
+}
+
+% ------------------------------------------------------------------------------
+
+\begin{document}
+
+% ------------------------------------------------------------------------------
+% Cover Page and ToC
+% ------------------------------------------------------------------------------
+
+\title{ \normalsize \textsc{}
+		\\ [2.0cm]
+		\HRule{1.5pt} \\
+		\LARGE \textbf{\uppercase{Base di Dati}
+		\HRule{2.0pt} \\ [0.6cm] \LARGE{Corso A} \vspace*{10\baselineskip}}
+		}
+        
+\date{\text{Ultima Compilazione - }\today}
+\author{\textbf{Autore} \\ 
+		Giuseppe Acocella \\
+		2025/26\\
+        \url{https://github.com/Peenguino}}
+
+\maketitle
+\newpage
+
+\tableofcontents
+
+\newpage
+
+\section{Introduzione}
+
+I database sono insiemi di dati omogenei gestiti in collezioni. Alla base di questo definiamo tabelle, i cui campi possono fare riferimento ad altre tabelle
+del database. Il topic di studio del corso è quello dei \textbf{database}, ma in questa introduzione definiamo un confronto con i \textbf{Data Warehouse}, per evidenziarne le \textbf{differenze}, anche
+non essendo parte del programma del corso. 
+
+\subsection{OLTP vs OLAP}
+
+Mettiamo a confronto i due tipi di \textbf{ambiti applicativi}:
+
+\begin{enumerate}
+    \item \textbf{OLTP - Database (transazionale)}:
+    \begin{enumerate}
+        \item Utilizzo comune.
+        \item Molti users.
+        \item Dati analitici e relazionali.
+        \item Relazioni statiche.
+        \item Una query altera solitamente pochi record della tabella.
+        \item Mirato all'utilizzo da parte delle applicazioni.
+        \item Aggiornamenti frequenti.
+        \item Visione dei dati correnti.
+        \item Pensato per le transazioni.
+    \end{enumerate}
+    \item \textbf{OLAP - Data Warehouse (analitico)}:
+    \begin{enumerate}
+        \item Pochi utenti esperti.
+        \item Dati multidimensionali.
+        \item Relazioni dinamiche.
+        \item Una query altera molti record della tabella.
+        \item Mirato ai soggetti.
+        \item Aggiornamenti rari ma massivi.
+        \item Visione dei dati storica.
+        \item Pensato per l'analisi di trend.
+    \end{enumerate}
+\end{enumerate}
+
+Per questa motivazione, se dei dati presenti in un database, dovessero servire per un analisi di trend andrebbe effettuata un operazione abbastanza complessa di
+estrazione e preparazione per l'immagazzinamento nel Data Warehouse. Entrambi (DB e DW) seguono una politica \textbf{schema first}, ossia viene prima definito uno schema
+(insieme di campi) su cui verrà basata la successiva popolazione della collezione di informazioni.
+
+\paragraph{Big Data} Un esempio di collezione di dati che \textbf{non segue} una politica \textbf{schema first}, basandosi infatti sulle proprietà di volume, varietà e velocità
+non possono mantenere la rigidità impostata da uno schema. Solitamente sono quindi associati a sistemi NoSQL o approcci Data Lake.
+
+\newpage
+
+\subsection{Data Base Management Systems - DBMS}
+
+Un DBMS (sistema per basi di dati) è un sistema centralizzato o distribuito che offre opportuni linguaggi per:
+
+\begin{enumerate}
+    \item Definire lo \textbf{schema} di una DB.
+    \item Scegliere le \textbf{strutture dati} a \textbf{supporto} della DB.
+    \item \textbf{Memorizzare} dati seguendo i vincoli definiti dai schemi del DB.
+    \item Recuperare e modificare dati del DB tramite interrogazioni (\textbf{query}).
+\end{enumerate}
+
+Solitamente si pone tra i programmi applicativi e l'effettivo database per permettere l'interazione vincolata tra i due.
+
+\paragraph{Dati gestiti dai DBMS}
+
+Solitamente in un DB sono contenuti:
+
+\begin{enumerate}
+    \item \textbf{Metadati}: Descrivono permessi, applicazioni, parametri quantitativi sui dati effettivi. Seguono uno schema definito dal DBMS stesso.
+    \item \textbf{Dati}: Rappresentazioni di fatti conformi alle definizioni degli schemi del DB.
+    \begin{enumerate}
+        \item Sono organizzati in \textbf{insiemi} strutturati ed \textbf{omogenei}, tra i quali sono definite delle \textbf{relazioni}.
+        \item Sono accessibili tramite \textbf{transazioni}, operazioni atomiche che non hanno \textbf{mai effetti parziali}.
+        \item Sono protetti da accessi non autorizzati e preservati da possibili malfunzionamenti.
+        \item Sono utilizzabili in maniera concorrente da più utenti.
+    \end{enumerate}
+\end{enumerate}
+
+\paragraph{DBMS a Modello Relazionale} Il modello relazionale è il più comune tra i DBMS commerciali e si basa sull'astrazione della \textbf{relazione}, ossia la \textbf{tabella}
+vista come un insieme di record con campi ben definiti. Questo ci permette di poter creare tabelle ed interrogarle con un linguaggio ad alto livello.
+
+\paragraph{Funzionalità dei DBMS} Elenchiamo quindi le proprietà garantite da un DBMS:
+
+\begin{enumerate}
+    \item Linguaggio per la definizione di un DB.
+    \item Linguaggio per l'uso dei dati nel DB.
+    \item Meccanismi di controllo del DB.
+    \item Strumenti per la gestione admin del DB.
+    \item Strumenti per lo sviluppo delle app che richiedono dati dal DB.
+\end{enumerate}
+
+\newpage
+
+\subsubsection{Livelli di Vista Dati dei DBMS}
+
+Per garantire le proprietà di \textbf{indipendenza fisica} e \textbf{logica} dei dati è stato proposto l'approccio di tre livelli di descrizione dei dati.
+
+\begin{enumerate}
+    \item \textbf{Indipendenza Fisica}: Le applicazioni che utilizzano il DB \textbf{non} devono essere modificati in seguito a modifiche dell'organizzazione fisica
+    dei dati nel DB.
+    \item \textbf{Indipendenza Logica}: Le applicazioni che utilizzano il DB \textbf{non} devono essere modificati in seguito a modifiche dello schema logico del DB.
+\end{enumerate}
+
+Gli effettivi livelli di vista sono invece:
+
+\begin{enumerate}
+    \item \textbf{Livello Fisico}: Gestione effettiva dell'immagazzinamento dei dati nel DB, ad esempio in questo livello si scelgono le strutture dati e gli algoritmi
+    utilizzati dal DBMS per navigare tra i dati.
+    \item \textbf{Livello Logico}: Descrizione della struttura degli insiemi di dati e delle relazioni tra di loro, astraendo completamente dalla loro gestione fisica.
+    \item \textbf{Livello Vista Logica}: Sottoinsieme del livello logico esposto alle applicazioni esterne.
+\end{enumerate}
+
+\subsubsection{Meccanismi di Controllo Dati e Transazioni dei DBMS}
+
+I DBMS cercano di garantire queste proprietà sui dati immagazzinati in un DB:
+
+\begin{enumerate}
+    \item \textbf{Integrità}: Mantenimento delle proprietà definite dallo schema.
+    \item \textbf{Sicurezza}: Protezione dei dati da usi non autorizzati.
+    \item \textbf{Affidabilità}: Protezione in caso di malfunzionamenti hardware/software.
+\end{enumerate}
+
+\paragraph{Transazioni - Operazioni Atomiche} Una transazione è una sequenza di azioni di lettura e scrittura in memoria permanente e di elaborazioni di dati in memoria
+temporanea secondo queste proprietà:
+
+\begin{enumerate}
+    \item \textbf{Atomicità}: Le transazioni terminate prematuramente sono trattate come se non fossero mai iniziate. I loro effetti sul DB sono nulli.
+    \item \textbf{Persistenza}: Le transazioni terminate con successo sono permanenti, ossia non alterabili neanche da malfunzionamenti.
+    \item \textbf{Serializzabilità}: L'esecuzione concorrente di più transazioni è vista come un esecuzione seriale di transazioni.
+\end{enumerate}
+
+\paragraph{Riepilogo Pro e Contro Utilizzo DBMS}
+
+Elenchiamo rapidamente i pro e i contro di questo approccio:
+
+\begin{enumerate}
+    \item \textbf{Pro}: Indipendenza dei dati, recupero efficiente dei dati, integrità e sicurezza, accessi interattivi e concorrenti, amministrazione e riduzione dei tempi di
+    sviluppo delle applicazioni.
+    \item \textbf{Contro}: Necessaria la definizione di uno schema, gestiscono solo dati strutturati ed omogenei, ottimizzati per app OLTP e non per OLAP.
+\end{enumerate}
+
+\newpage
+
+\section{Progettazione di una Base Dati}
+
+La nascita dei database è causata da alcune problematiche presenti in sistemi di
+gestione informazioni più datati. Un classico esempio di problematica è quella della
+\textbf{ridondanza logica}, ossia un informazione ripetuta più volte tra vari record. In queste
+casistiche si preferisce astrarre e fare riferimento solo una volta ad un dato.
+
+\subsection{Attori e Fasi della Progettazione di DB}
+
+Elenchiamo attori e fasi della progettazione di una base dati.
+
+\paragraph{Attori della Progettazione} Elenchiamoli:
+
+\begin{enumerate}
+    \item \textbf{Committente}: Azienda che commissiona la creazione di una base dati, per una propria necessità.
+    \item \textbf{Consulente}: Progettisti del DB.
+    \item \textbf{Utente}: Chi usufruirà del DB, solitamente un dipendente del committente.
+    \item \textbf{DB Administrator}: Amministratore del DB.
+\end{enumerate}
+
+\paragraph{Fasi della Progettazione} Si definiscono fasi specifiche della progettazione di un DB:
+
+\begin{enumerate}
+    \item \textbf{Specifica Requisiti Committente}: Il committente deve definire le proprie necessità ed il consulente deve
+    raccogliere le informazioni.
+    \item \textbf{Progettazione Concettuale}: Realizzazione di uno schema concettuale orientato agli oggetti che deve essere osservabile ed
+    approvato dal committente. In questa fase si astrae completamente da dettagli tecnici d'implementazione/ottimizzazione
+    proprio perchè deve risultare semplice al committente e non deve causare ridondanza logica.
+    \item \textbf{Progettazione Logica}: Concretizzazione della progettazione concettuale tramite linguaggi relazionali.
+    \item \textbf{Progettazione Fisica}: Allocazione fisica delle tabelle generate dal linguaggio relazionale della progettazione logica.
+\end{enumerate}
+
+\paragraph{Progettazione come Modellazione} Spesso il committente stesso non riesce a rendere esplicite tutte le sue necessità, di conseguenza
+è compito del consulente capire a fondo i comportamenti ed i dettagli necessari alla modellazione logica.
+
+\subsection{Linguaggio O-O Progettazione Concettuale}
+
+Questo linguaggio si basa su $3$ operatori diversi:
+
+\begin{enumerate}
+    \item \textbf{Classi (aka Collezioni)}: Ad esempio la classe Persone di entità persona. Formalmente una classe modella un insieme di entità omogenee. Queste possono essere
+    entità fisiche, avvenimenti o \textbf{modelli (progetti)} di entità.
+    \newpage
+    \item \textbf{Associazioni}: Insieme di fatti binari, ad esempio associazione di un proprietario ad un auto.
+    \item \textbf{Sottoclassi}: Sottoinsieme di una classe, come Studenti può esserlo di Persone.
+\end{enumerate}
+
+\newpage
+
+%\begin{figure}[htbp]
+    %\center
+    %\includegraphics[scale=0.4]{img/classiComplessita2.png}
+%\end{figure}
+
+
+\end{document}

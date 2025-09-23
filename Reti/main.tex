@@ -1,0 +1,419 @@
+\documentclass{article}
+
+\usepackage{amsmath, amsthm, amssymb, amsfonts}
+\usepackage{thmtools}
+\usepackage{graphicx}
+\usepackage{setspace}
+\usepackage{geometry}
+\usepackage{float}
+\usepackage{hyperref}
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\usepackage{framed}
+\usepackage[dvipsnames]{xcolor}
+\usepackage{tcolorbox}
+
+%Define the listing package
+\usepackage{listings} %code highlighter
+\usepackage{color} %use color
+\definecolor{mygreen}{rgb}{0,0.6,0}
+\definecolor{mygray}{rgb}{0.5,0.5,0.5}
+\definecolor{mymauve}{rgb}{0.58,0,0.82}
+ 
+%Customize a bit the look
+\lstset{ %
+backgroundcolor=\color{white}, % choose the background color; you must add \usepackage{color} or \usepackage{xcolor}
+basicstyle=\footnotesize, % the size of the fonts that are used for the code
+breakatwhitespace=false, % sets if automatic breaks should only happen at whitespace
+breaklines=true, % sets automatic line breaking
+captionpos=b, % sets the caption-position to bottom
+commentstyle=\color{mygreen}, % comment style
+deletekeywords={...}, % if you want to delete keywords from the given language
+escapeinside={\%*}{*)}, % if you want to add LaTeX within your code
+extendedchars=true, % lets you use non-ASCII characters; for 8-bits encodings only, does not work with UTF-8
+frame=single, % adds a frame around the code
+keepspaces=true, % keeps spaces in text, useful for keeping indentation of code (possibly needs columns=flexible)
+keywordstyle=\color{blue}, % keyword style
+% language=Octave, % the language of the code
+morekeywords={*,...}, % if you want to add more keywords to the set
+numbers=left, % where to put the line-numbers; possible values are (none, left, right)
+numbersep=5pt, % how far the line-numbers are from the code
+numberstyle=\tiny\color{mygray}, % the style that is used for the line-numbers
+rulecolor=\color{black}, % if not set, the frame-color may be changed on line-breaks within not-black text (e.g. comments (green here))
+showspaces=false, % show spaces everywhere adding particular underscores; it overrides 'showstringspaces'
+showstringspaces=false, % underline spaces within strings only
+showtabs=false, % show tabs within strings adding particular underscores
+stepnumber=1, % the step between two line-numbers. If it's 1, each line will be numbered
+stringstyle=\color{mymauve}, % string literal style
+tabsize=2, % sets default tabsize to 2 spaces
+title=\lstname % show the filename of files included with \lstinputlisting; also try caption instead of title
+}
+%END of listing package%
+ 
+\definecolor{darkgray}{rgb}{.4,.4,.4}
+\definecolor{purple}{rgb}{0.65, 0.12, 0.82}
+ 
+%define Javascript language
+\lstdefinelanguage{JavaScript}{
+keywords={typeof, new, true, false, catch, function, return, null, catch, switch, var, if, in, while, do, else, case, break},
+keywordstyle=\color{blue}\bfseries,
+ndkeywords={class, export, boolean, throw, implements, import, this},
+ndkeywordstyle=\color{darkgray}\bfseries,
+identifierstyle=\color{black},
+sensitive=false,
+comment=[l]{//},
+morecomment=[s]{/*}{*/},
+commentstyle=\color{purple}\ttfamily,
+stringstyle=\color{red}\ttfamily,
+morestring=[b]',
+morestring=[b]"
+}
+ 
+\lstset{
+language=JavaScript,
+extendedchars=true,
+basicstyle=\footnotesize\ttfamily,
+showstringspaces=false,
+showspaces=false,
+numbers=left,
+numberstyle=\footnotesize,
+numbersep=9pt,
+tabsize=2,
+breaklines=true,
+showtabs=false,
+captionpos=b
+}
+
+\lstdefinelanguage{C}{
+keywords={typeof, new, true, false, catch, function, return, null, catch, switch, var, if, in, while, do, else, case, break},
+keywordstyle=\color{blue}\bfseries,
+ndkeywords={class, export, boolean, throw, implements, import, this},
+ndkeywordstyle=\color{darkgray}\bfseries,
+identifierstyle=\color{black},
+sensitive=false,
+comment=[l]{//},
+morecomment=[s]{/*}{*/},
+commentstyle=\color{purple}\ttfamily,
+stringstyle=\color{red}\ttfamily,
+morestring=[b]',
+morestring=[b]"
+}
+
+\colorlet{LightGray}{White!90!Periwinkle}
+\colorlet{LightOrange}{Orange!15}
+\colorlet{LightGreen}{Green!15}
+
+\newcommand{\HRule}[1]{\rule{\linewidth}{#1}}
+
+\NewEnviron{NORMAL}{% 
+    \scalebox{2}{$\BODY$} 
+} 
+
+\declaretheoremstyle[name=Theorem,]{thmsty}
+\declaretheorem[style=thmsty,numberwithin=section]{theorem}
+\tcolorboxenvironment{theorem}{colback=LightGray}
+
+\declaretheoremstyle[name=Proposition,]{prosty}
+\declaretheorem[style=prosty,numberlike=theorem]{proposition}
+\tcolorboxenvironment{proposition}{colback=LightOrange}
+
+\declaretheoremstyle[name=Principle,]{prcpsty}
+\declaretheorem[style=prcpsty,numberlike=theorem]{principle}
+\tcolorboxenvironment{principle}{colback=LightGreen}
+
+\setstretch{1.2}
+\geometry{
+    textheight=9in,
+    textwidth=5.5in,
+    top=1in,
+    headheight=12pt,
+    headsep=25pt,
+    footskip=30pt
+}
+
+% ------------------------------------------------------------------------------
+
+\begin{document}
+
+% ------------------------------------------------------------------------------
+% Cover Page and ToC
+% ------------------------------------------------------------------------------
+
+\title{ \normalsize \textsc{}
+		\\ [2.0cm]
+		\HRule{1.5pt} \\
+		\LARGE \textbf{\uppercase{Reti di Calcolatori}
+		\HRule{2.0pt} \\ [0.6cm] \LARGE{Corso A} \vspace*{10\baselineskip}}
+		}
+
+\date{\text{Ultima Compilazione - }\today}
+\author{\textbf{Autore} \\ 
+		Giuseppe Acocella \\
+		2025/26\\
+        \url{https://github.com/Peenguino}}
+
+\maketitle
+\newpage
+
+\tableofcontents
+
+\newpage
+
+\section{Introduzione alle Reti}
+
+Come facciamo a costruire una rete di computer che sia scalabile e che supporti
+\textbf{svariati tipi di applicazioni} come streaming, messaggistica e videochiamate?
+Internet ci permette di farlo, e tecnicamente è un insieme di miliardi di host (servers, laptops, smartphones)
+connessi tra loro. 
+
+\paragraph{Internet - Vista dei Componenti}
+
+Questa connessione è permessa da specifici componenti:
+
+\begin{enumerate}
+    \item \textbf{Link di Comunicazione}: Fibra ottica, rame, onde radio, microonde.
+    \item \textbf{Dispositivi di Interconnessione}: I più comuni sono:
+    \begin{enumerate}
+        \item \textbf{Switch}: Dispositivo che collega tra loro \textbf{più host}.
+        \item \textbf{Router}: Dispositivo che collega tra loro \textbf{più reti}.
+    \end{enumerate}
+    \item \textbf{Reti}: Insieme di host, dispositivi di interconnessione e link gestiti da una stessa organizzazione.
+\end{enumerate}
+
+\paragraph{Internet - Vista dei Servizi} Da un punto di vista di servizi offerti invece
+Internet:
+
+\begin{enumerate}
+    \item E' un \textbf{infrastruttura} che offre servizi alle \textbf{applicazioni distribuite}.
+    \item Offre un \textbf{interfaccia di programmazione} (socket) che permette alle applicazioni, distribuite
+    su \textbf{host diversi}, di scambiarsi informazioni.
+\end{enumerate}
+
+\paragraph{Internet - Vista delle Entità Software}
+
+\begin{enumerate}
+    \item \textbf{Applicazioni}: Elaborano e si scambiano informazioni.
+    \item \textbf{Protocolli}: Regolano la trasmissione di queste informazioni, definendo
+    quindi il formato e l'ordine dei messaggi scambiati tra due o più entità in comunicazione. Due esempi
+    noti di protocolli internet sono:
+    \begin{enumerate}
+        \item \textbf{Trasmission Control Protocol (TCP)}
+        \item \textbf{Internet Protocol (IP)}
+    \end{enumerate}
+\end{enumerate}
+
+\paragraph{Standardizzazione di Protocolli} I protocolli di Internet vengono standardizzatida diversi enti, come:
+
+\begin{enumerate}
+    \item Internet Engineering Task Force (IETF). Si basano su una procedura detta RFC (Request for Comments)
+    che seguendo passi rigorosi definisce gradualmente nuovi standard per Internet.
+    \item IEEE 802 LAN Standards.
+    \item World Wide Web Consortium (W3C): Comunità internazionale che sviluppa standard aperti per favorire
+    lo sviluppo del Web.
+\end{enumerate}
+
+\newpage
+
+\subsection{Tipi di Rete per Dimensione}
+
+Descrizione dei tipi di rete per estensione fisica:
+
+\begin{enumerate}
+    \item \textbf{Personal Area Network} (PAN): Connessione personale, ad esempio una Bluetooth.
+    \item \textbf{Local Area Network} (LAN): Reti circoscritte ad un area limitata, utilizzano cavi o mezzi wireless per connettersi e sono solitamente proprietarie.
+    \item \textbf{Metropolitan Area Network} (MAN): Rete di calcolatori che non supera mai l'estensione fisica indicativa di una "città".
+    \item \textbf{Wide Area Network} (WAN): Reti che cercano di interconnettere host separati da distanze geografiche tramite cavi in fibra ottica o ponti radio.
+\end{enumerate}
+
+\subsection{Gestione di Internet come Rete di Reti}
+
+Ogni rete locale si espone alle altre reti grazie agli \textbf{Internet Service Provider} (ISP). Come possiamo immaginare però
+non connettiamo ogni punto terminale ad ogni altro punto terminale perchè provocherebbe un alta complessità da un punto di vista di collegamenti.
+Di conseguenza saranno presenti dei \textbf{Global ISP} che si occupano della gestione del route della comunicazione. Non esiste un solo \textbf{Global ISP} ma \textbf{molteplici}
+e questi si connettono tra loro con dei \textbf{Peering Point} su punti d'incontro tra le reti detti \textbf{Internet Exchange Point} (IXP).
+
+\paragraph{Content Provider Network} Idealmente si segue lo schema descritto sopra, ma a volte grandi aziende (Amazon, Google) si posizionano trasversalmente a questa organizzazione descritta, in modo tale da
+gestire la propria rete per avvicinare i propri servizi all'utente finale.
+
+\subsection{Reti e Mezzi d'Accesso}
+
+Descriviamo questi elementi caratterizzanti dell'accesso ad una rete:
+
+\begin{enumerate}
+    \item \textbf{Rete d'Accesso}: Rete che connette fisicamente un sistema terminale al \textbf{edge router}, ossia il primo router da sorgente a destinazione.
+    \item \textbf{Mezzi d'Accesso}: Come passiamo fisicamente dal calcolatore al edge router:
+    \begin{enumerate}
+        \item \textbf{Cablati (Vincolati)}: Doppino, coassiale, fibra.
+        \item \textbf{Wireless (Non Vincolati)}: Onde Radio, microonde, infrarossi.
+    \end{enumerate}
+\end{enumerate}
+
+\subsubsection{Schema dell'Accesso DSL}
+
+Uno dei primi schemi d'accesso è stato quello Digital Subscriber Line (DSL), dove la compagnia telefonica rappresentava l'ISP.
+Risultava quindi necessario splittare la linea telefonica già esistendo, suddividendo il traffico in bande di frequenze diverse:
+
+\begin{enumerate}
+    \item \textbf{Canale Telefonico}: $0-4 kHz$
+    \item \textbf{Upstream}: $4-50 kHz$
+    \item \textbf{Downstream}: $50 kHz \: - \: 1 MHz$
+\end{enumerate}
+
+\newpage
+
+In questo modo sarà necessario un multiplexer di accesso alla linea digitale (DSLAM) che permetta di separare i due tipi di comunicazione. Esistono \textbf{versioni diverse}
+di \textbf{questo schema}, riferiremo infatti allo schema \textbf{xDSL}, proprio perchè è possibile migliorare le caratteristiche della connessione ad esempio basandosi su una connessione
+in \textbf{fibra} tra DSLAM ed ISP, ad esempio:
+
+\begin{enumerate}
+    \item \textbf{Fibre To The Cabinet (FTTC)}: Standard VDSL e VDSL2.
+    \item \textbf{Fibre To The Derivation Point}.
+    \item \textbf{Fibre To The House (FTTH)}: Caratterizzato dai seguenti elementi:
+    \begin{enumerate}
+        \item Fibra ottica fino all'interno delle abitazioni.
+        \item Fibra uscente dalla centrale locale con terminatore ottico di linea \textbf{OLT} viene condivisa da diverse abitazioni.
+        \item Il terminatore ottico di rete \textbf{ONT} invece è connesso ad uno splitter tramite fibra dedicata, questo permette la gestione fino al centinaio di abitazioni.
+        \item L'\textbf{OLT} si connette al router dell'ISP e tramite questo ad Internet.
+    \end{enumerate}
+\end{enumerate}
+
+\vspace*{10px}
+
+\subsubsection{Tipi d'Accesso - Cavo, Aziendale, Domestico, Mobile e Satellitare}
+
+Descriviamo queste tipologie di accesso alla rete:
+
+\begin{enumerate}
+    \item \textbf{Accesso Via Cavo}: Il segnale ottico viene convertito in segnale elettromagnetico e inviato sulle linee di cavi coassiali per la distribuzione del segnale
+    alle varie abitazioni. La velocità potrebbe degradare a causa della distanza o della congestione del canale condiviso tra più abitazioni.
+    \item \textbf{Accesso Aziendale}: Nelle aziende i sistemi sono collegati al router di frontiera con una LAN.
+    \item \textbf{Accesso Domestico}: Utilizzate tecnologie Ethernet o WiFi per creare LAN domestiche.
+    \item \textbf{Accesso Mobile}: Infrastruttura radio mobile definita dagli ISP, può subire degrado di prestazioni a causa di distanza oppure ostacoli.
+    \item \textbf{Accesso Satellitare}: Accesso permesso da trasmettitori terrestri che si connettono a satelliti geostazionari (GEO) oppure satelliti a bassa quota (LEO).
+    Questo sistema risulta essere il più duttile e non richiede complesse installazioni, ma potrebbe risultare inferiore da alcuni punti di vista come la latenza più alta.
+\end{enumerate}
+
+\newpage
+
+\subsection{Nucleo della Rete - Commutazione Circuito vs Pacchetto}
+
+Come determiniamo il percorso effettuato da un messaggio? Come trasferiamo dalla porta di uscita a quella di ingresso di due calcolatori? A queste domande
+risponde il tipo di commutazione.
+
+\paragraph{Commutazione di Circuito}
+
+Si instaura un cammino tra gli host in comunicazione e tutte le risorse del canale sono dedicate a loro. Questo causa un utilizzo esclusivo del canale e conseguente spreco
+di risorse. Per poter permettere molteplici comunicazioni utilizzando questo tipo di commutazione esistono due politiche:
+
+\begin{enumerate}
+    \item \textbf{Frequency Division Multiplexing (FDM)}: Divido il canale in bande di frequenze e le dedico alle diverse comunicazioni.
+    \item \textbf{Time Division Multiplexing (TDM)}: Dedico tutto il canale alla coppia di host ma per una finestra di tempo limitata.
+\end{enumerate}
+
+\paragraph{Commutazione di Pacchetto}
+
+Il flusso dati di una comunicazione viene suddiviso in \textbf{pacchetti}, e gli viene assegnato un \textbf{header} che mantenga dei metadati riguardanti il flusso dati originale.
+Questo tipo di instradamento segue queste fasi:
+
+\begin{enumerate}
+    \item \textbf{Suddivisione} in \textbf{pacchetti} ed \textbf{assegnamento header}.
+    \item \textbf{Instradamento} del singolo \textbf{pacchetto indipendentemente} dagli altri. Pacchetti di flussi dati diversi possono condividere i canali di comunicazione.
+    \item Fase di \textbf{Store and Forward}, ossia prima che il commutatore (router) consegni i pacchetti dovrà prima aspettare che siano del tutto arrivati. Il tipo di Multiplexing
+    quindi è statistico e non prefissato. Seguendo questa politica potremmo incorrere anche in problemi di \textbf{perdita di pacchetti} in base al tipo di gestione del buffer di ciascun commutatore.
+    Non abbiamo quindi alcuna garanzia sulle prestazioni utilizzando questa tecnica. 
+\end{enumerate}
+
+\paragraph{Confronto Caratteristiche Commutazione Circuito/Pacchetto} Elenchiamo pro e contro di ciascuna tecnica:
+
+\begin{enumerate}
+    \item \textbf{Commutazione Circuito - Pro}:
+    \begin{enumerate}
+        \item Prestazioni garantite.
+        \item Tecnologie di switching efficienti.
+        \item Tariffazioni per ISP semplici da definire.
+    \end{enumerate}
+    \item \textbf{Commutazione Circuito - Contro}:
+    \begin{enumerate}
+        \item Segnalazione e configurazione delle tabelle di switching.
+        \item Poca ottimizzazione del uso di risorse.
+    \end{enumerate}
+    \newpage
+    \item \textbf{Commutazione Pacchetto - Pro}:
+    \begin{enumerate}
+        \item Utilizzo ottimale delle risorse.
+        \item Non richiede fase di setup e tabelle di switching predefinite.
+    \end{enumerate}
+    \item \textbf{Commutazione Pacchetto - Contro}:
+    \begin{enumerate}
+        \item Tecnologie di inoltro non efficienti.
+        \item Ritardi variabili.
+        \item Rischio di congestione.
+    \end{enumerate}
+
+\end{enumerate}
+
+\subsection{Metriche - Prestazioni della Rete (Latenza, Throughput)}
+
+Descriviamo due metriche fondamentali delle prestazioni della rete:
+
+\begin{enumerate}
+    \item \textbf{Latenza}: Tempo richiesto dal primo bit partito dalla sorgente fino all'arrivo a destinazione. 
+    Questa definizione è ideale, infatti dipende anche dal tipo di commutazione, quella di pacchetto con Store $\&$ Bound introduce altre difficoltà.
+    Nello specifico le \textbf{cause specifiche} di \textbf{ritardo} nella \textbf{commutazione di pacchetto} sono:
+
+    \begin{enumerate}
+        \item \textbf{Ritardo di Elaborazione del Nodo}
+        \begin{enumerate}
+            \item Controllo errori sui bit.
+            \item Determinazione porta di uscita.
+        \end{enumerate}
+        \item \textbf{Ritardo di Accodamento}
+        
+        Componente di ritardo più complessa da stabilire, si basa su una \textbf{condizione di stabilità} ossia un rapporto $\rho = \frac{L\:a}{R}$ dove $a$ è velocità
+        media di arrivo, $R$ velocità di trasmissione ed $L$ lunghezza media dei pacchetti in bit.
+        La condizione $\rho < 1$
+        è detta \textbf{condizione di stabilità}.
+        \begin{enumerate}
+            \item Attesa di trasmissione.
+            \item Dipende da intensità e tipo di traffico.
+        \end{enumerate}
+        \item \textbf{Ritardo di Trasmissione L/R}
+        
+        Tempo impiegato dal router per trasmettere un pacchetto sul link, con $R\:(bit/sec)$ indichiamo il rate, ossia la velocita di trasmissione del collegamento mentre con 
+        $L \: (bit)$ la lunghezza del pacchetto. Il ritardo sarà quindi $d_{trasm} = \frac{L}{R}$. Quindi rappresenta il ritardo di passaggio nel commutatore.
+        
+        \item \textbf{Ritardo di Propagazione}
+        
+        Quanto un bit ci mette per spostarsi fisicamente, rappresenta il ritardo di passaggio nel link.
+    \end{enumerate}
+
+    Il ritardo complessivo è calcolato come somma di tutti i ritardi calcolati sopra.
+
+\newpage
+
+    \item \textbf{Throughput}
+    Rappresenta la capacità effettiva di un link da host $A$ verso host $B$, difficile da definire formalmente, ma diamo questi due riferimenti:
+
+    \begin{enumerate}
+        \item \textbf{Throughput Istantaneo}: Velocità in $bit/sec$ a cui host $B$ riceve in ogni istante.
+        \item \textbf{Throughput Medio}: Rapporto tra quantità $L$ di dati trasferiti e il tempo $T$ impiegato per il loro trasferimento, ovvero $\frac{L}{T}$.
+    \end{enumerate}
+
+    Un potenziale bottleneck influenzerebbe pesantemente questa metrica, in caso quindi di più di un collegamento $q_{i}$ il calcolo sarà $min(q_{1}, ...\:, q_{n})$.
+    Il Throughput quindi è differente dalla velocità di trasmissione del collegamento che si pone come upper bound alla metrica del Throughput.
+
+    \item \textbf{Prodotto Rate per Ritardo}
+    Il prodotto rate per ritardo rappresenta il "volume" del collegamento, ossia il massimo numero di bit che possono riempire il collegamento ad
+    un certo istante.
+
+\end{enumerate}
+
+\newpage
+
+%\begin{figure}[htbp]
+    %\center
+    %\includegraphics[scale=0.4]{img/classiComplessita2.png}
+%\end{figure}
+
+
+\end{document}
