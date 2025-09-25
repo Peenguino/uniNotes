@@ -140,3 +140,72 @@ Il **manifesto Agile** affronta diversamente il problema grazie a dei **principi
 attività e portarla a termine, "astraendo" dalla precisione del fatto, bisogna che si inizi che che si finisca:
     - Work in progress limit, permette di definire un limite alle attività inserite in doing
     - Questo permette di risparmiare i context switch che risultano essere costosi
+
+## Analisi Requisiti
+
+- **Dominio**: Va specificato l'ambito ed il contesto del prodotto, tramite:    
+    - **Glossario** dei **termini**.
+    - **Due** modelli **statico** e **dinamico** del dominio.
+        - **Statico**: Descrizione fisica del contesto. Solitamente viene descritto con il linguaggio UML.
+        - **Dinamico**: Descrizione dei processi da eseguire. Solitamente descritto con una descrizione testuale oppure in UML.
+    
+    Quindi alla fine dell'analisi del dominio si ottengono:
+    - **Entità**
+    - **Relazioni**
+    - **Processi** e **Comportamenti**
+    
+    I vari requisiti devono essere anche standardizzati (ISO...) e molto probabilmente il cliente non è minimamente a conoscenza di questi dettagli.
+
+### Tipi di Requisiti
+
+E' buona prassi tenere divise queste due tipologie di requisiti.
+
+1. **Requisiti Funzionali**: Descrivono funzionalità che il sistema deve realizzare in termini di azioni, reazioni ad input e comportamenti in specifici condizioni, ma astrae dal tipo di specifica ed implementazione.
+2. **Requisiti Non Funzionali**: Proprietà del sistema software
+    - **Caratteristiche di Qualità**: Sicurezza, usabilità, security (riguardante i dati), affidabilità, efficienza, safety (in termini di assenze di crash in contesti critici), robustezza...
+    - **Caratteristiche del Processo di Sviluppo**: Standard di processo, uso di ambienti CASE, linguaggi di programmazione, metodi di sviluppo...
+    - **Caratteristiche Esterne**: Vincoli legislativi...
+    - **Requisiti Fisici**: Hardware, rete...
+
+### Esempio di Esercizio su Analisi Requisiti
+
+```
+Si consideri un sistema per il prelievo automatizzato di denaro contante (Bancomat). Per poter utilizzare il sistema l'utente deve possedere una tessera magnetica. Il sistema deve mettere a disposizione le funzioni di prelievo, saldo, estratto conto. Il sistema deve essere disponibile a persone non vedenti, deve garantire un tempo di risposta inferiore al minuto, e deve essere sviluppato su architettura X86. Le operazioni di prelievo devono richiedere autenticazione tramite un codice segreto memorizzato sulla carta. Il sistema deve essere facilmente espandibile, e adattabile alle future esigenze bancarie.
+```
+
+1. **Requisito Funzionale**: Sistema deve mettere permettere prelievo, saldo, estratto conto.
+2. **Requisito Non Funzionale**: Sistema deve essere disponibile a persone non vedenti.
+3. **Requisito Non Funzionale**: Sistema deve garantire un tempo di risposta inferiore al minuto.
+4. **Requisito Non Funzionale**: Sistema deve essere sviluppato su architettura X86.
+5. **Requisito Funzionale**: Le operazioni di prelievo devono richiedere autenticazione tramite un codice segreto
+6. **Requisito Non Funzionale**: Il sistema deve essere facilmente espandibile, e adattabile alle future esigenze bancarie.
+
+### Descrizione di Requisiti di un Sistema
+
+Posso seguire due approcci
+
+1. **Linguaggio Naturale** (Glossario e Specifica dei Requisiti)
+2. **Linguaggio Grafici** (Modello del Dominio e Casi d'Uso)
+
+I requisiti di un sistema valgono come contratto tra cliente e consulente.
+
+### Fasi dell'Analisi dei Requisiti
+
+Presentati in cascata ma non per forza di cose raccolti in cascata.
+
+1. **Acquisizione**: Si procede con analisti che effettuano interviste strutturate e non al cliente. Possono essere utilizzati questionari, prototipi del prodotto, osservazione del cliente e altre tecniche interattive.
+2. **Elaborazione**: Raffinamento dei requisiti raccolti e bozza di documento dei requisiti, seguendo uno standard (come l'IEEE/ANSI 830-1993), con documento caratterizzato da elementi come:
+    - Introduzione
+    - Glossario
+    - Definizione requisiti funzionali e non
+    - Architettura
+    - Specifica di requisiti del SW
+    - Modelli astratti del sistema
+    - Evoluzione del sistema
+    - Appendici
+    - Indici
+    
+    I requisiti ben posti sono asserzioni sul sistema. Bisogna evitare **omissioni**, **inconsistenze** (più requisiti che parlano della stessa cosa e si contraddicono), **ambiguità** (vanno controllati i quantificatori), **sinonimi** ed **omonimi**, **presenza di dettagli tecnici**, **ridondanza**.
+3. **Convalida**
+4. **Negoziazione**
+5. **Gestione**
