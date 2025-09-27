@@ -352,7 +352,7 @@ Questo tipo di instradamento segue queste fasi:
 
 \end{enumerate}
 
-\subsection{Metriche - Prestazioni della Rete (Latenza, Throughput)}
+\subsection{Metriche - Prestazioni della Rete (Latenza, Throughput, Prod. Rate/Ritardo)}
 
 Descriviamo due metriche fondamentali delle prestazioni della rete:
 
@@ -407,6 +407,121 @@ Descriviamo due metriche fondamentali delle prestazioni della rete:
     un certo istante.
 
 \end{enumerate}
+
+\subsection{Modello Stratificato}
+
+Lo schema base di gestione delle reti è di tipo \textbf{stratificato}, ossia ciascun livello ha le proprie caratteristiche e responsabilità
+seguendo i due criteri di:
+
+\begin{enumerate}
+    \item \textbf{Separation of Concern}: Divisione di interessi e responsabilità tra i livelli.
+    \item \textbf{Information Hiding}: Si espone solo l'interfaccia di ciascun livello ma non la sua implementazione.
+\end{enumerate}
+
+Quindi ogni livello fornisce \textbf{servizi} al livello superiore e scambia informazioni con i livelli adiacenti tramite \textbf{interfacce}.
+In questo caso anche in caso di rifattorizzazione di un livello gli altri livelli sarebbero indipendenti dalle modifiche apportate a meno di modifica dell'interfaccia.
+Bisogna quindi definire dei protocolli che guidino la gestione di questi livelli.
+
+\paragraph{Cosa è un Protocollo} In protocollo si specificano \textbf{sintassi} di un messaggio, la \textbf{semantica} di un messaggio e \textbf{azioni} da intraprendere in caso di ricezione di messaggio. 
+
+\vspace*{10px}
+
+\subsubsection{Stack Protocollare TCP/IP}
+
+Si compone di $5$ livelli (ciascun livello sarà guidato a sua volta da protocolli):
+
+\vspace*{10px}
+
+\begin{enumerate}
+    \item \textbf{Livello Applicazione}: Rappresenta delle applicazioni di rete, oppure collegamenti logici e scambi di messaggi end-to-end tra due processi su host diversi.
+    \begin{enumerate}
+        \item \textbf{Protocolli}: \textbf{ftp}, \textbf{smtp}, \textbf{http}.
+        \item \textbf{Entità Informazione del Livello}: L'informazione a questo livello è detta \textbf{messaggio}.
+    \end{enumerate}
+
+    \newpage
+
+    \item \textbf{Livello Trasporto}: Trasferimento dati end-to-end tra processi su host remoti.
+    \begin{enumerate}
+        \item \textbf{Protocolli}: \textbf{tcp}, \textbf{udp}.
+        \item \textbf{Entità Informazione del Livello}: L'informazione a questo livello è detta:
+        \begin{enumerate}
+            \item \textbf{Segmento} se in \textbf{Protocollo TCP}.
+            \item \textbf{Datagramma Utente} se in \textbf{Protocollo UDP}.
+        \end{enumerate}
+    \end{enumerate}
+    \item \textbf{Livello Rete}: Trasferimento e instradamento di \textbf{datagrammi} dalla sorgente alla destinazione. 
+    \begin{enumerate}
+        \item \textbf{Protocolli}: \textbf{IP} o \textbf{ICMP}.
+        \item \textbf{Entità Informazione del Livello}: L'informazione a questo livello è detta \textbf{datagramma}.
+    \end{enumerate}
+    \item \textbf{Livello Link}: Trasferimento dati in \textbf{frame} attraverso il collegamento tra elementi di rete vicini.
+    \begin{enumerate}
+        \item \textbf{Protocolli}: \textbf{PPP} o \textbf{Ethernet}.
+        \item \textbf{Entità Informazione del Livello}: L'informazione a questo livello è detta \textbf{frame}.
+    \end{enumerate} 
+    \item \textbf{Livello Fisico}: Trasferimento dei bit di un frame sul mezzo trasmissivo.
+\end{enumerate}
+
+\subsubsection{Stack Protocollare ISO/OSI - Cenno Storico}
+
+A differenza dello Stack TCP/IP, che era stato definito dall'IETF, l'ISO/OSI voleva essere uno standard effettivo e formale, definito invece dall'ISO.
+Si differenziava dall'TCP/IP perchè aggiungeva due livelli ossia Presentazione e Sessione (compresi nel livello Applicazione nel TCP/IP).
+Non dimostrò nessun pratico vantaggio al TCP/IP quindi viene solo usato come riferimento formale.
+
+\subsection{Breve Introduzione alla Sicurezza di Reti}
+
+Un software malevolo può penetrare in un host e può rendere questo host parte di una botnet che distribuisce richieste spam. Esistono varie tecniche:
+
+\begin{enumerate}
+    \item \textbf{DDoS} (Distributed Denial of Service):
+    \begin{enumerate}
+        \item \textbf{Bandwidth Flooding}: Inondazione di pacchetti
+        \item \textbf{Connection Flooding}: Inondazione di richieste TCP
+    \end{enumerate}
+    \item \textbf{Sniffing}: Man in the middle host C collegato ad un mezzo condiviso può ottenere copia di ogni pacchetto trasmesso tra due host A e B.
+    \item \textbf{Spoofing}: Man in the middle host C che immette pacchetti spacciandosi per un altro utente tra due host A e B.
+\end{enumerate}
+
+\newpage
+
+\paragraph{Parametri e Criteri di Sicurezza} Esistono dei metodi per difendersi da potenziali attacchi:
+
+\begin{enumerate}
+    \item \textbf{Autenticazione}: Dimostrazione della propria identità.
+    \item \textbf{Crittografia}: Garantisce confidenzialità delle informazioni.
+    \item \textbf{Integrità} ed \textbf{Autenticità}: Assicurare che i dati non siano stati alterati e provengano da fonti affidabili.
+    \item \textbf{Controllo Accessi}: Limitare l'uso di risorse in base ai ruoli.
+    \item \textbf{Utilizzo di Firewall}: Filtrare il traffico tramite dispositivi hardware o software dedicato.
+\end{enumerate}
+
+\section{Livello Applicazione}
+
+\subsection{Introduzione a Paradigmi, Protocolli e Tipi d'Utilizzo}
+
+Livello che definisce programmi applicativi che comunicano tra i vari host. Si seguono in genere due paradigmi di comunicazione tra host in questo livello:
+
+\begin{enumerate}
+    \item \textbf{Client/Server}: Host server sempre attivo che attende richieste dei vari host client.
+    \item \textbf{Peer to Peer}: Tutti i client alla pari, spesso utilizzato nella condivisione di file.
+\end{enumerate}
+
+\paragraph{Protocolli} La comunicazione si basa su protocolli aperti (HTTP, SMTP) oppure proprietari. Una web app ad esempio si basa sul protocollo HTTP, invece
+un client di posta elettronica può utilizzare il protocollo SMTP. 
+
+\paragraph{Socket e API} Ogni processo, essendo che comunicherà con \textbf{processi di altre macchine}, dovra essere \textbf{identificato}
+dall'\textbf{IP della macchina} (da $32$ bit) e dalla \textbf{porta dedicata al processo} (da $16$ bit). Questo avviene grazie all'astrazione dei socket, che
+utilizzando IP e porta permettono ai processi di scrivere/leggere da ciascun lato.
+
+\paragraph{Caratterizzazione di un Applicazione} Ciascuna applicazione dovrà scegliere un protocollo da utilizzare in base alla sua caratterizzazione ed in base a specifici criteri:
+
+\begin{enumerate}
+    \item \textbf{Throughput}: Tasso effettivo di trasferimento dati, ad esempio un client di mail non avrà bisogno di un alto Throughput.
+    \item \textbf{Integrità dei Dati}: Richiesta d'integrita del flusso dei dati, ad esempio una stream potrebbe non richiedere un integrità assoluta.
+    \item \textbf{Sensibilità ai Ritardi}: Richiesta di una bassa latenza, ad esempio un videogioco multiplayer potrebbe richiedere una bassa latenza.
+\end{enumerate}
+
+L'analisi di questi criteri in relazione all'applicazione permette la scelta del protocollo di trasporto (livello inferiore), quindi nel nostro caso se TCP (orientato allo stream) o UDP (orientato al messaggio).
 
 \newpage
 
