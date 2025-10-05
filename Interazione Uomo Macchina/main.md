@@ -118,3 +118,95 @@ Noi capiamo come agire spesso in risposta a vincoli. Sviluppo quindi un modello 
 2. **Lock-in**: Il lock-in mantiene un operazione attiva, **evitando** che **l'utente possa terminarla prematuramente**. Un classico esempio è il pop up che si apre in chiusura di un editor di file, previene la chiusura involontaria.
 3. **Lock-out**: Il lock-out previene che un operazione in ingresso venga effettuata involontariamente, è necessario che l'utente riconfermi la propria operazione. Un classico esempio è il pop up che chiede di essere maggiorenni per poter accedere.
 
+# Lezione 5 - Golfi di Esecuzione e Valutazione - 02/10/2025
+
+## User Goals and Interaction
+
+Il principio di **interazione** si basa su elementi di **sfida** in modo tale da capire come **fornire input** per ottenere uno **specifico output**.
+
+## Definizioni di Golfo di Esecuzione/Valutazione
+
+- **Golfo di Esecuzione**: Come mi posso interfacciare per fornire i miei input.
+    - **Definizione**: sforzo mentale per tradurre obiettivi in azioni fisiche.
+    - Ponte tra Intento e Azione.
+    - Strettamente legato alle Affordances
+    - Correlato all'esecuzione fisica dell'azione.
+
+    L'idea sarebbe quella di compensare questo golfo utilizzando dei ponti. L'utente interagirà con il sistema, definendo il golfo, attraverso:
+    - Le intenzioni, il goal dell'utente
+    - Le azioni che eseguirà
+    - Interfacciarsi con l'input da fornire al sistema
+
+- **Golfo di Valutazione**: Capire cosa sia successo, nel momento in cui entro a contatto con l'output prodotto.
+    - **Definizione**: Comprendere lo stato del sistema, capire se i cambiamenti percepiti hanno mosso il sistema verso il goal.
+    - L'user richiederà quindi un feedback continuo riguardo i risultati e lo stato corrente del sistema.
+    - **Obiettivo**: Gli utenti devono aver capito come funziona il sistema.
+
+    Il golfo di Valutazione quindi è all'inizio valutato come semplice da compensare ed attraversare con un ponte, ma in realtà va definito tramite tre elementi:
+    - Interfaccia (display) del sistema
+    - Interpretazione
+    - Valutazione
+
+## 7 Stati dell'Azione
+
+- La possibilità di saper utilizzare un prodotto non dipende esclusivamente dall'utente ma anche dal modo in cui il prodotto si pone. Molto spesso se non so come interfacciarmi con un sistema è anche causato dal sistema stesso.
+
+- Descrizione degli Stati:
+    - **Golfo d'Esecuzione**:
+
+        1. **Specificare** il Goal
+        2. **Pianificare** il Goal
+        3. **Specificare** il Goal
+        4. **Eseguire**
+    - **Golfo di Valutazione**:
+
+        5. **Percepire** l'Esito
+        6. **Interpretare** l'Esito
+        7. **Comparare** l'Esito 
+
+- Spesso queste **fasi** sono **iterate** oppure basate su **feedback loop**, ossia che si interrompono su una specifica fase per testarla.
+
+### Domande e Checklist per le 7 Fasi dell'Azione
+
+- Domande per quella fase (per definire il ponte):
+    - **Golfo d'Esecuzione - Feed Forward**:
+
+        1. Cosa voglio ottenere?
+        2. Quali sono le alternative?
+        3. Cosa posso fare e come lo faccio?
+        4. Esecuzione.
+    - **Golfo di Valutazione - Feed Back**:
+
+        5. Cosa è successo?
+        6. Cosa vuol dire?
+        7. E' quello che volevo fare?
+
+### Funzionamento Feed Forward e Feed Back
+
+- **Feed Forward**: si basa sull'utilizzo appropriato di signifiers, vincoli e ???
+- **Feed Back**: ???
+
+### I 7 Principi Fondamentali del Design - Ulteriore Presentazione
+
+- Discoverability: Determinare il corrente stato del sistema.
+- Feedback: Avere un esito da un azione eseguita per definire lo stato del sistema.
+- Modello Concettuale: Proiezione del sistema che porta ad una convinzione ed un buon feeling sulla comprensione del sistema.
+- Affordances: Rende possibili le azioni che l'user vuole eseguire.
+- Signifiers: Migliora la discoverability per rendere migliore la comunicazione tra sistema ed utente.
+- Mappings: Link tra funzionalità e layout presentato all'utente.
+- ?:?
+
+### Opportunistic vs Planned Actions
+
+- **Azioni Opportunistiche**: Non tutto è risolvibile con un algoritmo, il comportamento trae vantaggio dalle circostanze attuali, invece che pianificare ed analizzare il range di azioni, e appena è presentata l'opportunità viene eseguita un azione. Si basa sul pensiero del subconscio.
+
+- **Azioni Pianificate**: Richiedono più effort e pianificano algoritmicamente tutto il comportamento. Si basa sul pensiero conscio. L'**overlearning**, dopo anni d'esperienza, rende azioni pianificate ad azioni opportunistiche.
+
+Vengono effettuati quindi processi di pattern matching del pensiero del subconscio, invece il pensiero conscio è più algoritmico.
+
+## Livelli di Brain Processing
+
+- **Livello Viscerale**: Ci permette di rispondere velocemente, senza controllo o awareness dell'azione che stiamo compiendo. Le risposte viscerali sono rapide ed automatiche e si basano sui concetti di buono, cattivo, pericoloso...
+Da un **punto di vista di design**, molta risposta alla presentazione di un prodotto è viscerale, bravi designer utilizzano questi design estetici che tranquillizzino gli utenti in maniera primordiale. E' il livello più a contatto con il mondo.
+- **Livello Comportamentale**: Si basa sulle skill acquisite e triggerate da situazioni che matchano il pattern. Le azioni di questo livello sono largamente appartenenti al subconscio, anche essendo consapevoli della situazione, non siamo coscienti del processo nello specifico. Il feedback è parte critica di questa fase sulla gestione delle aspettative, il tutto si basa su un feedback loop in relazione alle aspettative. Esiste un processo di nudging, guidando l'utente alla formazione di un modello mentale aderente al modello concettuale del sistema.
+- **Livello Riflessivo**: Livello di analisi, conscio decision-making, ragionamento profondo. Solitamente la fase riflessiva è lenta, profonda e cognitiva. I livelli di emozioni più alti vengono dal livello riflessivo, qui assegno e peso tutti i feedback ottenuti essendo che sto anche pagando di più da un punto di vista di risorse mentali. Da un **punto di vista di design**, sappiamo che le scelte effettuate in questo livello sono quelle più durature, formano la memoria dell'utente sugli eventi accaduti. L'appeal di questo livello causa ad esempio una review positiva/negativa. ?MAPPING PRESENTE NELLE SLIDE (INSERISCI L'IMMAGINE)?

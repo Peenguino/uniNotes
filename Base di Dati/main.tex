@@ -332,7 +332,7 @@ Elenchiamo attori e fasi della progettazione di una base dati.
 \paragraph{Progettazione come Modellazione} Spesso il committente stesso non riesce a rendere esplicite tutte le sue necessità, di conseguenza
 è compito del consulente capire a fondo i comportamenti ed i dettagli necessari alla modellazione logica.
 
-\subsection{Linguaggio O-O Progettazione Concettuale}
+\subsection{Progettazione Concettuale}
 
 Questo linguaggio si basa su $3$ operatori diversi:
 
@@ -343,6 +343,187 @@ Questo linguaggio si basa su $3$ operatori diversi:
     \item \textbf{Associazioni}: Insieme di fatti binari, ad esempio associazione di un proprietario ad un auto.
     \item \textbf{Sottoclassi}: Sottoinsieme di una classe, come Studenti può esserlo di Persone.
 \end{enumerate}
+
+\begin{figure}[htbp]
+    \center
+    \includegraphics[scale=0.6]{img/esempioRelazione1.png}
+\end{figure}
+
+\subsubsection{Associazioni e Cardinalità}
+
+Formalmente le associazioni sono insiemi di coppie, quindi delle relazioni. Il tipo di freccetta che indica l'associazione
+è detta cardinalità e corrisponde informalmente alla domanda:
+
+\[ \text{"Per ogni elemento della classe A quanti della classe B?"} \]
+
+Chiaramente va fatto sulla stessa direzione per entrambi i versi. Questo permette di risolvere le ambiguità causate dalla terminologia comune che è detta:
+
+\[ \text{"Uno a Molti"} \:\: \text{oppure} \:\: \text{"Molti a Molti"} \]
+
+che in qualche modo genera ambiguità perchè è come se si tenesse in conto solo di un verso. E' fondamentale ricordarsi quindi che la caratterizzazione della cardinalità di un associazione va
+fatta in entrambi i versi.
+
+Graficamente quindi avremo queste possibilità alle estremità delle associazioni:
+
+\begin{enumerate}
+    \item \textbf{Freccia Singola}: Per ogni elemento della classe di partenza è presente un elemento nella classe d'arrivo.
+    \item \textbf{Freccia Doppia}: Per ogni elemento della classe di partenza sono presenti più elementi nella classe d'arrivo.
+    \item \textbf{Trattino}: Nessun limite inferiore, di conseguenza per ogni elemento della classe di partenza può anche non essere presente alcun elemento nella classe d'arrivo.
+\end{enumerate}
+
+Esistono diverse notazioni grafiche, ma queste dispense fanno riferimento a quelle utilizzate durante gli esercizi del corso, quindi questa sarà la notazione comune di riferimento.
+
+\newpage
+
+\subsubsection{Associazioni Ternarie/con Attributi e Reificazione}
+
+A volte le associazioni potrebbero complicarsi perchè:
+
+\begin{enumerate}
+    \item Potrebbero avere la \textbf{necessità} di avere degli \textbf{attributi}. Ad esempio in un caso di associazione tra Clienti e Stanze, la tariffa potrebbe non essere
+    nè attributo di Clienti e nè di Stanze. In questo caso si assegna un \textbf{attributo} all'\textbf{associazione}.
+
+    \begin{figure}[htbp]
+        \center
+        \includegraphics[scale=0.55]{img/associazioneAttributo.png}
+    \end{figure}
+
+    \item Potrei invece immaginare l'attributo come \textbf{vera} e \textbf{propria entità} di una specifica classe Tariffe. In quel caso non starei semplicemente dando 
+    un attributo 
+
+    
+    all'associazione ma starei componendo un \textbf{associazione ternaria}.
+    \begin{figure}[htbp]
+        \center
+        \includegraphics[scale=0.55]{img/associazioneTernaria.png}
+    \end{figure}
+
+\end{enumerate}
+
+\paragraph{Reificazione} Si preferisce, nei casi illustrati sopra, semplificare la gestione 
+
+dell'associazione tramite processo di reificazione, ossia la creazione di una classe di supporto aggiuntiva che permetta la gestione
+regolare delle associazioni viste prima. Si illustrano le reificazioni delle associazioni viste sopra:
+
+\vspace*{15px}
+
+\begin{figure}[htbp]
+    \centering
+    \begin{minipage}{0.45\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{img/esempioReificazione1.png}
+        \caption{Reificazione di Associazione con Attributo}
+    \end{minipage}
+    \hfill
+    \begin{minipage}{0.45\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{img/esempioReificazione2.png}
+        \caption{Reificazione di Associazione Ternaria}
+    \end{minipage}
+\end{figure}
+
+Un dettaglio da notare è la \textbf{cardinalità} sulla nuova classe di supporto, infatti in \textbf{direzione} della \textbf{nuova classe} sarà presente un associazione di \textbf{uno a molti}.
+
+\newpage
+
+\subsubsection{Sottoclassi e Tipologie}
+
+Una \textbf{sottoclasse} è un sottoinsieme di elementi di una classe, per i quali prevediamo di raccogliere ulteriori informazioni.
+
+\[ \text{Studenti} \subseteq \text{Persone} \]
+\[ \text{Libri Rari} \subseteq \text{Libri} \]
+
+\begin{figure}[htbp]
+    \center
+    \includegraphics[scale=0.7]{img/notazioneGraficaSottoclassi.png}
+    \caption{Notazione grafica di riferimento}
+\end{figure}
+
+\vspace*{10px}
+
+Esistono varie tipologie di sottoclassi:
+
+\vspace*{10px}
+
+\begin{figure}[htbp]
+    \center
+    \includegraphics[scale=0.7]{img/tipiDiSottoclassi.png}
+\end{figure}
+
+\newpage
+
+\subsection{Progettazione Logica}
+
+Il \textbf{tipo} di \textbf{schema logico} presentato in questo corso è lo \textbf{schema relazionale}.
+
+\vspace*{10px}
+
+Basata su \textbf{schemi relazionali} detti informalmente \textbf{tabelle} di valori elementari con chiavi primarie:
+
+\vspace*{5px}
+
+\begin{center}
+\begin{tabular}{ |c|c|c|c| }
+    \hline
+    \multicolumn{4}{|c|}{Impiegati} \\
+    \hline
+    \underline{IdImpiegato} & Nome & Stipendio & IdReparto* \\
+    \hline
+    232 & Lucia & 1200 & Y1 \\
+    \hline
+    143 & Luigi & 1500 & X2 \\
+    \hline
+\end{tabular}
+\end{center}
+
+\vspace*{5px}
+
+In questo contesto \textbf{non esiste differenza} tra \textbf{attributi} ed \textbf{associazioni} dato che le chiavi
+esterne permetteranno il \textbf{riferimento} ad \textbf{altre tabelle}.
+
+\vspace*{5px}
+
+\begin{center}
+\begin{tabular}{ |c|c| }
+    \hline
+    \multicolumn{2}{|c|}{Reparti} \\
+    \hline
+    \underline{IdReparto} & Budget \\
+    \hline
+    Y1 & 100000 \\
+    \hline
+    X2 & 200000 \\
+    \hline
+\end{tabular}
+\end{center}
+
+\vspace*{5px}
+
+Solitamente quindi si definisce \textbf{uno dei campi} della \textbf{tabella} come \textbf{chiave primaria}, ossia che \textbf{identifica} univocamente \textbf{la riga}. Invece il campo che permette la dereferenziazione univoca
+di una riga in un altra tabella è detta \textbf{chiave esterna}, che corrisponde alla \textbf{chiave primaria} della \textbf{tabella esterna}.
+
+\paragraph{Chiave e Superchiave Minimale} Definiamo \textbf{superchiave} qualsiasi \textbf{insieme di attributi} che \textbf{non} può \textbf{ripetersi} in \textbf{righe diverse}. Si definisce \textbf{chiave} una \textbf{superchiave minimale}, ossia un insieme di attributi a cui
+non possiamo rimuovere alcun attributo. Sarà quindi scelta del progettista scegliere una \textbf{chiave primaria tra} tutte le \textbf{chiavi possibili}.
+
+\subsection{Da Schema Concettuale a Schema Logico - Fasi}
+
+Elenchiamo e descriviamo le fasi necessarie per il passaggio da schema \textbf{concettuale} a \textbf{logico}.
+
+\begin{enumerate}
+    \item Aggiungere una \textbf{chiave primaria} artificiale ad ogni collezione che ne ha bisogno.
+    \begin{enumerate}
+        \item Una chiave deve essere \textbf{immutabile}, \textbf{muta}, ossia non deve portare con se alcuna informazione, ed \textbf{invisibile} agli utenti.
+    \end{enumerate}
+    \item Tradurre le \textbf{associazioni} e le \textbf{inclusioni} in \textbf{chiavi esterne}.
+    \begin{enumerate}
+        \item Una associazione $1-N$ diventano \textbf{chiavi esterne}.
+        \item Una associazione $M-N$ diventano \textbf{tabelle} con due chiavi esterne che puntano alle tabelle tra cui esiste l'associazione.
+    \end{enumerate}
+    \item Tradurre gli \textbf{attributi multivalore} in \textbf{tabelle}.
+    \item \textbf{Appiattire} gli \textbf{attributi complessi}, ossia da struct a lista di parametri semplici.
+\end{enumerate}
+
+% Ti manca la parte su ATTRIBUTI MULTIVALORE e PARTIZIONE DI TABELLE, attendi le slide
 
 \newpage
 

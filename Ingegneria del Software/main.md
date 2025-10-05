@@ -209,3 +209,81 @@ Presentati in cascata ma non per forza di cose raccolti in cascata.
 3. **Convalida**
 4. **Negoziazione**
 5. **Gestione**
+
+**? Riprendi tutta la parte mancante ?**
+
+#### Convalida di Requisiti
+
+##### Tecniche di Convalida di Requisiti
+
+1. **Deskcheck**:
+    - **Walkthrough**: Lettura sequenziale dei documenti
+    - **Ispezione**: Lettura strutturata dei documenti
+        - **Tecnica del lemmario**: Utilizzo dei termini del glossario con puntatori ai requisiti che li nominano, si facilità la ricerca di inconsistenze, sinonimi, omonimi o ridondanze.
+        - Ricerca di rimozioni, distorsioni, generalizzazione.
+2. Uso di strumenti di analisi del linguaggio naturale
+3. Prototipi: Provare requisiti tramite demo proposta al cliente.
+
+**Verificabilità di Requisito**: Un requisito è detto verificabile se, tramite testing in modo oggettivo, se il sistema soddisfa quel requisito.
+
+#### Negoziazione di Requisiti
+
+Si assegnano delle priorità ai requisiti, ad esempio secondo il **principio MoSCoW**:
+
+Per ordine d'importanza: Must Have, Should Have, Could Have, Want to Have.
+
+#### Gestione di Requisiti
+
+- Ogni **requisito** va **denominato** con ad esempio un **id**, ed ogni requisito avrà questi **attributi**:
+    - Stato: proposto, approvato, rifiutato.
+    - Priorità: importanza, settando ad esempio con il MoSCoW
+    - Effort: richiesta gg/uomo.
+    - Rischio: valutazione della fattibilità tecnica
+    - Stabilità: 
+    - Versione Destinazione.
+
+Va anche tracciato il percorso di vita di un requisito, costruendo delle mappe tra componenti del sistema, codice e relativi test, detti strumenti CASE per la gestione dei requisiti
+
+#### Aspetti Contrattuali ???
+
+### User Stories
+
+Tecnica dei processi Agile dove i requisiti sono descritti con un template predefinito
+
+$$\text{As a USER ROLE, I want GOAL so that BENEFIT}$$
+
+Ad esempio "In qualità di **cliente** voglio **cancellare la mia prenotazione** in hotel, per **avere un rimborso**.
+
+Solitamente si utilizzano delle user story cards, strumento su carta come preset.
+
+# Modellazione UML (Unified Model Language)
+
+- Un sistema va descritto tramite **modelli statici/dinamici**, con linguaggi **formali/informali**.
+- L'UML permette descrizione e progettazione di sistemi software, non permette solo **modellazione statica ma anche dinamica** permettendo, grazie a sintassi e semantica ben definita, qualcosa come automi a stati finiti o diagrammi di flusso.
+- Il software di riferimento sarà **Visual Paradigm**.
+
+## Modello Statico vs Dinamico
+
+1. **Modello Statico**: Rappresentato dai **diagrammi di casi d'uso**.
+    - Un caso d'uso è un compito che un attore può svolgere con l'aiuto del sistema.
+    - Un attore è una persona che interagisce con il sistema.
+    - Elenchiamo tutti gli **elementi fondamentali del modello statico**:
+        - **Attori**: Hanno un nome, come una classe. Esiste un attore principale, è il primo che "mette la mano sulla tastiera". **Se** il **tempo** è **menzionato tra gli attori**, allora il **tempo è attore principale**.
+        - **Caso d'uso**: Hanno un nome, rappresentano un compito.
+            - **Narrativa di un Caso d'Uso**: Serie di attributi (?vedi slide?), ma in particolare:
+                - **Precondizioni**.
+                - **Sequenza Di Eventi**: Solitamente il primo evento è quello eseguito dall'attore protagonista.
+                - **Postcondizioni**.
+                - Sequenze alternative in caso di Fallimento.
+            - **? Vedi slide con esempi e applicazioni e potenziali if ?**
+            - **Inclusione di Caso d'Uso**: Si definisce una dipendenza con la keyword `include`, solitamente le keyword sono definite tra virgolette, questioni di sintassi. Solitamente utilizzato per fattorizzare, non si usa l'`include` per dettagliare i casi d'uso, ma solo se si invoca qualcosa di già definito in un altro caso d'uso. Si crea quindi una dipendenza tra il $\text{caso d'uso}_2$ che include un $\text{caso d'uso}_1$.
+            - **Estensione di Caso d'Uso**: Creazione di dipendenza "al contrario", ossia un $\text{caso d'uso}_1$ esiste ed è istanziabile ed un $\text{caso d'uso}_2$ lo estende "decorandolo". Esisterebbe un processo di decomposizione funzionale, ma il caso d'uso vuole essere una macro entità, non un entità piccola.
+        - **Relazioni**: Relazioni sisgnificative tra gli attori ed il caso d'uso, rappresentano interazione.
+        - **Confine del Sistema**: Indica il confine del sistema oggetto del modello.
+
+            <img src="img/diagrammaCasoUso.png" width="340">
+
+
+2. Modello Dinamico
+
+## Esercizio di Analisi 

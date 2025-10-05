@@ -525,6 +525,261 @@ L'analisi di questi criteri in relazione all'applicazione permette la scelta del
 
 \newpage
 
+\subsection{TCP vs UDP nel Contesto del Livello Applicazione}
+
+Si sceglie un protocollo del livello trasporto in base alle caratteristiche dell'applicazione in questione. Descriviamone le caratteristiche:
+
+\begin{enumerate}
+    \item \textbf{TCP}
+    \begin{enumerate}
+        \item Orientato allo stream.
+        \item Necessario un primo setup tra client e server, questo ha un \textbf{costo} in termini di \textbf{latenza}.
+        \item Utilizzo di un buffer limitato d'appoggio per lo stream.
+        \item Nessuna garanzia su proprietà di \textbf{Timing} e \textbf{Throughput}.
+        \item Attualmente utilizzato in diversi contesti.
+    \end{enumerate}
+    \item \textbf{UDP}
+    \begin{enumerate}
+        \item Orientato al messaggio.
+        \item Non necessario alcun setup.
+        \item Nessuna garanzia su proprietà di \textbf{Timing}, \textbf{Throughput}, \textbf{Trasferimento Dati}, \textbf{Controllo Flusso}, \textbf{Ampiezza Minima di Banda}.
+        \item Si accettano potenziali perdite di pacchetti.
+    \end{enumerate}
+\end{enumerate}
+
+\subsubsection{API e Socket}
+
+\paragraph{API - Application Programming Interface} Un API è un insieme di regole che un programmatore deve rispettare per utilizzare delle risorse. Se un processo
+a livello applicazione vuole comunicare un messaggio ad un altro host allo stesso livello allora dovrà interagire con il sistema operativo che implementa i sottostanti
+livelli dello stack TCP/IP attraverso un interfaccia.
+
+\paragraph{Interfaccia Socket} API che viene utilizzata da interfaccia tra gli strati di applicazione e trasporto, è l'API di Internet per eccellenza. Dato che un host abbiamo
+detto essere individuato grazie ad un IP da $32$ bit, identificheremo un processo e la relativa socket con la porta da $16$ bit.
+
+\vspace*{15px}
+
+Per fare un esempio di API basato su uno dei protocolli del livello trasporto citati prima, mostreremo una bozza di setup tra client e server in TCP e qualche pseudocomando:
+
+\vspace*{15px}
+
+\begin{enumerate}
+    \item \textbf{Client}:
+    \begin{lstlisting}
+    //Apertura Connessione
+    connection TCPopen(IPaddress, int)
+    \end{lstlisting}
+\newpage
+    \item \textbf{Server}:
+    \begin{lstlisting}
+    //Binding
+    int tcpbind(int port)
+    //Attesa Richieste
+    connection TCPaccept(int)
+    //Spedire Dati
+    void TCPsend(connection, data)
+    //Ricevere Dati
+    data TCPreceive(connection)
+    //Chiusura Connessione:
+    void TCPclose(connection)
+    \end{lstlisting}
+\end{enumerate}
+
+\paragraph{Meccanismi di Sicurezza in TCP/UDP} Nativamente questi livelli non implementano alcun meccanismo di sicurezza, dunque è stato aggiunto un layer con un
+socket TLS (Transport Layer Security) che garantisce proprietà come cifratura o integrità dei dati.
+
+\vspace*{30px}
+
+\subsection{Protocollo HTTP - HyperText Transfer Protocol}
+
+Protocollo del livello Applicazione che risulta essere \textbf{generico}, \textbf{stateless} e \textbf{basato sulla tipizzazione} che non deve per forza essere HTML, si negozia infatti il tipo di contenuto.
+
+\vspace*{10px}
+
+Inizialmente nato per le pagine HTML, attualmente utilizzato anche per la comunicazione tra applicazione tramite API REST che permettono esposizione di servizi.
+
+\vspace*{10px}
+
+Dati un client ed un server, il client tramite un \textbf{browser} ottiene una \textbf{pagina HTML} e tante \textbf{risorse dereferenziabili} con \textbf{URL}.
+
+\vspace*{20px}
+
+\paragraph{URI - Uniform Resource Identifier} Permette l'identificazione di una risorsa:
+
+\begin{enumerate}
+    \item \textbf{URN - Uniform Resource Name}: Sottoinsieme dell'URI che deve identificare univocamente una risorsa anche quando questa cessa di esistere.
+    \item \textbf{URL - Uniform Resource Locator}: Sottoinsieme dell'URI che identifica una risorsa attraverso il suo meccanismo d'accesso.
+\end{enumerate}
+
+\newpage
+
+\paragraph{Sintassi di un URL} Un URL segue questo schema per essere definito:
+
+\[ \boxed{<\text{scheme}> // <\text{user}> \::\: <\text{password}> \text{@} <\text{host}> \::\: <\text{port}>/<\text{path}>} \]
+
+\begin{enumerate}
+    \item $<\text{user}> \::\: <\text{password}>$ è attualmente deprecata.
+    \item $<\text{port}>$ è spesso omessa, dato che se non definita viene utilizzata la porta standard $80$.
+    \item $<\text{path}>$ segue lo stesso schema di un file system, dato che storicamente i server web erano statici e l'accesso ad una risorsa avveniva tramite il suo path.
+\end{enumerate}
+
+Istanziando al protocollo HTTP come $<\text{scheme}>$ otteniamo:
+
+\[ \boxed{\text{http}\: // <\text{host}> \::\: <\text{port}>/<\text{path}> \:?\: <\text{query}>} \]
+
+\paragraph{Client/Server HTTP} Protocollo basato su richiesta/risposta tra client e server. La \textbf{risposta} è \textbf{stateless}, ossia non dipende dalla richiesta effettuata.
+Il protocollo su cui si basa, del livello trasporto, è il TCP, dato che risulta necessario prima \textbf{setuppare} una connessione \textbf{tra server e client}.
+
+\subsubsection{Versioni HTTP, Persistenza e Pipelining}
+
+\paragraph{HTTP/1.0 - Connessione Non Persistente}
+Nella versione HTTP 1.0 la connessione non era persistente, e per ciascuna risorsa richiesta veniva aperta una nuova connessione TCP tra client e server. Questo comportava un overhead significativo, poiché ogni richiesta (ad esempio per immagini, fogli di stile, script) necessitava di una nuova connessione, aumentando la latenza e il carico sul server.
+
+\paragraph{HTTP/1.1 - Connessione Persistente e Pipelining}
+Con HTTP/1.1 è stata introdotta la \textbf{connessione persistente}: una singola connessione TCP può essere riutilizzata per più richieste e risposte tra client e server, 
+riducendo l'overhead di apertura e chiusura delle connessioni. Inoltre, HTTP/1.1 supporta il \textbf{pipelining}, cioè la possibilità di inviare più richieste bufferizzando tramite una pipe di richieste.
+Tuttavia, il pipelining non è stato ampiamente adottato a causa di problemi di gestione dell'ordine delle risposte e di compatibilità.
+
+\newpage
+
+\subsubsection{Messaggi HTTP}
+
+In questo protocollo il messaggio può essere o una \textbf{richiesta} o una \textbf{risposta}.
+E' facilmente riconoscibile il tipo di messaggio già dalla sua \textbf{startline}, ossia la prima linea del messaggio.
+
+\begin{enumerate}
+    \item \textbf{HTTP Request}: Composta da due parti:
+    \begin{enumerate}
+        \item \textbf{Request Line}:
+        \[ \boxed{\text{METODO} \:\: \text{URI} \:\: \text{VERSIONE\_HTTP}} \]
+        ad esempio:
+        \[ \text{GET} \:\: \text{/dump/page.html} \:\: \text{HTTP/1.1} \]
+        \item \textbf{Header}: Insieme di coppie (nomi-valori), che mantengono informazioni 
+        
+        riguardanti formati preferiti, charset o encodings, ad esempio:
+
+        \[ \text{Accept:} \:\: \text{text/plain; text/html, image/png, application/json} \]
+        \[ \text{Accept-Charset} \:\: \text{iso-8859-5, unicode-1-1} \]
+
+    \end{enumerate}
+
+    Durante questa fase è possibile che si instauri una negoziazione tra client e server sulla versione di HTTP da utilizzare. Dato che la comunicazione
+    partirà sempre da una richiesta lato client, in base al confronto tra le versioni dell'HTTP in utilizzo di client e server si stabilisce quale usare.
+    \item \textbf{HTTP Response}:
+    \begin{enumerate}
+        \item \textbf{Status Line}:
+        \[ \boxed{\text{VERSIONE\_HTTP} \:\: \text{STATUS\_CODE} \:\: \text{FRASE}} \]
+        ad esempio:
+        \[ \text{HTTP/1.1} \:\: \text{200} \:\: \text{OK} \]
+        \vspace*{5px}
+        dove lo status code segue questo criterio:
+        \vspace*{5px}
+
+        \begin{center}
+        \begin{tabular}{ |c|c| } 
+        \hline
+        1xx & Informational \\ 
+        \hline
+        2xx & Success \\ 
+        \hline
+        3xx & Redirection \\ 
+        \hline
+        4xx & Client Error \\ 
+        \hline
+        5xx & Server Error \\ 
+        \hline
+        \end{tabular}
+        \end{center}
+
+        \vspace*{5px}
+        
+        \item \textbf{Response Headers}: Informazioni relative alla risposta che non possono essere
+        inserite nella Status Line, come ad esempio la \textbf{location della risorsa} oppure il \textbf{software} utilizzato dal
+        \textbf{server} per handlare la richiesta.
+        \newpage
+        \item \textbf{Entity Headers}: Mantiene informazioni come:
+        
+        \begin{center}
+        \begin{tabular}{ |c|c| } 
+        \hline
+        Content-Base & URI Assoluta per dereferenziare il body \\ 
+        \hline
+        Content-Encoding & Codifica del body \\ 
+        \hline
+        Content-Language & Lingua del body \\ 
+        \hline
+        Content-Type & Tipo del body \\ 
+        \hline
+        Expires & Validità Temporale, usato nel Caching \\ 
+        \hline
+        Last Modified & Ultima modifica della risorsa, usato nel Caching \\ 
+        \hline
+        \end{tabular}
+        \end{center}
+
+    \end{enumerate}
+ 
+\end{enumerate}
+
+\subsubsection{Content Negotiation}
+
+Il client conosce l'URL più generico della risorsa a cui vuole riferirsi. In base ai parametri forniti nell'header della richiesta
+sarà il server a dereferenziare l'URL più specifico, magari in base alle informazioni sulla lingua, il tipo di compressione o il formato.
+
+\subsubsection{Metodi dell'HTTP}
+
+Descriviamo le caratteristiche di ciascun metodo messo a disposizione da questo protocollo:
+
+\begin{enumerate}
+    \item \textbf{OPTION}: Permette di listare quali siano i metodi chiamabili su una risorsa.
+    \begin{enumerate}
+        \item \textbf{Sintassi}: $\boxed{\text{OPTION} \:\: [RISORSA]}$
+    \end{enumerate}
+    \item \textbf{GET}: Permette la richiesta di una risorsa, anche in maniera \textbf{parziale} o \textbf{condizionale}.
+    \begin{enumerate}
+        \item \textbf{Sintassi}: $\boxed{\text{GET} \:\: [RISORSA]}$
+    \end{enumerate}
+    Un comune utilizzo di una GET condizionale è quella basata sull'\textit{If-Modified-Since}, che permette di ottenere la risorsa solo se questa è stata modificata.
+    \item \textbf{HEAD}: Permette la richiesta solo della \textit{response line} e dell'\textit{header} di una risorsa, senza il suo \textit{body}.
+    \begin{enumerate}
+        \item \textbf{Sintassi}: $\boxed{\text{HEAD} \:\: [RISORSA]}$
+    \end{enumerate}
+    \item \textbf{POST}: Permette che il server accetti l'\textit{entità} passata nel \textit{body} della richiesta come \textbf{nuova subordinata} della risorsa identificata dall'\textit{URI}.
+    \begin{enumerate}
+        \item \textbf{Sintassi}: $\boxed{\text{POST} \:\: [RISORSA]}$
+    \end{enumerate}
+    \begin{figure}[htbp]
+        \center
+        \includegraphics[scale=0.275]{img/metodoPOST.png}
+    \end{figure}
+    Sarà quindi responsabilità del server trovare un nuovo URI per la nuova risorsa.
+    \newpage
+    \item \textbf{PUT/DELETE}: Permette di inserire (PUT) o cancellare (DELETE) una risorsa all'URI passato al metodo.
+    \begin{enumerate}
+        \item \textbf{Sintassi}: $\boxed{\text{PUT/DELETE} \:\: [RISORSA]}$
+    \end{enumerate}
+    In questo caso invece il client dovrà conoscere a priori l'URI della nuova risorsa che sta inserendo.
+\end{enumerate}
+
+\paragraph{Metodi Safe ed Idempotenti} Definiamo queste due proprietà e listiamo i metodi che le rispettano:
+
+\begin{enumerate}
+    \item \textbf{Metodi Safe}: Non hanno effetti collaterali, dunque non modificano la risorsa, quindi i metodi: GET, HEAD, OPTION e TRACE.
+    \item \textbf{Metodi Idempotenti}: Hanno lo stesso effetto se eseguiti una o $n$ volte sulla stessa risorsa, quindi i metodi: GET, HEAD, PUT, DELETE, OPTION, TRACE. 
+\end{enumerate}
+
+\subsubsection{Web Caching}
+
+Immaginando di avere una rete locale, assumendo di avere \{$host_1, ... , host_k$\} nella rete, cosa succede se $host_1$ richiede una risorsa
+su un host remoto $host_x$ e lo stesso viene fatto da $host_2$ subito dopo? Questo procedimento attualmente non viene per nulla ottimizzato, di conseguenza
+sono state formulate politiche di caching che permettono, tramite l'utilizzo di host intermedi, di mantenere le informazioni riguardanti le richieste per non ripeterle.
+
+\paragraph{Server Proxy} Un approccio di \textbf{Web Caching} infatti è quello del \textbf{Server Proxy}, che si pone tra gli host della rete locale ipotizzata ed il server remoto. Se il server proxy cachasse infatti le richieste
+allora il secondo host potrebbe acquisire quelle infomazioni senza effettuare richieste al server remoto ma solo richiedendole al server proxy stesso.
+
+% Manca parte cookie, attendi uscita slide
+
+\newpage
+
 %\begin{figure}[htbp]
     %\center
     %\includegraphics[scale=0.4]{img/classiComplessita2.png}
