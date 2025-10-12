@@ -505,7 +505,7 @@ di una riga in un altra tabella è detta \textbf{chiave esterna}, che corrispond
 \paragraph{Chiave e Superchiave Minimale} Definiamo \textbf{superchiave} qualsiasi \textbf{insieme di attributi} che \textbf{non} può \textbf{ripetersi} in \textbf{righe diverse}. Si definisce \textbf{chiave} una \textbf{superchiave minimale}, ossia un insieme di attributi a cui
 non possiamo rimuovere alcun attributo. Sarà quindi scelta del progettista scegliere una \textbf{chiave primaria tra} tutte le \textbf{chiavi possibili}.
 
-\subsection{Da Schema Concettuale a Schema Logico - Fasi}
+\subsubsection{Da Schema Concettuale a Schema Logico - Fasi}
 
 Elenchiamo e descriviamo le fasi necessarie per il passaggio da schema \textbf{concettuale} a \textbf{logico}.
 
@@ -524,6 +524,76 @@ Elenchiamo e descriviamo le fasi necessarie per il passaggio da schema \textbf{c
 \end{enumerate}
 
 % Ti manca la parte su ATTRIBUTI MULTIVALORE e PARTIZIONE DI TABELLE, attendi le slide
+
+\newpage
+
+Nello schema logico le \textbf{sottoclassi} vengono rappresentate come \textbf{nuove tabelle}, con chiavi esterne in direzione
+della superclasse.
+
+\vspace*{10px}
+
+\begin{center}
+\begin{tabular}{ |c|c| }
+    \hline
+    \multicolumn{2}{|c|}{Persone} \\
+    \hline
+    \underline{PId} & Nome \\
+    \hline
+\end{tabular}
+\end{center}
+
+\makebox[0.95\textwidth][c]{
+\begin{tabular}{ |c|c|c| }
+    \hline
+    \multicolumn{3}{|c|}{Impiegati} \\
+    \hline
+    Reparto & Stipendio & \underline{PId}* \\
+    \hline
+\end{tabular}
+\hspace{0.2cm}
+\begin{tabular}{ |c|c|c| }
+    \hline
+    \multicolumn{3}{|c|}{Consulenti} \\
+    \hline
+    Progetto & Tariffa & \underline{PId}* \\
+    \hline
+\end{tabular}
+}
+
+\vspace*{10px}
+
+\subsection{Algebra Relazionale}
+
+Insieme di operatori su relazioni che restituiscono altre relazioni. La forza di questo sistema di operazioni è che sono componibili, e formano successivamente ulteriori operazioni.
+
+\paragraph{Operatori Primitivi} Elenchiamo gli operatori primitivi:
+
+\begin{enumerate}
+    \item \textbf{Proiezione}: Data una tabella $R$, la funzione $\Pi_{A,B}(R)$ genera una nuova tabella in cui si mostrano solo le colonne $A,B$ della tabella $R$.
+    \item \textbf{Restrizione}: Data una tabella $R$, la funzione $\rho_{cond}(R)$ genera una nuova tabella in cui si mostrano solo le righe in cui vale la condizione $cond$.
+    \item \textbf{Unione}: Unione $R \: \cup \: S$, l'operazione può essere effettuata solo tra tabelle con lo stesso schema.
+    \item \textbf{Differenza}: Differenza $R - S$, l'operazione può essere effettuata solo tra tabelle con lo stesso schema.
+    \item \textbf{Prodotto Cartesiano}: Date due tabelle $R$ ed $S$, produce una nuova tabella con tutte le possibili n-uple formate dal prodotto delle due tabelle.
+    \item \textbf{Ridenominazione}: Ridenominazione $\delta_{A \rightarrow B}(R)$, consiste informalmente nella ridenominazione dei campi che definiscono le colonne dello schema. Questo perchè altre operazioni binarie richiedono che le colonne di schemi diversi non abbiano gli stessi nomi.
+\end{enumerate}
+
+\paragraph{Operatori Derivati} Elenchiamo gli operatori derivati:
+
+\begin{enumerate}
+    \item \textbf{Intersezione}: Date due tabelle $R$ ed $S$, restituisce le righe (tuple) che sono sia in $R$ sia in $S$, dunque è necessario che le due tabelle abbiano lo \textbf{stesso schema}.
+    \[ R \: \cap \: S = R - (R - S) \]
+    \item \textbf{Giunzione (Join)}: L'operazione $R \bowtie_{R.A = S.B} S$ combina le righe (tuple) di $R$ ed $S$ \textbf{solo quando} un attibuto A di R \textbf{è uguale} ad un attributo B di S. Questa operazione è derivata da:
+    \[ R \bowtie_{R.A = S.B} S = \rho_{R.A = S.B} (R \times S) \]
+    \newpage
+    \item \textbf{Giunzione Naturale}: L'operazione $R \:v\: S$ è una giunzione automatica su tutti gli attributi che hanno lo stesso nome in entrambe le relazioni, quindi non sono specificate condizioni.
+\end{enumerate}
+
+\paragraph{Raggruppamento - Group By} Data una tabella $A$ si definisce uno dei suoi attributi $(A_{i})$ come \textbf{dimensione} e si genera una nuova tabella definendo funzioni $(f_{i})$ sulle altre colonne dette \textbf{misure}. Formalmente la definiamo quindi come $\Gamma_{\{A_i\}\{f_i\}}(R)$.
+
+\begin{figure}[htbp]
+    \center
+    \includegraphics[scale=0.55]{img/groupBy.png}
+\end{figure}
 
 \newpage
 

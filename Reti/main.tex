@@ -773,10 +773,134 @@ Immaginando di avere una rete locale, assumendo di avere \{$host_1, ... , host_k
 su un host remoto $host_x$ e lo stesso viene fatto da $host_2$ subito dopo? Questo procedimento attualmente non viene per nulla ottimizzato, di conseguenza
 sono state formulate politiche di caching che permettono, tramite l'utilizzo di host intermedi, di mantenere le informazioni riguardanti le richieste per non ripeterle.
 
-\paragraph{Server Proxy} Un approccio di \textbf{Web Caching} infatti è quello del \textbf{Server Proxy}, che si pone tra gli host della rete locale ipotizzata ed il server remoto. Se il server proxy cachasse infatti le richieste
-allora il secondo host potrebbe acquisire quelle infomazioni senza effettuare richieste al server remoto ma solo richiedendole al server proxy stesso.
+\begin{enumerate}
+    \item \textbf{Server Proxy}: Un approccio di \textbf{Web Caching} infatti è quello del \textbf{Server Proxy}, che si pone tra gli host della rete locale ipotizzata ed il server remoto. Se il server proxy cachasse infatti le richieste
+    allora il secondo host potrebbe acquisire quelle infomazioni senza effettuare richieste al server remoto ma solo richiedendole al server proxy stesso.
+    \item \textbf{User Agent Cache}: Un metodo alternativo è quello che si basa sul mantenimento in locale da parte del browser delle risorse visitate da un utente.
+\end{enumerate}
 
-% Manca parte cookie, attendi uscita slide
+\subsubsection{Cookies}
+
+Il protocollo HTTP è per definizione stateless, di conseguenza risulta necessario un meccanismo che permetta di
+mantenere uno stato utente riguardante la sua navigazione su una applicazione web. Vengono quindi utilizzati per autenticazione, ricordare il profilo utente e creare sessioni su un protocollo stateless.
+
+\vspace*{10px}
+
+Si vuole quindi avere la possibilità di numerare e far riconoscere gli utenti sul sito presentando ogni volta un cookie.
+Il meccanismo nello specifico si basa su questi passaggi:
+
+\begin{enumerate}
+    \item \textbf{Riga di intestazione} nel \textbf{messaggio di risposta} HTTP.
+    \item \textbf{Riga di intestazione} nel \textbf{messaggio di richiesta} HTTP.
+    \item \textbf{Cookie file} mantenuto dal \textbf{browser} dell'user.
+    \item \textbf{Database} di gestione \textbf{cookie} del \textbf{server web}.
+\end{enumerate}
+
+\newpage
+
+\paragraph{Cookie First/Third Party} Esistono due tipologie diverse di cookie:
+
+\begin{enumerate}
+    \item \textbf{First Party Cookie}: Creati direttamente dal sito web che l'utente sta visitando per mantenere informazioni riguardanti lo stato.
+    \item \textbf{Third Party Cookie}: Memorizzano informazioni sensibili riguardanti gli utenti, sono creati e memorizzati da un dominio diverso rispetto a quello del sito web visitato.
+\end{enumerate}
+
+\subsection{Protocollo Telnet}
+
+Protocollo di terminale il cui scopo è quello di permettere l'uso interattivo di macchine remote.
+Chiaramente i due calcolatori devono poter comunicare a prescindere dai sistemi operativi che utilizzano, di conseguenza si utilizza un \textbf{interfaccia minima} a \textbf{caratteri}.
+
+\paragraph{Protocollo TELNET [RFC 854]} Questo modello standardizzato si basa su un programma client ed uno server, nello specifico si seguono questi passi:
+
+\begin{enumerate}
+    \item Il client stabilisce una \textbf{connessione TCP} con il server.
+    \item Il \textbf{client} acquisisce l'\textbf{input dei tasti} e lo invia al server, successivamente \textbf{accetta i caratteri} che il \textbf{server manda indietro} e li visualizza sul terminale utente.
+    \item Il server accetta la connessione TCP e trasmette i dati al sistema operativo locale.
+\end{enumerate}
+
+Il client si connette alla porta $23$ del server e la connessione TCP persiste per la durata della sessione di login.
+
+\paragraph{NVT - Network Virtual Terminal} L'obiettivo di TELNET è quello di poter operare con quanti più calcolatori diversi e di conseguenza sistemi operativi eterogenei. Di conseguenza si definisce un
+\textbf{terminale virtuale} che permette la conversione dei comandi dei vari terminali locali e viceversa, creando una vera e propria interfaccia comune di riferimento. Si definiscono quindi dei set di caratteri universali per trasformare quelli delle macchine locali in comunicazione tra loro.
+
+\paragraph{SSH - Secure Shell} Lo standard attuale per comunicazioni tra macchine remote via terminale è SSH, ossia un architettura di protocolli nata per sostituire TELNET ed i suoi problemi di sicurezza. Uno dei servizi principali di SSH è quello di tunneling, infatti grazie al port forwarding
+possiamo mettere in comunicazione due processi su due macchine diverse mappando le loro porte a quella di SSH, lasciando quindi viaggiare la comunicazione tra i due processi tramite il tunnel SSH.
+
+\newpage
+
+\subsection{Protocollo SMTP - Simple Mail Transport Protocol}
+
+Uno dei protocolli applicativi più antichi, si basa su due "protagonisti":
+
+\begin{enumerate}
+    \item \textbf{User Agent}: Client dell'user che permette l'editing e l'invio di messaggi di posta.
+    \item \textbf{Mail Server}: Server dei provider che devono archiviare i messaggi ricevuti, dato che il tipo di comunicazione tra i vari User Agent è asincrona, di conseguenza dovranno immagazzinare in una coda i messaggi in uscita.
+\end{enumerate}
+
+\paragraph{Indirizzo Mail - Sintassi} Solitamente un indirizzo è indicato con:
+
+\[ \boxed{\text{local-part} \: @ \: \text{domain-name}} \]
+
+\vspace*{5px}
+
+dove con \textit{local-part} si indica la specifica "cassetta" dell'user nel mail server, mentre
+\textit{domain-name} indica l'effettivo mail server.
+
+\paragraph{Spooling dei Mail Server} I Mail Server seguono una tecnica di spooling, ossia tentano di inviare i messaggi di posta settando una connessione TCP con la macchina destinazione. Se la connessione viene aperta e il trasferimento va a buon fine allora
+il Mail Server cancella la copia della mail in locale. Altrimenti, se qualcosa dovesse andare storto ritenterebbe la connessione TCP in maniera periodica fino ad un certo intervallo di tempo, se viene superato allora si scarta il messaggio, notificando il mittente della condizione.
+
+\paragraph{Gestione Alias dei Mail Server} Gestione a puntatori di indirizzi di casella postale, ne esistono di due tipi:
+
+\begin{enumerate}
+    \item \textbf{Uno a Molti}: Un singolo indirizzo alias riferisce a più indirizzi mail reali.
+    \item \textbf{Molti a Uno}: Un singolo indirizzo mail reale ha molti indirizzi alias che lo riferiscono.
+\end{enumerate}
+
+\paragraph{Protocollo SMTP [RFC5321]} Si stabilisce una connessione TCP sulla porta $25$, si segue una politica PUSH da parte di ogni client fino a quello precedente al destinatario. Quindi
+dal primo user fino all'ultimo Mail Server tutti agiranno da client nei confronti del server destinatario successivo. Tre fasi:
+
+\begin{enumerate}
+    \item Handshaking a livello applicativo.
+    \item Trasferimento messaggi in coda.
+    \item Chiusura.
+\end{enumerate}
+
+\vspace*{-10px}
+
+\subparagraph{Comandi SMTP} Questo standard definisce specifici comandi:
+
+\begin{enumerate}
+    \item $\text{HELO} \: < \text{client identifier} > $
+    \item $\text{MAIL FROM:} \: < \text{reverse-path} > \: < \text{CRLF} > $
+    \item $\text{RCPT TO:} \: < \text{forward-path} > \: < \text{CRLF} > $
+    \item $\text{DATA}$
+    \item $\text{QUIT}$
+\end{enumerate}
+
+\newpage
+
+\paragraph{Formato Messaggi SMTP}
+
+I comandi sono formato ASCII, mentre le risposte sono ASCII a 7 bit. Nello specifico, il messaggio è così composto:
+
+\begin{enumerate}
+    \item \textbf{Header}: Contiene le linee d'intestazione, come ad esempio \textit{To}, \textit{From}, \textit{Subject}, che \textbf{non} corrispondono ai parametri passati ai comandi SMTP citati prima. 
+    \item \textbf{Body}: Contiene il messaggio effettivo, composto da caratteri ASCII a 7 bit.
+\end{enumerate}
+
+\paragraph{MIME - Multipurpose Internet Mail Extension} Fino ad ora i body erano composti solo da caratteri ASCII a 7 bit. Si definisce quindi una codifica per trasferimento media e testo non-ASCII.
+Si aggiungono quindi dei parametri nelle intestazioni per dichiarare l'utilizzo del MIME nel body.
+
+\subsection{Protocolli POP3/IMAP}
+
+Fino ad ora abbiamo descritto il protocollo SMTP che pusha l'informazione fino all'ultimo mail server. Essendo però un tipo di comunicazione asincrona, sarà il client del destinatario a pullare il messaggio. Si definiscono quindi i protocolli
+POP e IMAP.
+
+\begin{enumerate}
+    \item \textbf{POP3}: Il client apre una connessione TCP sulla porta 110, si autentica con utente e password e richiede l'elenco dei messaggi e li preleva uno alla volta.
+    \item \textbf{IMAP}: Più feature di POP3, permette la gestione logica in folder dei messaggi memorizzati sul server e permette di estrarre solo alcuni componenti dei messaggi.
+    \item \textbf{HTTP}: In alternativa, anche HTTP può effettuare richieste ai Mail Server tramite browser.
+\end{enumerate}
 
 \newpage
 

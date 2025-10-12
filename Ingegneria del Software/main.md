@@ -286,4 +286,28 @@ Solitamente si utilizzano delle user story cards, strumento su carta come preset
 
 2. Modello Dinamico
 
-## Esercizio di Analisi 
+## Classi ed Oggetti in UML
+
+- **Classi**: Descrivono un tipo di oggetto
+    - **Nome**: Nome della classe in maiuscolo e sempre al singolare.
+    - **Attributi**: Tipizzati. Questi attributi seguono una specifica **sintassi**, ossia: $$ visibilità \: nome : tipo \: [molteplicità] = valore Iniziale \{ proprietà \}$$
+    Un attributo ha una molteplicità, se è $[0 .. 1]$ allora è opzionale, invece se è esattamente $1$ viene omesso.
+    
+    - **Operazioni**: Metodi tipizzati, segue sistassi $$visibilità \: nome (tipoParametri) : tipoRitorno \:$$ ?? RIVEDI SLIDE SULLA SINTASSI OPERAZIONI ??
+    - **Classi Astratte e Interfacce**: Esistono anche questo tipo di classi e si indicano rispettivamente con le keyword $<<interface>>$ e $\{ abstract \}$.
+
+- **Relazioni**: Permettono di correlare classi tra loro. Esistono le **Relazioni Cicliche** e permettono di stabilire gerarchie (come in BD). Poi abbiamo tipi diversi di relazioni tra classi:
+    - **Associazione**: Riferimenti ad altre classi tramite attributi di tipo della classe a cui stiamo puntando.
+    - **Molteplicità**: ?? vedi slide ??. Questa è strettamente legata al nome dato all'associazione
+    - **Aggregazione**: Relazione poco forte, non ha un nome.
+    - **Composizione**: Relazione molto forte, non ha un nome.
+    - **Generalizzazione**: Relazione di sotto/superclasse, dove classi condividono attributi,
+- **Dipendenze**: Solitamente una classe X **usa** un metodo di una classe Y.   Non è un se e solo se, non per forza un utilizzo causa una dipendenza, magari il metodo invocato da X aveva come tipo di ritorno un `void`.
+- **Oggetti**: Istanze delle classi
+- **Enumerazioni**: Non delle classi effettive, permettono la definizione di tipi $enum$.
+
+Dato un concetto questo è una **Classe** o un **Attributo**? Dipende da se mi interessa descriverne ex novo una struttura oppure se volgio solo mantenere una informazione (es. degli Autori dei Libri come Classi oppure come Attributo di Libro)
+
+### Analisi Nome Verbo per Identificazione Classi
+
+Spesso i **sostantivi** sono **entità del dominio** ed i verbi **operazioni tra classi**. 
