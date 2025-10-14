@@ -206,35 +206,25 @@ Presentati in cascata ma non per forza di cose raccolti in cascata.
     - Indici
     
     I requisiti ben posti sono asserzioni sul sistema. Bisogna evitare **omissioni**, **inconsistenze** (più requisiti che parlano della stessa cosa e si contraddicono), **ambiguità** (vanno controllati i quantificatori), **sinonimi** ed **omonimi**, **presenza di dettagli tecnici**, **ridondanza**.
-3. **Convalida**
-4. **Negoziazione**
-5. **Gestione**
+3. **Convalida**: Si valuta la stesura appena definita cercando potenziali omissioni, inconsistenze, ambiguità, sinonimi ed omonimi, presenza di dettagli tecnici ed eventuale ridondanza. Le ambiguità possono essere di vario tipo, ad esempio causate da quantificatori usati in modo improprio, da disgiunzioni, da coordinazione non vincolata dal linguaggio naturale, da referenzialità non ben definita dal linguaggio naturale. Si evitano quindi volontariamente doppie negazioni, verbi deboli e forme passive.
 
-**? Riprendi tutta la parte mancante ?**
+    #### Tecniche di Convalida di Requisiti
 
-#### Convalida di Requisiti
+    1. **Deskcheck**:
+        - **Walkthrough**: Lettura sequenziale dei documenti
+        - **Ispezione**: Lettura strutturata dei documenti
+            - **Tecnica del lemmario**: Utilizzo dei termini del glossario con puntatori ai requisiti che li nominano, si facilità la ricerca di inconsistenze, sinonimi, omonimi o ridondanze.
+            - Ricerca di rimozioni, distorsioni, generalizzazione.
+    2. Uso di strumenti di analisi del linguaggio naturale
+    3. Prototipi: Provare requisiti tramite demo proposta al cliente.
 
-##### Tecniche di Convalida di Requisiti
+    **Verificabilità di Requisito**: Un requisito è detto verificabile se, tramite testing in modo oggettivo, se il sistema soddisfa quel requisito.
 
-1. **Deskcheck**:
-    - **Walkthrough**: Lettura sequenziale dei documenti
-    - **Ispezione**: Lettura strutturata dei documenti
-        - **Tecnica del lemmario**: Utilizzo dei termini del glossario con puntatori ai requisiti che li nominano, si facilità la ricerca di inconsistenze, sinonimi, omonimi o ridondanze.
-        - Ricerca di rimozioni, distorsioni, generalizzazione.
-2. Uso di strumenti di analisi del linguaggio naturale
-3. Prototipi: Provare requisiti tramite demo proposta al cliente.
-
-**Verificabilità di Requisito**: Un requisito è detto verificabile se, tramite testing in modo oggettivo, se il sistema soddisfa quel requisito.
-
-#### Negoziazione di Requisiti
-
-Si assegnano delle priorità ai requisiti, ad esempio secondo il **principio MoSCoW**:
-
+4. **Negoziazione**: Si assegnano delle priorità ai requisiti, ad esempio secondo il **principio MoSCoW**:
 Per ordine d'importanza: Must Have, Should Have, Could Have, Want to Have.
 
-#### Gestione di Requisiti
-
-- Ogni **requisito** va **denominato** con ad esempio un **id**, ed ogni requisito avrà questi **attributi**:
+5. **Gestione**: 
+    - Ogni **requisito** va **denominato** con ad esempio un **id**, ed ogni requisito avrà questi **attributi**:
     - Stato: proposto, approvato, rifiutato.
     - Priorità: importanza, settando ad esempio con il MoSCoW
     - Effort: richiesta gg/uomo.
@@ -242,9 +232,11 @@ Per ordine d'importanza: Must Have, Should Have, Could Have, Want to Have.
     - Stabilità: 
     - Versione Destinazione.
 
-Va anche tracciato il percorso di vita di un requisito, costruendo delle mappe tra componenti del sistema, codice e relativi test, detti strumenti CASE per la gestione dei requisiti
+    Va anche tracciato il percorso di vita di un requisito, costruendo delle mappe tra componenti del sistema, codice e relativi test, detti strumenti CASE per la gestione dei requisiti
 
-#### Aspetti Contrattuali ???
+#### Aspetti Contrattuali
+
+Il **documento dei requisiti** normalmente precede la **stipulazione di un contratto**, ne è quindi una **parte integrante**, riformulare i requisiti vuol dire quindi riformulare un contratto.
 
 ### User Stories
 
@@ -275,7 +267,8 @@ Solitamente si utilizzano delle user story cards, strumento su carta come preset
                 - **Sequenza Di Eventi**: Solitamente il primo evento è quello eseguito dall'attore protagonista.
                 - **Postcondizioni**.
                 - Sequenze alternative in caso di Fallimento.
-            - **? Vedi slide con esempi e applicazioni e potenziali if ?**
+            - La sequenza principale di eventi non è unica ma può differenziarsi tramite l'uso di if che possono coprire le varie possibilità.
+            - Le **precondizioni** e le **postcondizioni** sono **sempre asserzioni** e **mai azioni**.
             - **Inclusione di Caso d'Uso**: Si definisce una dipendenza con la keyword `include`, solitamente le keyword sono definite tra virgolette, questioni di sintassi. Solitamente utilizzato per fattorizzare, non si usa l'`include` per dettagliare i casi d'uso, ma solo se si invoca qualcosa di già definito in un altro caso d'uso. Si crea quindi una dipendenza tra il $\text{caso d'uso}_2$ che include un $\text{caso d'uso}_1$.
             - **Estensione di Caso d'Uso**: Creazione di dipendenza "al contrario", ossia un $\text{caso d'uso}_1$ esiste ed è istanziabile ed un $\text{caso d'uso}_2$ lo estende "decorandolo". Esisterebbe un processo di decomposizione funzionale, ma il caso d'uso vuole essere una macro entità, non un entità piccola.
         - **Relazioni**: Relazioni sisgnificative tra gli attori ed il caso d'uso, rappresentano interazione.
@@ -284,7 +277,7 @@ Solitamente si utilizzano delle user story cards, strumento su carta come preset
             <img src="img/diagrammaCasoUso.png" width="340">
 
 
-2. Modello Dinamico
+2. Modello Dinamico: Basato sull'utilizzo di diagrammi di macchina a stati, attività o sequenza
 
 ## Classi ed Oggetti in UML
 
@@ -293,12 +286,12 @@ Solitamente si utilizzano delle user story cards, strumento su carta come preset
     - **Attributi**: Tipizzati. Questi attributi seguono una specifica **sintassi**, ossia: $$ visibilità \: nome : tipo \: [molteplicità] = valore Iniziale \{ proprietà \}$$
     Un attributo ha una molteplicità, se è $[0 .. 1]$ allora è opzionale, invece se è esattamente $1$ viene omesso.
     
-    - **Operazioni**: Metodi tipizzati, segue sistassi $$visibilità \: nome (tipoParametri) : tipoRitorno \:$$ ?? RIVEDI SLIDE SULLA SINTASSI OPERAZIONI ??
+    - **Operazioni**: Metodi tipizzati, segue sistassi $$visibilità \: nome (tipoParametri) : tipoRitorno \:$$
     - **Classi Astratte e Interfacce**: Esistono anche questo tipo di classi e si indicano rispettivamente con le keyword $<<interface>>$ e $\{ abstract \}$.
 
 - **Relazioni**: Permettono di correlare classi tra loro. Esistono le **Relazioni Cicliche** e permettono di stabilire gerarchie (come in BD). Poi abbiamo tipi diversi di relazioni tra classi:
     - **Associazione**: Riferimenti ad altre classi tramite attributi di tipo della classe a cui stiamo puntando.
-    - **Molteplicità**: ?? vedi slide ??. Questa è strettamente legata al nome dato all'associazione
+    - **Molteplicità**: Come in BD, un associazione ha una molteplicità che indica il numero di oggetti coinvolti nell'associazione in un dato istante, da entrambi i versi dell'associazione. Queste associazioni spesso vengono rinominate, soprattutto se sono presenti molteplici associazioni tra stesse classi.
     - **Aggregazione**: Relazione poco forte, non ha un nome.
     - **Composizione**: Relazione molto forte, non ha un nome.
     - **Generalizzazione**: Relazione di sotto/superclasse, dove classi condividono attributi,
@@ -308,6 +301,22 @@ Solitamente si utilizzano delle user story cards, strumento su carta come preset
 
 Dato un concetto questo è una **Classe** o un **Attributo**? Dipende da se mi interessa descriverne ex novo una struttura oppure se volgio solo mantenere una informazione (es. degli Autori dei Libri come Classi oppure come Attributo di Libro)
 
-### Analisi Nome Verbo per Identificazione Classi
+### Identificazione Classi
 
-Spesso i **sostantivi** sono **entità del dominio** ed i verbi **operazioni tra classi**. 
+Risulta quindi necessario stabilire delle pratiche per identificare le classi, queste infatti:
+
+- Rappresentano l'astrazione di uno specifico elemento del dominio.
+- Hanno numero ridotto di responsabilità.
+- Alcune best practice: Evitare funzioni che si travestono da classi, ed evitare gerarchie di ereditarietà profonde.
+
+Si seguono **due macro approcci** per l'identificazione di classi:
+
+1. **Approccio Data Driven**: Si identificano i **dati del sistema** e si dividono in classi.
+2. **Approccio Responsibility Driven**: Si identificano **responsabilità** e le si dividono in classi.
+
+Un metodo comune di riconoscimento classi è tramite **analisi nome-verbo** dove solitamente:
+
+1. I **sostantivi** sono **classi** oppure **attributi**.
+2. I **verbi** sono **operazioni** e quindi responsabilità di una classe.
+
+?? FIXA CON LE SLIDE 04 E 06 ??
