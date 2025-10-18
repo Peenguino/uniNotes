@@ -902,7 +902,181 @@ POP e IMAP.
     \item \textbf{HTTP}: In alternativa, anche HTTP può effettuare richieste ai Mail Server tramite browser.
 \end{enumerate}
 
+\subsection{DNS - Domain Name System}
+
+Vogliamo avere la possibilità di dereferenziare nomi e non indirizzi numerici, dato che questi ultimi risultano essere più difficili da ricordare. La domanda quindi è come \textbf{associare indirizzi IP a nomi}.
+Inizialmente la gestione di queste associazioni era statica, ma attualmente risulta impossibile utilizzare questa politica, date le dimensioni di Internet.
+
+\paragraph{Architettura Centralizzata vs Distribuita} Potremmo immaginare un unico server con relativo unico database a cui riferirsi per risolvere queste associazioni. Questo però ci vincolerebbe ad una \textbf{pesante dipendenza} da quest'ultimo. Questo dovrebbe gestire miliardi di query al giorno, ed in caso di fallimento del server si bloccherebbe tutto Internet. Si preferisce quindi un architettura distribuita.
+
+\paragraph{Composizione Essenziale del DNS} Si compone di tre elementi fondamentali:
+
+\begin{enumerate}
+    \item Uno \textbf{schema di assegnazione} dei \textbf{nomi} gerarchico basato sui domini.
+    \item Un \textbf{database distribuito} contenente nomi e corrispondenti IP.
+    \item Un \textbf{protocollo} per la \textbf{distribuzione delle informazioni} tra \textbf{name servers}:
+    \begin{enumerate}
+        \item \textbf{Name Servers}: Comunicano per risolvere nomi.
+        \item \textbf{Porta}: Utilizzano porta 53 in UDP (sono a volte TCP).
+    \end{enumerate}
+\end{enumerate}
+
 \newpage
+
+\paragraph{Servizi Offerti dal DNS} Elenchiamo i servizi offerti dal DNS:
+
+\begin{enumerate}
+    \item Risoluzione nomi (hostnames) in indirizzi IP.
+    \item \textbf{Host Aliasing}: Più alias possono dereferenziare lo stesso hostname, e di conseguenza, lo stesso indirizzo IP.
+    \item \textbf{Distribuzione Carico}: In caso di potenziale carico elevato assegnato ad un server, si fa corrispondere un singolo hostname a più IP per evitare problemi di sovraccarico su una macchina specifica.
+    
+\end{enumerate}
+
+\paragraph{Struttura Gerarchica di Gestione Domini} Lo spazio dei nomi è definito da una \textbf{struttura gerarchica ad albero} dove ogni nodo è identificato da un \textbf{etichetta}, ossia un \textbf{nome di dominio}.
+
+\begin{figure}[htbp]
+    \center
+    \includegraphics[scale=0.5]{img/DNS1.png}
+\end{figure}
+
+I domini top-level (.com, .edu, .gov, .net, .org) vengono gestiti dallo IANA.
+
+\subsubsection{Gerarchia dei Name Servers}
+
+Avendo definito il \textbf{DNS} come un \textbf{database distribuito} in una \textbf{gerarchia} di più \textbf{name servers}, allora bisogna definire cosa sia un \textbf{name server}, ossia un 
+programma che gestisce la conversione da nome di dominio ad indirizzo IP.
+
+\paragraph{Zone e Domini di Name Servers} Tutte le informazioni per le risoluzioni di nomi sono ripartite su più name server, dunque ciascuno di essi immagazzina le info relative alla propria \textbf{zona} ed i riferimenti ai \textbf{name servers} dei \textbf{domini} di \textbf{livello inferiore}.
+
+\vspace*{10px}
+
+\begin{figure}[htbp]
+    \center
+    \includegraphics[scale=0.5]{img/DNS2.png}
+\end{figure}
+
+\newpage
+
+\paragraph{Ruoli dei Server nella Gerarchia} Elenchiamo tutti i ruoli e le loro responsabilità:
+
+\begin{enumerate}
+    \item \textbf{Root Name Server}: Responsabile dei record della zona radice, riconosce tutti i domini TLD (Top Level Domain) e conosce il server TLD che li risolve, quindi restituisce le info sui name server TLD. A questo ruolo corrispondono circa 13 indirizzi IP.
+    \item \textbf{Top Level Domain Server}: Mantiene le info dei nomi di dominio che appartengono ad un certo TLD, e restituisce informazioni sui name server di competenza dei sottodomini.
+    \item \textbf{Authoritative Name Server}: Responsabile di una certa \textbf{zona}, memorizza nome ed indirizzo IP di un insieme di host di cui può effettuare la traduzione. Questo ruolo può essere suddiviso in altri due sottoruoli:
+    \begin{enumerate}
+        \item \textbf{Primary Authoritative Name Server}: Mantengono il file di zona.
+        \item \textbf{Secondary Authoritative Name Server}: Ricevono il file di zona e offrono il servizio di risoluzione.
+    \end{enumerate}
+\end{enumerate}
+
+A questa gerarchia si \textbf{aggiunge} un \textbf{ulteriore ruolo}, che \textbf{non appartiene} propriamente alla \textbf{gerarchia}, ma che si occupa da prima interfaccia nel caso in cui un client (es. Browser) tenti di riferire ad un nome:
+
+\begin{enumerate}
+    \item \textbf{Local Name Server}: Un server appartenente ad un ISP (Internet Service Provider) che assume il ruolo di proxy, per fare prima un controllo nelle tabelle locali per cercare la risoluzione del nome richiesto dal client, e solo successivamente, in caso di fault, richiede
+    la query effettiva al DNS, nello specifico ad un Root Name Server.    
+\end{enumerate}
+
+\vspace*{-10px}
+
+\paragraph{Query Ricorsiva/Iterativa} Esistono due tipi diversi di risoluzione dei nomi:
+
+\begin{enumerate}
+    \item \textbf{Query Ricorsiva}: Il Local Name Server richiede una conversione completa di nome.
+    \item \textbf{Query Iterativa}: Viene restituito al client o al Local Name Server il riferimento al server successivo da contattare per completare la risoluzione di nome.
+\end{enumerate}
+
+\vspace*{-20px}
+
+\begin{figure}[htbp]
+    \centering
+    \begin{minipage}{0.35\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{img/queryRicorsiva.png}
+        \caption{Query Ricorsiva}
+    \end{minipage}
+    \hspace{0.8cm}  
+    \begin{minipage}{0.37\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{img/queryIterativa.png}
+        \caption{Query Iterativa}
+    \end{minipage}
+\end{figure}
+
+\newpage
+
+\paragraph{Caching DNS} Nel DNS si utilizza molto il caching per ridurre richieste che rimbalzano continuamente tra server. Solitamente quindi si mantiene in cache di server DNS il dato in cache in modo non autorevole, e i server invalideranno queste informazioni dopo un periodo fissato. Un altro approccio potrebbe essere quello di mantenere in cache direttamente degli indirizzi 
+IP di server DNS TLD (Top Level Domain), evitando di riferirsi più volte ai server radice.
+
+\paragraph{Record DNS} Un DNS è un database distribuito di \textit{resource records} (RR) che seguono la seguente sintassi:
+
+\[ \boxed{\text{RR format}: \:\: ( \text{name, value, type, ttl})} \]
+
+\vspace*{10px}
+
+dove gli elementi vengono così interpretati:
+
+\begin{enumerate}
+    \item \textbf{TTL}: Tempo residuo del record in cache.
+    \item \textbf{Name} e \textbf{Value}: Dipendono da type.
+    \item \textbf{Type}: Esistono vari tipi:
+    \vspace*{5px}
+    \begin{center}
+        \begin{tabular}{|l|l|p{0.45\textwidth}|}
+        \hline
+        \textbf{Type} & \textbf{Name} & \textbf{Value} \\
+        \hline
+        A & hostname & indirizzo IP \\
+        \hline
+        CNAME & hostname (sinonimo) & nome canonico dell'host \\
+        \hline
+        NS & nome di dominio & hostname dell'Authoritative Name Server per quel dominio \\
+        \hline
+        MX & nome di dominio & nome canonico del server di posta associato a name \\
+        \hline
+        \end{tabular}
+    \end{center}
+\end{enumerate}
+
+\vspace*{15px}
+
+\subsubsection{Protocollo DNS}
+
+L'effettivo protocollo del livello applicazione che si occupa di questa risoluzione di nomi utilizza prevalentemente \textbf{UDP} sulla \textbf{porta 53}.
+L'applicazione è detta \textbf{resolver}, effettua polling al server DNS e dopo $n$ richieste o richiede ad un altro server oppure informa l'applicazione con il fallimento.
+
+\vspace*{10px}
+
+\paragraph{Perchè UDP e Quando TCP} Viene utilizzato il protocollo TCP per una questione di riduzione di ritardi, riduzione di overhead causato dal setup di TCP e perchè solitamente le query DNS richiedono pochi dati, quindi rispettano le dimensioni di un pacchetto UDP. A volte viene utilizzato il protocollo TCP, ma questo
+accade solo se è necessaria l'affidabilità del trasferimento oppure se si sforano i $512$ byte dei pacchetti UDP.
+
+\newpage
+
+\paragraph{Messaggi del Protocollo DNS} I messaggi di query e reply seguono lo stesso formato:
+
+\begin{figure}[htbp]
+    \center
+    \includegraphics[scale=0.65]{img/messaggioDNS.png}
+\end{figure}
+
+Dove ogni campo indica
+
+\begin{enumerate}
+    \item \textbf{Identification}: Campo di $16$ bit per l'identificazione di una query, la risposta ad una query usa lo stesso identification id.
+    \item \textbf{Flags}: Indicano se query o reply, se desiderata o disponibile la ricorsione e se la risposta è autorevole.
+    \item \textbf{Questions}: Nome richiesto e tipo di query.
+    \item \textbf{Answers}: RR (\textit{resource records}) in risposta alla query.
+    \item \textbf{Authority}: Record per i server di competenza.
+    \item \textbf{Additional Info}: Informazioni utili aggiuntive.
+\end{enumerate}
+
+\paragraph{DNS e Sicurezza} Dato il funzionamento molto decentralizzato del DNS, esistono vari attacchi che sfruttano questa sua caratteristica:
+
+\begin{enumerate}
+    \item \textbf{DNS Cache Poisoning}: Un attaccante invia risposte DNS falsificate ad un DNS Server o ad un client, avvelenandone la cache.
+    \item \textbf{Man-in-the-Middle Attack}: Vengono intercettate le comunicazioni tra un client ed un server DNS, ed in questo modo viene indirizzato un obiettivo verso host malevoli.
+    \item \textbf{DNS Hijacking}: Si restituiscono risposte non corrette alle query DNS, reindirizzando il client verso siti malevoli alterando le impostazioni DNS. Questo può essere fatto
+    a diversi livelli, infatti può essere un Local, Router oppure Rogue Hijacking.
+\end{enumerate}
 
 %\begin{figure}[htbp]
     %\center

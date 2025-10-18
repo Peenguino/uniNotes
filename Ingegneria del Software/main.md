@@ -319,4 +319,20 @@ Un metodo comune di riconoscimento classi è tramite **analisi nome-verbo** dove
 1. I **sostantivi** sono **classi** oppure **attributi**.
 2. I **verbi** sono **operazioni** e quindi responsabilità di una classe.
 
-?? FIXA CON LE SLIDE 04 E 06 ??
+## Modellazione Processi
+
+- Modellazione di processi dinamici tramite cose come **diagrammi di flusso**, per descrivere il **modello dinamico** di un **dominio**.
+
+- **Attività in UML**: Attività contenuta in un erttangolo con gli angoli smussati, che definiranno i nodi di un grafo diretto:
+    - Ciascun **nodo** indica un **azione** (diverso da uno stato di un automa a stati finiti). Ci aspettiamo solo un arco uscente e solo un arco entrante in un nodo.
+    - Ciascun **arco** rappresenta il **control flow**, ossia la sequenza del flusso possibile trovandosi nell'azione del nodo.
+- **Nodi di Controllo**: 
+    Due frecce entranti in un azione (NON UTILIZZATE IN QUESTO CORSO) hanno la semantica di una join, mentre due frecce uscenti in un azione (NON UTILIZZATE IN QUESTO CORSO) hanno la semantica di una selezione di flusso.
+    <img src="img/nodiDiControllo.png" width="500">
+- **Segnali ed Eventi**: Gestione asincrona di attività:
+    - **Invio di Segnale**: Asincrono e non blocca l'attività corrente. Permette l'interazione con cose esterne, non parte del sistema.
+    - **Accettazione di evento esterno**: Operazione duale alla precedente.
+    - **Accettazione di evento temporale**: Permette di definire un attesa arbitraria (assoluta o relativa).
+- **Sottoattività**: Possono indicare attività che mappano su sequenze di azioni atomiche, quindi descritte da un altra parte.
+- **Partizioni**: Permettono di assegnare la responsabilità delle azioni a delle unità operative.
+    <img src="img/partizioniFlussi.png" width="500">

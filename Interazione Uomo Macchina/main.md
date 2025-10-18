@@ -210,3 +210,77 @@ Vengono effettuati quindi processi di pattern matching del pensiero del subconsc
 Da un **punto di vista di design**, molta risposta alla presentazione di un prodotto è viscerale, bravi designer utilizzano questi design estetici che tranquillizzino gli utenti in maniera primordiale. E' il livello più a contatto con il mondo.
 - **Livello Comportamentale**: Si basa sulle skill acquisite e triggerate da situazioni che matchano il pattern. Le azioni di questo livello sono largamente appartenenti al subconscio, anche essendo consapevoli della situazione, non siamo coscienti del processo nello specifico. Il feedback è parte critica di questa fase sulla gestione delle aspettative, il tutto si basa su un feedback loop in relazione alle aspettative. Esiste un processo di nudging, guidando l'utente alla formazione di un modello mentale aderente al modello concettuale del sistema.
 - **Livello Riflessivo**: Livello di analisi, conscio decision-making, ragionamento profondo. Solitamente la fase riflessiva è lenta, profonda e cognitiva. I livelli di emozioni più alti vengono dal livello riflessivo, qui assegno e peso tutti i feedback ottenuti essendo che sto anche pagando di più da un punto di vista di risorse mentali. Da un **punto di vista di design**, sappiamo che le scelte effettuate in questo livello sono quelle più durature, formano la memoria dell'utente sugli eventi accaduti. L'appeal di questo livello causa ad esempio una review positiva/negativa. ?MAPPING PRESENTE NELLE SLIDE (INSERISCI L'IMMAGINE)?
+
+# Lezione 6
+
+# Lezione 7
+
+# Lezione 8 - Human Errors and Mitigation Strategies - 17/10/2025
+
+## Errori e Causa
+
+- La maggior parte degli errori è causata dall'uomo
+- L'errore comune del designer è quello di considerare che l'utente interagirà continuamente al massimo dell'attenzione con l'applicazione in questione
+- Quindi **interruzioni** e **comportamenti ripetitivi** spengono l'attenzione dell'utente. Può accadere quindi che una fase potenzialmente importante, che richiederebbe davvero l'attenzione dell'utente, viene approcciata con poca attenzione, ormai persa.
+- E' una **bad practice** quella di **dare la colpa all'utente** per un cattivo utilizzo del prodotto. Questo non porterebbe nulla di vantaggioso al design del prodotto stesso, a massimo si cerca la colpa lato progettazione.
+
+### Route Cause Analysis
+
+Gli incidenti avvengono a causa di insiemi di sorgenti. Quindi vanno seguiti dei principi, come ad esempio limitando il dominio dell'utente, per limitare i potenziali casi di errore. Si acquisiscono quindi ad esempio le analitics degli utenti e poi si segue lo schema **The Five Whys**, ossia non basta chiedersi solo una volta perchè è stato commesso un errore ma tante volte (ad esempio 5 volte).
+
+### 5 Motivazioni per cui Chiedersi 5 Perchè
+
+- Identificare la causa e non curare solo i sintomi.
+- Rendere oggettivo il mondo, per rendere evidente tramite dati delle scelte
+- Migliorare problemi sul prodotto per il bene generato.
+- Ricercare miglioramente e accettare il cambiamento.
+- Embrace della cultura del progresso.
+
+## Classificazione di Errori
+
+Suddivisi in due macroclassi: **slips** e **mistakes**:
+
+- **Slips - (Tradotti come Lapsus)**:
+    - **Action Based**: Azioni svolte in "autopilot", lapsus di azione, pianifico e specifico bene l'azione ma la eseguo in maniera sbagliata. 
+    
+        Esempio: "Devo uscire di casa con la moto, prendo le chiavi, ho preso le chiavi della macchina."
+    - **Memory Lapse**: Non eseguo l'azione. 
+    
+        Esempio: "Devo uscire di casa con la moto, non prendo le chiavi"
+- **Mistakes - (Tradotti come Errori Cognitivi)**:
+    - **Knowledge Based**: L'user non ha capito il funzionamento, di conseguenza ha un modello mentale disallineato dal modello concettuale progettato.
+    - **Rule Based**
+    - **Memory Lapse**: Dimenticanza, come se fosse un lapsus di memoria nello stato di transizione tra i golfi, che causa un interruzione nelle fasi di pianificazione.
+
+<img src="img/slipsAndMistakes1.png" width="450">
+
+## Feedback e Utenti Esperti
+
+Abbiamo già detto come il feedback sia utile ad un utente, ma diventa inutile per gli utenti esperti, ad esempio il feedback speech può risultare pesante ed inutile in determinati contesti.
+
+## Error Prevention
+
+- Capire le cause degli errori per minimizzarle.
+- Fare sensibility check, solitamente magari non viene mai fatta un azione e quindi viene effettuato un secondo check prima di effettuare l'operazione. Esempio: "Solitamente la media del bonifico è 2000$, ne viene effettuato uno da $20000 allora si chiede una conferma esplicita."
+- Possibilità dell'azione di undo.
+- Rendere semplice per l'utente capire quale sia l'errore.
+- Non bisogna trattare azioni distanti da quelle attese come errori.
+
+### Constraint to Block Errors
+
+Vedi Slide
+
+### Conferme e Messaggi d'Errore
+
+Vedi Slide
+
+### Minimizzazione Slips
+
+Difficile pensare di diminuire gli slips degli utenti, quindi gli slips devono essere fatti ma senza danni. Non devono essere eliminati gli errori, ma **bisogna fare in modo** che quegli **errori non causino incidenti**
+
+### Key Principles
+
+- Bisogna mettere l'utente nella posizione di sapere tutto il necessario per operare con la nostra teconologia.
+- Vedi slide
+- Bisogna progettare per colmare la distanza tra due golfi
+
