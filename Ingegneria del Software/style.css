@@ -1,0 +1,16 @@
+/* immagini dentro i div con più elementi */
+div img {
+  display: inline-block;      /* restano affiancate */
+  vertical-align: middle;     /* allineamento uniforme */
+  width: auto;
+  max-width: 30%;             /* rimpicciolisce ciascuna immagine */
+  height: auto;               /* mantiene proporzioni */
+  margin: 0 5px;              /* piccolo spazio laterale */
+}
+
+/* immagini singole */
+div img:only-child {
+  display: block;             /* centrata se è da sola */
+  margin: 0 auto;
+  max-width: 80%;             /* più grande se è singola */
+}

@@ -349,9 +349,9 @@ Un metodo comune di riconoscimento classi è tramite **analisi nome-verbo** dove
     - **Accettazione di evento temporale**: Permette di definire un attesa arbitraria (assoluta o relativa).
     
     <div style="text-align: center;">
-    <img src="img/invioSegnale.png" width="170">
-    <img src="img/accettazioneSegnale.png" width="150">
-    <img src="img/eventoTemporale.png" width="150">
+    <img src="img/invioSegnale.png" width="115">
+    <img src="img/accettazioneSegnale.png" width="100">
+    <img src="img/eventoTemporale.png" width="98">
     </div>
 
 - **Sottoattività**: Possono indicare attività che mappano su sequenze di azioni atomiche, quindi descritte da un altra parte.
