@@ -1078,6 +1078,139 @@ Dove ogni campo indica
     a diversi livelli, infatti può essere un Local, Router oppure Rogue Hijacking.
 \end{enumerate}
 
+\newpage
+
+\section{Livello Trasporto}
+
+L'obiettivo di questo livello è quello di creare una connessione logica tra processi applicativi su host diversi, assumono quindi di essere collegati a livello fisico, astraendo dalla reale connessione fisica di cui si occuperanno i livelli sottostanti. I protocolli di trasporto vengono
+eseguiti nei sistemi terminali, mantenendo la politica per cui si mantengono dumb i dispositivi intermedi e smart quelli terminali.
+
+\subsection{Introduzione al Livello Trasporto}
+
+In questo sottocapitolo definiamo concetti base del livello trasporto.
+
+\paragraph{Servizi del Livello Trasporto} Elenchiamo i servizi offerti da questo livello:
+
+\begin{enumerate}
+    \item Offre servizi al livello applicazione, permettendo alle applicazioni di scegliere il modo in cui inviare/ricevere dati secondo uno \textbf{stile} a \textbf{messaggi} oppure a \textbf{stream}.
+    \item Comunica con il livello Rete sottostante, che si occupa a sua volta della consegna del datagramma all'host destinatario. 
+\end{enumerate}
+
+\paragraph{Servizio Connection/Non Connection Based} Seguendo gli stili definiti sopra possiamo definire anche servizi orientati o meno alla connessione. Nello stile orientato alla connessione
+si instaura una logica di server/client dopo una fase di setup, mentre in uno stile non orientato alla connessione i dati vengono visti come messaggi indipendenti.
+
+\paragraph{Azioni del Livello Trasporto} Elenchiamo le azioni di questo livello in base a chi le esegue:
+
+\begin{enumerate}
+    \item \textbf{Azioni Mittente}:
+    \begin{enumerate}
+        \item Riceve un messaggio dal livello applicazione.
+        \item Determina i valori dell'header del segmento.
+        \item Crea il segmento.
+        \item Passa il segmento al livello Rete.
+    \end{enumerate}
+    \item \textbf{Azioni Destinatario}:
+    \begin{enumerate}
+        \item Riceve il segmento dal livello Rete.
+        \item Controlla i valori dell'header.
+        \item Estrae il messaggio del livello applicazione.
+        \item Smista il messaggio all'applicazione attraverso la socket.
+    \end{enumerate}
+\end{enumerate}
+
+\newpage
+
+\subsection{TCP vs UDP e Multiplexing/Demultiplexing}
+
+I due protocolli di trasporto principali hanno caratteristiche differenti:
+
+\begin{enumerate}
+    \item \textbf{Protocollo TCP}:
+    \begin{enumerate}
+        \item Orientato alla Connessione.
+        \item Orientato allo Stream.
+        \item Gestione della connessione.
+        \item Consegna affidabile dei dati.
+        \item Controlli di congestione e flow.
+    \end{enumerate}
+    \item \textbf{Protocollo UDP}:
+    \begin{enumerate}
+        \item Senza connessione, non affidabile.
+        \item Orientato al messaggio.
+        \item Estensione del servizio \textit{host to host} del livello rete.
+    \end{enumerate}
+\end{enumerate}
+
+Entrambi i protocolli però offrono controlli sugli errori e servizi di multiplexing e demultiplexing.
+
+\paragraph{Multi/Demultiplexing} Il livello di trasporto ha la responsabilità di smistare i messaggi ottenuti dal livello di rete tra i vari processi tramite la risoluzione di socket address.
+Questo risulta necessario se più processi utilizzano lo stesso protocollo di trasporto per la comunicazione su rete, cosa che accade molto spesso. Quindi abbiamo due attori duali:
+
+\begin{enumerate}
+    \item \textbf{Mittente in Multiplexing}: Gestisce i dati da più socket e si occupa dell'aggiunta del header di trasporto.
+    \item \textbf{Destinatario in Demultiplexing}: Usa le informazioni nell'header per recapitare i segmenti alla corretta socket.
+\end{enumerate}
+
+Nello specifico, nel demultiplexing vengono utilizzati dall'host indirizzi IP e numeri di porta per smistare il segmento verso la corretta socket dato che ogni datagramma si porta dietro un segmento del
+livello trasporto ed ogni segmento nell'header mantiene un numero di porta sorgente ed uno di destinazione.
+
+\paragraph{Definizione di Porta} Ogni comunicazione a livello trasporto è univocamente identificata tramite la combinazione $IP/porta$, una \textbf{porta} è quindi definita come un intero a $16$ bit che viene assegnato
+ad un processo, più nello specifico è un \textbf{punto di demultiplexing} dei protocolli TCP o UDP. Esistono dei range di porte predefinite, come le \textit{System Ports}, \textit{User Ports} o \textit{Dynamic Ports}. In generale è il
+sistema operativo ad occuparsi dell'assegnamento di porte.
+
+\paragraph{Multiplexing TCP/UDP} Esistono differenze tra i tipi di multiplexing dei due protocolli, infatti il protocollo TCP esegue il multiplexing basandosi su una quadrupla con tutte le informazioni su sorgente e destinatario
+ossia $(IP_{sorg}, porta_{sorg}, IP_{dest}, porta_{dest})$, mentre il protocollo UDP utilizza la coppia $(IP_{dest}, porta_{dest})$.
+
+\newpage
+
+\subsection{Trasporto UDP}
+
+Servizio di trasporto best effort, i datagrammi UDP possono essere persi o consegnati fuori sequenza. Questo protocollo è orientato al messaggio, quindi ogni datagramma è indipendente e di dimensioni limitate.
+Questo garantisce però una semplicità non indifferente, risultando vantaggioso in contesti di applicazioni time-sensitive.
+
+\paragraph{Impieghi e Caratteristiche del Trasporto UDP} E' facile e leggero da gestire, non esiste alcun controllo sulla congestione e le intestazioni non superano gli $8$ byte. Viene impiegato in contesti di applicazioni multimediali, dove sono tollerate le piccole perdite, oppure in altre applicazioni come il DNS, HTTP/3 o SNMP (Simple Network Management Protocol).
+
+\paragraph{Azioni Mittente/Destinatario} Elenchiamo le azioni effettuate in base al tipo di attore:
+
+\begin{enumerate}
+    \item \textbf{Azioni Mittente}:
+    \begin{enumerate}
+        \item Riceve un messaggio del livello Applicazione.
+        \item Determina i valori dei campi dell'header UDP.
+        \item Crea lo user datagram.
+        \item Passa lo user datagram al livello Rete.
+    \end{enumerate}
+    \item \textbf{Azioni Destinatario}:
+    \begin{enumerate}
+        \item Riceve lo user datagram dal livello Rete.
+        \item Controlla la checksum
+        \item Estrae il messaggio di livello Applicazione.
+        \item Smista il messaggio attraverso la socket.
+    \end{enumerate}
+\end{enumerate}
+
+\paragraph{Composizione di un Datagramma UDP} Descriviamo l'entità base del protocollo UDP:
+
+\vspace*{10px}
+
+\begin{center}
+    \begin{tabular}{|l|l|}
+    \hline
+    numero porta sorgente & numero porta destinazione \\
+    \hline
+    lunghezza & checksum \\
+    \hline
+    \multicolumn{2}{|c|}{\rule{0pt}{3em}payload\rule{0pt}{3em}} \\
+    \hline
+    \end{tabular}
+\end{center}
+
+\vspace*{10px}
+
+Il messaggio si compone di $8$ byte di intestazione, i numeri di porta per la fase di demultiplexing e la lunghezza del messaggio massima del datagramma UDP è di $65535$ byte.
+
+\newpage
+
 %\begin{figure}[htbp]
     %\center
     %\includegraphics[scale=0.4]{img/classiComplessita2.png}

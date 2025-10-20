@@ -38,7 +38,9 @@ Solitamente si parla quindi di **modello di software**, ossia una sua **rapprese
 
 2. **Modello a V**: Viene preso il modello a cascata e "spezzato" in modo tale da suddividere le attività in **analisi** a **sx** e **sintesi** a **dx**.
 
+    <div style="text-align: center;">
     <img src="img/modelloSpirale.png" width="500">
+    </div>
 
     - **SX**: Attività di analisi che scompongono le esigenze degli utenti in piccole parti.
     - **DX**: Attività di sintesi che aggregano e testano tali parti per verificare che il sistema soddisfi le esigenze degli utenti.
@@ -72,7 +74,9 @@ Solitamente si parla quindi di **modello di software**, ossia una sua **rapprese
 
 Schema basato sulla gestione delle fasi dello schema a cascata in base al periodo corrente del prodotto software.
 
+<div style="text-align: center;">
 <img src="img/unifiedProcess.png" width="500">
+</div>
 
 ### Modelli Agili
 
@@ -274,7 +278,9 @@ Solitamente si utilizzano delle user story cards, strumento su carta come preset
         - **Relazioni**: Relazioni sisgnificative tra gli attori ed il caso d'uso, rappresentano interazione.
         - **Confine del Sistema**: Indica il confine del sistema oggetto del modello.
 
+            <div style="text-align: center;">
             <img src="img/diagrammaCasoUso.png" width="340">
+            </div>
 
 
 2. Modello Dinamico: Basato sull'utilizzo di diagrammi di macchina a stati, attività o sequenza
@@ -323,16 +329,98 @@ Un metodo comune di riconoscimento classi è tramite **analisi nome-verbo** dove
 
 - Modellazione di processi dinamici tramite cose come **diagrammi di flusso**, per descrivere il **modello dinamico** di un **dominio**.
 
-- **Attività in UML**: Attività contenuta in un erttangolo con gli angoli smussati, che definiranno i nodi di un grafo diretto:
+- **Attività in UML**: Attività contenuta in un rettangolo con gli angoli smussati, che definiranno i nodi di un grafo diretto:
     - Ciascun **nodo** indica un **azione** (diverso da uno stato di un automa a stati finiti). Ci aspettiamo solo un arco uscente e solo un arco entrante in un nodo.
     - Ciascun **arco** rappresenta il **control flow**, ossia la sequenza del flusso possibile trovandosi nell'azione del nodo.
 - **Nodi di Controllo**: 
     Due frecce entranti in un azione (NON UTILIZZATE IN QUESTO CORSO) hanno la semantica di una join, mentre due frecce uscenti in un azione (NON UTILIZZATE IN QUESTO CORSO) hanno la semantica di una selezione di flusso.
+    <div style="text-align: center;">
     <img src="img/nodiDiControllo.png" width="500">
+    </div>
+
+    La **join moltiplica i token**, dato un token in ingresso infatti li moltiplica per ogni freccia entrante, mentre la **join li consuma**, lasciandone uscire solo uno. Differente è il comportamento di una merge, che se posizionata dopo una fork lascia che tutti i token seguano lo stesso arco entrante, ma mantenendo la loro molteplicità.
 - **Segnali ed Eventi**: Gestione asincrona di attività:
     - **Invio di Segnale**: Asincrono e non blocca l'attività corrente. Permette l'interazione con cose esterne, non parte del sistema.
+
+
     - **Accettazione di evento esterno**: Operazione duale alla precedente.
+
+
     - **Accettazione di evento temporale**: Permette di definire un attesa arbitraria (assoluta o relativa).
+    
+    <div style="text-align: center;">
+    <img src="img/invioSegnale.png" width="170">
+    <img src="img/accettazioneSegnale.png" width="150">
+    <img src="img/eventoTemporale.png" width="150">
+    </div>
+
 - **Sottoattività**: Possono indicare attività che mappano su sequenze di azioni atomiche, quindi descritte da un altra parte.
+
+    <div style="text-align: center;">
+    <img src="img/sottoattivita.png" width="450">
+    </div>
+
 - **Partizioni**: Permettono di assegnare la responsabilità delle azioni a delle unità operative.
-    <img src="img/partizioniFlussi.png" width="500">
+    <div style="text-align: center;">
+    <img src="img/partizioniFlussi.png" width="350">
+    </div>
+
+## Comportamenti in UML - Diagramma di Macchina a Stati Finiti
+
+- Una **macchina a stati finiti** ci permette di descrivere il **comportamento** delle **istanze** di una **classe**.
+- Dunque l'evento non è più il rettangolo dagli angoli smussati, è lo stato indicato da un rettangolo ed un evento triggera lo spostamento da uno stato ad un altro
+
+    <div style="text-align: center;">
+    <img src="img/esempioImplementazioneMacchinaAStati.png" width="400">
+    </div>
+
+### Stati e Transizioni
+
+La sintassi di una transizione è così definita:
+
+<div style="text-align: center;">
+<img src="img/stati_e_transizioni.png" width="450">
+</div>
+
+Quindi in occorrenza di un **evento**, se la **condizione** risulta essere **vera** allora questo comporta l'**esecuzione delle azioni** elencate.
+
+Un esempio potrebbe essere:
+
+<div style="text-align: center;">
+<img src="img/esempioAutomaStatiFiniti1.png" width="450">
+</div>
+
+### Tipologie di Eventi
+
+Esistono tre tipi di eventi: un **operazione** `op(a)`, un **evento di variazione** `when(exp)` oppure un **evento temporale** `after(t)`.
+
+<div style="text-align: center;">
+<img src="img/esempioEventoTemporale.png" width="200">
+</div>
+
+### Entry, Exit, Do, Transizioni Interne
+
+- **Entry**: Azione eseguita appena entrati in uno stato.
+- **Do**: Azione interna eseguita in modo continuato mentre l'oggetto si trova in quello stato.
+- **Exit**: Azione eseguita appena usciti da uno stato.
+- **Transizioni Interne**: Risposte ad un evento che causano l'esecuzione di un azione senza il cambio di stato esterno.
+
+### Stato Composito
+
+Stato che al suo interno contiene un altro automa. Questo favorisce la visualizzazione dell'automa, rendendolo meno complesso da un punto di vista grafico.
+
+L'ingresso allo stato della macchina avviene se una freccia si posiziona sul suo bordo, proseguendo quindi dallo stato iniziale al suo interno.
+
+L'uscita avviene da una transizione di completamento, quindi dallo stato finale dello stato composito in direzione della transizione di completamento.
+
+<div style="text-align: center;">
+<img src="img/statoComposito.png" width="320">
+</div>
+
+Questi possono essere sia sequenziali sia paralleli, quindi sottostati attivati per regione dello stato.
+
+- **Sottomacchina**: Per **ragioni di fattorizzazione** potremmo pensare che sia utile poter definire tipi di stati compositi, questo porta all'utilizzo di **sottomacchine**, che ci permette di definire appunto un tipo di sottostati e riutilizzarli quando necessario.
+
+<div style="text-align: center;">
+<img src="img/sottomacchina.png" width="450">
+</div>
