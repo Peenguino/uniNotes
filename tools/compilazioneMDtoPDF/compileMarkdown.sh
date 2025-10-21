@@ -19,7 +19,9 @@ echo "$stringa" > "$tmp_filename"
 more $1 >> "$tmp_filename"
 
 # Converti il file in PDF con Pandoc
-pandoc "$tmp_filename" -o "${filename}.pdf"
+
+#pandoc input.md -o output.pdf --pdf-engine=weasyprint -c style.css
+pandoc "$tmp_filename" -o "${filename}.pdf" --pdf-engine=weasyprint -c style.css
 
 # Rimozione file md temporaneo
 rm "$tmp_filename"
