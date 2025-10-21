@@ -14,6 +14,23 @@ Nello specifico, prima di compilare in pdf, aggiunge un comando che permette l'a
     ```bash
     sudo apt install pandoc
     ```
+
+- Per l'utilizzo dell'engine WeasyPrint è richisto python 3 quindi:
+
+    ```bash
+    sudo apt install -y python3 python3-pip python3-venv
+    ```
+    vanno poi installate le librerie richieste da WeasyPrint:
+    ```bash
+    sudo apt install -y libpangocairo-1.0-0 libgdk-pixbuf2.0-0 libffi-dev libcairo2 libcairo2-dev
+    ```
+
+- Installiamo ora WeasyPrint usando pip:
+
+    ```bash
+    pip install weasyprint
+    ```
+
 - Successivamente vanno dati i permessi di esecuzione allo script:
     ```bash
     sudo chmod +x compileMarkdown.sh
