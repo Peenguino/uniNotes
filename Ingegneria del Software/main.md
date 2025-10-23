@@ -424,3 +424,18 @@ Questi possono essere sia sequenziali sia paralleli, quindi sottostati attivati 
 <div style="text-align: center;">
 <img src="img/sottomacchina.png" width="450">
 </div>
+
+- **Pseudostati: Scelta, Giunzione, History**
+    - **Scelta**: definita pseudostato perchè non sto fermo nello stato, ma è stato di transizione e mi permette di valutare la guardia. Non posso sapere l'esecuzione prima dell'effettiva valutazione della guardia.
+    - **Giunzione**: Le condizioni in questo caso sono valutabili staticamente, solitamente posto prima degli eventi che attivano le transizioni di ingresso.
+
+    Quando viene scelto **Giunzione o Scelta**? Giunzione viene valutata la guardia prima di uscire dallo stato di partenza, invece Scelta viene valutata la guardia durante l'occorrenza dell'evento.
+
+    - **History**: ???
+
+### Scelta Descrizione Modello Dinamico
+
+- **Diagramma di Macchina a Stati**: descrive l'evoluzione delle istanze di un classificatore (Focus sull'evoluzione di un oggetto in relazione ad eventi che accadono).
+- **Diagramma di Attività**: descrive un flusso di azioni da svolgere. (Focus sulla sequenza e l'ordine delle cose da fare).
+
+Esistono quindi best practices per la buona definizione di Macchine a Stati/Attività.
