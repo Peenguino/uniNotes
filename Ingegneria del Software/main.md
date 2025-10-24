@@ -439,3 +439,51 @@ Questi possono essere sia sequenziali sia paralleli, quindi sottostati attivati 
 - **Diagramma di Attività**: descrive un flusso di azioni da svolgere. (Focus sulla sequenza e l'ordine delle cose da fare).
 
 Esistono quindi best practices per la buona definizione di Macchine a Stati/Attività.
+
+# Progettazione Software
+
+Progettazione delle componenti di un sistema più complesso
+
+- **Architettura Software**: Struttura del sistema composta dalle parti, dalle relazione e dalle proprietà visibili.
+
+- Come in vari ambiti ingegneristici, vogliamo standardizzare il linguaggio in cui esprimiamo la nostra progettazione. Esistono quindi vari stili che vengono analizzati in viste diverse.
+
+- **Viste del Software**:
+    - **Vista Comportamentale**: 
+        - Permette di descrivere un **sistema SW** come **composizione** di **componenti SW**, definendo le componenti e le loro interfacce, caratterizzando i connettori.
+        - Descrive tramite uno snapshot di un sistema dinamico, quindi uno schema statico di un sistema dinamico.
+        - **Componente**: Unità di SW indipendente e riusabile.
+            - Ha interfacce ben fissate.
+            - Può essere indipendente dagli altri.
+            - Il sistema viene composto da componenti che tra loro si collegano comunicando.
+            - **Porti delle Interfacce**: Insieme di interfacce omogenee.
+            - **Connettori**: Permette la connessioni di componenti, spesso con **prototipi** che spiegano il tipo di connessione. Nella versione semplificata si usa la notazione a lollipop e forchette, ma indicano solo chi invoca e chi viene invocato, ma in ogni caso queste possono essere sia get sia set quindi non si determina la direzione di comunicazione solo dalle notazioni lollipop/forchetta.
+    - **Vista Strutturale**:
+        - Struttura effettiva del codice, analisi delle dipendenze.
+        - Si valuta la portabilità del SW
+        - Permette la progettazione dei test.
+        - Elementi di questa parte sono detti **moduli**, con relazioni di elementi del tipo **parte di**, **eredita da**, **dipende da**, **può usare**...
+        - E' importante definire **visibilità e metodi in questa sezione**
+        - Tipi di Relazione:
+            - **Relazione d'Uso (dipendenza)**: Classe A usa Classe B. ATTENZIONE, invocazione e dipendenza non sono in se e solo se, se invoco un metodo esterno di cui non devo aspettare l'esito, allora non dipendo da esso.
+            - **AllowedToUse (dipendenza asimmetrica)**: Se layerizzo a 3 strati, non permetto al livello 1 ed il 3 di comunicare direttamente, ma dovranno passare per il livello 2.
+            - Generalizzazione (Super/Sottoclasse): Relazione canonica di sottoclasse, ma posso farlo anche tra package. Questo risulta utile se voglio definire un interfaccia di package per poi implementarlo in modi differenti.
+    - **Vista Logistica o di Deployment**:
+        - Come viene allocato il software nell'ambiente di esecuzione.
+        - Ambienti di esecuzione vengono rappresentati come dei parallelepipedi
+        - Gli **artefatti sono gli eseguibili** che rilasciamo.
+
+
+- **Stili di Progettazione**: 
+    - **Pipe & Filter**: Flusso di elaborazione dei dati, che viaggiano lungo le pipe e sono fitrati da filter.
+    - **Client/Server**:
+        - **P2P**
+    - **Publish/Subscribe**: Basato sulle figure di Broker, Publisher e Subscriber.
+        - Publisher: Genera classi di eventi
+        - Broker: Smista gli eventi
+        - Subscriber: Si abbona alle classi di eventi che ritiene rilevanti.
+
+        Questo può seguire modalità diverse, ossia pull o push.
+    - **Model View Controller**: Viste differenti dal modello da view diverse controllate dal controller. La comunicazione viene fatta direttamente dal model alla view.
+    - **Model View Presenter**: Simile, ma l'aggiornamento della vista passa dal controller.
+    - Process Coordinator: Visto anche come pipeline, un client che invoca tanti servizi magari già preesistenti, li invoca nell'ordine giusto e rielabora fungendo da server per l'utente.

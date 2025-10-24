@@ -213,7 +213,7 @@ Da un **punto di vista di design**, molta risposta alla presentazione di un prod
 
 # Lezione 6
 
-# Lezione 7
+# Lezione 7 - - 16/10/2025
 
 # Lezione 8 - Human Errors and Mitigation Strategies - 17/10/2025
 
@@ -284,3 +284,181 @@ Difficile pensare di diminuire gli slips degli utenti, quindi gli slips devono e
 - Vedi slide
 - Bisogna progettare per colmare la distanza tra due golfi
 
+# Lezione 9 - Information Architecture - 23/10/2025
+
+## GUI Design in Generale
+
+- Il design di interfacce grafiche si basa sull'anticipare cosa l'utente vuole fare, garantendo che quest'ultimo abbia gli strumenti di cui ha bisogno. La progettazione di queste intefacce si basa su concetti di **interaction design**, **visual design** e **information architecture**.
+
+- Questo design quindi si basa su una rappresentazione a strati, ossia:
+    1. **Data and Content**: Information Architecture
+    2. **Functionality, Inputs and Outputs**: ...
+    3. **Presentation Layer**: ...
+
+- Focus di questa lezione è il **layer di Data and Content**, che ha anche maggiore priorità rispetto agli altri layer dato che definirà dei constraint per i livelli successivi.
+
+## Users Behavior Patters
+
+- Pattern più a basso livello di come un utente si interfaccerà con il prodotto, nello specifico con la UI.
+
+- L'analisi di questi pattern ci permette di applicare uno studio a prescindere dal contesto di progettazione.
+
+1. **Self Exploration**: Esplorazione senza che l'utente possa perdersi o fare azioni pericolose.
+    - Spesso l'utente skippa l'onboarding o non legge il manuale.
+    - I primi momenti saranno dedicati all'esplorazione dell'utente, e l'interfaccia deve essere progettata in questa direzione.
+    - Quindi creare possibilità di esplorazione, ad esempio tramite menù, che indichi il modo per interagire con l'applicazione.
+2. **Instant Gratification**: L'utente vuole essere gratificato al momento dell'esecuzione dell'azione.
+    - Le prime azioni dovrebbero essere assolutamente semplici per gratificare e direzionare l'utente ad un buon rapporto con l'interfaccia.
+    - Successivamente può diventare difficili, ma l'ingresso confident dell'utente può spingerlo a continuare.
+    - Da evitare lunghe istruzioni, tempi di caricamenti lunghi o pubblicità vanno contro questo pattern.
+3. **Satisficing**: Buono abbastanza, meglio qualcosa che funziona adesso che qualcosa che funzionerà meglio dopo.
+    - Satisficing: Satisftying + Sufficing.
+    - Bene abbastanza è meglio di ottimo in relazione all'investimento di tempo e impegno.
+    - Scelta delle etichette che non generi confusione tra i significati nell'interfaccia.
+    - Cambiare qualcosa dell'interfaccia, anche se dovesse velocizzare i processi dell'utente, questo probabilmente troverà comodo non cambiare e restare nella routine di cui è abituato, diventa quasi una sorta di debito nei confronti del design, dato che durante la progettazione bisogna trovare un compromesso con questo effetto.
+4. **Changes in Midstream**: L'interfaccia non deve chiudere l'utente in un ambiente con poche scelte. La navigazione dovrebbe essere globale, per permettere all'utente di spostarsi senza perdere lo stato corrente.
+5. **Deferred Choices**: Rispondere al minimo richiesto, l'utente non risponde a domande non necessarie, quindi bisogna permettere di rispondere dopo.
+    - Bisognerebbe fornire valori dei campi di default.
+6. **Incremental Construction**: Bisogna dare all'utente la possibilità di affinare dopo l'azione che sta eseguendo.
+    - Soprattutto in applicazioni creative, bisognerebbe tenere gli utenti in uno stato di flow, quindi aumentando la skill dell'utente dovrebbe aumentare anche la difficoltà dell'interfaccia.
+7. **Habituation**: Le gesture spesso sono molto legate ad una familiarità di azioni eseguite altrove.
+    - Capire cosa le persone sanno, per fare in modo di poter supportare quei comportamenti.
+8. **Microbreaks**: Le interfacce devono supportare questo comportamento per cui gli utenti tendono a fare delle pause tra i task.
+9. **Spatial Memory**: Spesso gli utenti legano una funzionalità rispetto alla posizione della sua etichetta.
+10. **Prospective Memory**: Lo stesso concetto di lasciare non letta una mail, voglio fare in modo che si supporti l'utente con piccoli reminder.
+11. **Streamlined Repetition**: Comportamenti ripetitivi vanno resi rapidi, permettere ad esempio la selezione multipla nello spostamento di file.
+12. **Keyboard Only**: Sono date per scontate le shortcut, come `ctrl-s`, `ctrl-z`, ...
+13. **Other People's Advice**: Spesso le persone sono influenzate da scelte di altri. Spesso quindi online community sono grandi asset per un servizio.
+
+### Systematic Ways to Support Patterns
+
+**vedi dettagli slide**
+
+- Organizing content
+- Structuring navigation
+- vedi slide
+- vedi slide
+
+## Information Architecture
+
+L'**obiettivo** di questa architettura è quello di aiutare **gli utenti a trovare le informazioni** che cercano.
+
+Si basa tanto sul contenuto, dal contesto e dagli utenti a cui punta.
+
+### Organization Schemes
+
+Come viene categorizzato il contenuto della nostra interfaccia? Questo può essere definito da **schemi esatti o soggettivi**, che **non sono tra loro mutuamente esclusivi**.
+
+1. **Exact Organization Schemes**: Dividere informazioni in sezioni mutualmente esclusive. Di carattere molto **data-driven**:
+    - Lo schema alfabetico è un esempio classico di questo tipo di schema.
+    - Lo schema temporale (in base alla data)
+    - Lo schema geografico 
+
+
+2. **Subjective Organization Schemes**: Non sono oggettivi ma dipendono dagli utenti. Difficili da modellare perchè devono essere aderenti al modello mentale dell'utente. Degli esempi potrebbero essere:
+    - **Topic Schema**: Ad esempio le sezioni di Netflix in apertura.
+    - Task Schema: Schema che cercano di guidare l'utente nei task che deve effettuare.
+    - **Audience Schema**: Clusterizzare in base al segmento utente (bambini, adulti...)
+    - **Metaphor Schema**: Usare metafore per clusterizzare funzionalità (come il cestino come astrazione sopra fs di un sistema).
+
+Queste tipologie possono essere combinate tra loro generando **schemi misti**
+
+### Organizational Schemes
+
+Vanno definite delle relazioni tra pezzi di content. Esistono quattro main strutture organizzative:
+- **Modello Gerarchico**: Da categorie generali di informazioni scendendo giù verso informazioni precise (a simil albero). I menù a tendina sono i classici esempi di strutture gerarchiche.
+- **Modello Sequenziale**: Informazioni definite step-by-step, un classico esempio è il checkout di Amazon.
+- **Modello Matriciale**: Ogni utente può definire il proprio path di navigazione, un esempio classico è la navigazione di HTML.
+- **Modello a Database**: Permette la ricerca dell'informazione, classico esempio Google.
+
+Bisogna considerare che anche allo **scalare delle informazioni**, lo schema scelto deve risultare **sostenibile**, permettendo e facilitando la crescita del sistema.
+
+Si **evitano** strutture che siano **troppo verticali o troppo orizzontali**.
+
+Un interfaccia deve essere **findable**, al sapere di che informazione sto cercando devo essere in grado di trovare quell'informazione nell'interfaccia, garantendo quindi una **buona navigazione**. Una struttura gerarchica quindi potrebbe non risultare molto efficace se non conosco a priori il path per raggiungerlo. Quindi una **search bar** in questo caso migliorerebbe la **discoverability**. Quindi vanno considerate contemporaneamente sia discoverability sia findability.
+
+### Interfaces Components
+
+Si utilizzano elementi standard che siano familiari con gli utenti:
+
+- **Input Controls**: vedi slide
+- **Navigational Components**: slider, paginazione, tags, icone
+- **Informational Components**: modali, messages boxes, icone
+- **Containers**: vedi slide
+
+# Lezione 10 - Innovation Methods - 24/10/2025
+
+## Sustaining vs Disruptive Innovation
+
+Esistono due tipi di innovazione, ossia la **costruttiva** e la **distruttiva**:
+
+- **Sustaining Innovation**: Basata sull'innovazione incrementale, vengono quindi effettuate microinnovazioni su sistemi già esistenti.
+    - Mercato di riferimento rimane lo stesso, mercato prevedibile-
+    - I big player non hanno motivo di distruggere il mercato innovando in maniera eccezionale.
+    - Mercato già esistente che resta lo stesso nel tempo.
+- **Disruptive Innovation**: Basata sull'innovazione estrema, che spazza via tutto il mercato costruito fino a quel momento. Un esempio potrebbe essere Spotify che entra sul mercato rinnovandolo del tutto.
+    - Creazione di un nuovo mercato.
+    - L'innovazione è pesante
+    - La disruptive è pesantemente Human Centered, spesso l'innovazione estrema cerca di mettere come focus la persona e i vantaggi che porta a quest'ultimo.
+
+Non per forza tutte le innovazioni sono distruttive, anche se rivoluzionarie. Esempio: Non è stato il motore a scoppio (lato tecnico) ad avviare l'utilizzo massiccio di macchine, ma dello studio di come poteva essere posizionato nel mercato (lato economico).
+
+## Product Manager vs Project Manager
+
+Il **product manager** analizza il mercato, analizza il mercato con le user stories e produce un backlog da consegnare ad un **project manager**.
+
+Quindi esiste una profonda differenza tra Product Management e Project Management.
+
+## Human Centered Design Process
+
+L'HCI è una forma mentis, l'HCDP è un processo che permetta di generare qualcosa che sia HCI. Quindi si definisce un metodo a step, detto metodo a **doppio diamante**, definita a divergenza e convergenza:
+
+### Modello a Doppio Diamante
+
+- **Fase Inspiration**: User Stories.
+- **Fase Ideation**: Scenarios.
+- **Fase Implementation**: Implementazione.
+
+Le fasi in parallelo invece sono quelle divergenti e convergenti:
+
+- **Fase Divergente**: Si lascia libertà alle persone del team di essere creativi.
+- **Fase Convergente**: Si definisce una conversazione, in modo tale da sintetizzare un compromesso ragionato tra le parti.
+
+Quindi si definisce uno spazio di problema ed uno della soluzione.
+
+### Design Thinking
+
+- **Processo iterativo** basato su delle **fasi aggiuntive** rispetto al **doppio diamante**, **focussando di più sul prototipo ed il testing**, fornendo delle fasi specifiche per l'iterazione su prototipazione e testing.
+
+- Il design thinking fornisce un approccio basato sulla risoluzione dei problemi delle persone.
+
+- Definito da 5 fasi:
+    - **Empathise**: Si studiano gli utenti
+    - **Define**: Si definiscono bene le domande, le personas...
+    - **Ideate**: Si propongono delle prime soluzioni
+    - **Prototype**: Si definisce un prototipo
+    - **Testing**: Si testa un prototipo
+
+## Human Centered Design vs Thinking Design
+
+Tutte queste tecniche sono ben definite per stabilire soluzioni che siano capaci di generare soldi. Quindi l'HCI centra i bisogni delle persone che sono quindi disposte a pagare.
+
+Quindi se vogliamo sono due processi (HCD Process e Design Thinking) cercano di implementare l'idea del HCD. I due processi non sono tra loro antitetiche, possono entrambe essere applicate.
+
+## Agile & Scrum
+
+- **Progetto a Cascata (Waterfall)**: Definizione dei requisiti e di tutte le fasi successive in maniera sequenziale.
+- **Agile**: Nel software non lo si utilizza, dato che le componenti possono essere definite anche nel mentre, quindi si definisce l'approccio **Agile**. Viene dall'abilità di creare e rispondere in base al cambiamento.
+    - L'Agile non è un metodo ma una **forma mentis**, definito da un **manifesto**:
+        - Gli individui e le interazioni battono i processi ed i mezzi.
+        - Software funzionante è meglio di documentazione estesa.
+        - Collaborazione dei clienti è meglio della negoziazione dei contratti.
+        - Rispondere al cambiamento è meglio di seguire piani.
+    - Testing e costo dei fallimenti: Più si va avanti nelle fasi di sviluppo e più costa cambiare qualcosa e fallire.
+    - Non si mette in discussione la data di rilascio, quindi è un approccio **time constrained**, si preferisce ridurre le feature al mettere in discussione la data d'uscita.
+
+- **Scrum**: Lo scrum è um processo che cerca di implementare la forma mentis agile, definita da specifiche fasi, attori ed altri elementi.
+    - **Sprint**: Set temporali, unità base dello sviluppo in Scrum, solitamente durano $k$  settimane, ed ognuna di queste fasi include le sottofasi di $\{ Plan, Design, Build, Test, Review, Launch \} $.
+    - **Task**: La grande differenza è che ogni dipendente quindi è responsabile di tutte le sottofasi dello sprint elencate prima.
+    - **Standup**: Si interazione tra Scrum Master e i membri del team che si confronta per capire cosa farà nella giornata e quale sottofase.
+    - **Backlog**: Definisce le feature da implementare.
