@@ -141,7 +141,7 @@ Il **manifesto Agile** affronta diversamente il problema grazie a dei **principi
         - Il cliente ha costante feedback
 
 - **Kanban**: suddivisione del to-do, doing, done, questo permette di prendere un
-attività e portarla a termine, "astraendo" dalla precisione del fatto, bisogna che si inizi che che si finisca:
+attività e portarla a termine, "astraendo" dalla precisione del fatto, bisogna che si inizi e che si finisca:
     - Work in progress limit, permette di definire un limite alle attività inserite in doing
     - Questo permette di risparmiare i context switch che risultano essere costosi
 
