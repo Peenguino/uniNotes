@@ -664,6 +664,12 @@ E' facilmente riconoscibile il tipo di messaggio già dalla sua \textbf{startlin
 
     Durante questa fase è possibile che si instauri una negoziazione tra client e server sulla versione di HTTP da utilizzare. Dato che la comunicazione
     partirà sempre da una richiesta lato client, in base al confronto tra le versioni dell'HTTP in utilizzo di client e server si stabilisce quale usare.
+    \vspace*{5px}
+
+    Un messaggio di HTTP Request deve avere necessariamente una request line.
+    \newline
+    Un messaggio HTTP Response deve necessariamente avere una status line.
+
     \item \textbf{HTTP Response}:
     \begin{enumerate}
         \item \textbf{Status Line}:
@@ -717,7 +723,8 @@ E' facilmente riconoscibile il tipo di messaggio già dalla sua \textbf{startlin
         \end{center}
 
     \end{enumerate}
- 
+
+
 \end{enumerate}
 
 \subsubsection{Content Negotiation}
@@ -1046,7 +1053,7 @@ L'applicazione è detta \textbf{resolver}, effettua polling al server DNS e dopo
 
 \vspace*{10px}
 
-\paragraph{Perchè UDP e Quando TCP} Viene utilizzato il protocollo TCP per una questione di riduzione di ritardi, riduzione di overhead causato dal setup di TCP e perchè solitamente le query DNS richiedono pochi dati, quindi rispettano le dimensioni di un pacchetto UDP. A volte viene utilizzato il protocollo TCP, ma questo
+\paragraph{Perchè UDP e Quando TCP} Viene utilizzato il protocollo UDP per una questione di riduzione di ritardi, riduzione di overhead causato dal setup di TCP e perchè solitamente le query DNS richiedono pochi dati, quindi rispettano le dimensioni di un pacchetto UDP. A volte viene utilizzato il protocollo TCP, ma questo
 accade solo se è necessaria l'affidabilità del trasferimento oppure se si sforano i $512$ byte dei pacchetti UDP.
 
 \newpage
@@ -1208,6 +1215,228 @@ Questo garantisce però una semplicità non indifferente, risultando vantaggioso
 \vspace*{10px}
 
 Il messaggio si compone di $8$ byte di intestazione, i numeri di porta per la fase di demultiplexing e la lunghezza del messaggio massima del datagramma UDP è di $65535$ byte.
+
+\newpage
+
+\subsection{Principi di Trasferimento Affidabile}
+
+Definiamo in maniera incrementale un \textbf{protocollo generico} per il trasferimento di dati affidabile, quindi \textbf{senza errori su bit} o \textbf{perdite}.
+La complessità del protocollo dipende anche dalle caratteristiche del canale non affidabile su cui si sta appoggiando. In questo caso
+il \textbf{livello di rete} è considerato \textbf{non affidabile}, dato che può causare \textbf{perdite}, \textbf{corruzioni} o \textbf{consegne fuori ordine}.
+
+\paragraph{Interfacce per Trasferimento Affidabile} Definiamo le interfacce 
+
+\begin{enumerate}
+    \item \textbf{RDT}: Reliable Data Transfer
+    \item \textbf{UDT}: Unreliable Data Transfer
+\end{enumerate}
+
+che comunicano grazie ai seguenti metodi:
+
+\begin{enumerate}
+    \item $rdt\_send()$: Chiamata dall'applicazione per chiedere di consegnare i dati al processo destinatario.
+    \item $udt\_send()$: Chiamata da RDT per inviare il pacchetto al destinatario tramite il canale inaffidabile.
+    \item $rdt\_receive()$: Chiamata dal protocollo inaffidabile UDT quando il pacchetto arriva sul lato destinatario del canale.
+    \item $deliver\_data()$: Chiamata da RDT per consegnare i dati al livello applicazione.
+\end{enumerate}
+
+\vspace*{20px}
+
+\begin{figure}[htbp]
+    \center
+    \includegraphics[scale=0.65]{img/trasferimentoAffidabile1.png}
+\end{figure}
+
+\newpage
+
+\subsubsection{RDT 1.0 - Trasferimento su Canale Affidabile}
+
+Questo schema si basa sull'\textbf{assunzione} che il \textbf{canale di rete} sottostante sia \textbf{perfettamente affidabile}.
+Quindi tutto il funzionamento si riduce a queste due entità che eseguono le seguenti operazioni:
+
+\begin{enumerate}
+    \item Il \textbf{mittente} \textbf{invia} al livello di rete i dati che riceve dal livello applicazione, quindi viene effettuato l'\textbf{incapsulamento del messaggio}, compenendo un \textbf{pacchetto}\footnote{Nel protocollo TCP si parla di segmenti, non di pacchetti, ma nel contesto di trasferimento affidabile generico parleremo di pacchetti.}.
+    \item Il \textbf{destinatario inoltra} al \textbf{livello applicazione} i dati che riceve dal livello di rete quindi viene effettuato il \textbf{decapsulamento del pacchetto} estraendo un \textbf{messaggio}.
+\end{enumerate}
+
+\subsubsection{RDT 2.0 - Trasferimento su Canale con Errori su Bit}
+
+Indebolendo l'ipotesi dello schema precedente, assumiamo di poter ottenere \textbf{errori sui bit} a causa del \textbf{transito} sul \textbf{canale inaffidabile}.
+
+\paragraph{Ritrasmissione con ACK/NAK} Si utilizzano quindi riscontri positivi \textbf{ACK} per confermare la corretta ricezione e negativi \textbf{NAK} per richiedere ritrasmissione. I protocolli basati su ritrasmissione sono anche detti \textbf{ARQ} (Automatic Repeat ReQuest).
+
+\paragraph{Meccanismi Caratteristici dei ARQ} I protocolli ARQ si basano su questi meccanismi:
+
+\begin{enumerate}
+    \item \textbf{Checksum} per \textbf{rilevamento errori sui bit}.
+    \item Meccanismo di \textbf{riscontro errore} esplicito con bit settato per \textbf{ACK o NAK}.
+    \item \textbf{Ritrasmissione} dei \textbf{pacchetti} ricevuti con errori.
+\end{enumerate}
+
+Il tipo di protocollo ARQ che trattiamo è quello \textbf{stop and wait}, ossia il mittente invia un messaggio e poi aspetta riscontro positivo da parte del destinatario prima di inviare il nuovo pacchetto.
+
+\begin{figure}[htbp]
+    \center
+    \includegraphics[scale=0.45]{img/RDT2.0_mittente.png}
+    \hspace*{30px}
+    \includegraphics[scale=0.45]{img/RDT2.0_destinatario.png}
+\end{figure}
+
+In questo schema però non si tiene conto di possibili corruzioni di ACK e NAK. Questo problema viene risolto nel
+RDT2.1 grazie ad una checksum per il controllo dell'ACK e alla ritrasmissione in caso di corruzione.
+Sarà necessario anche quindi un meccanismo di numerazione per capire se il pacchetto sia un duplicato o meno.
+
+\newpage
+
+\subsubsection{RDT 2.1 - Checksum per Controllo Corruzione ACK}
+
+Viene aggiunto un numero di sequenza ai pacchetti lato mittente, che nel caso dello stop and wait di prima sarà quindi $\{ 0,1 \}$. Quindi i passi sono:
+
+\begin{enumerate}
+    \item \textbf{Mittente}:
+    \begin{enumerate}
+        \item Aggiunta numero di sequenza al pacchetto.
+        \item Verifica corruzione ACK/NAK tramite checksum.
+        \item Quantità stati della macchina raddoppiati: Lo stato tiene conto della numerazione del pacchetto atteso.
+    \end{enumerate}
+    \item \textbf{Destinatario}:
+    \begin{enumerate}
+        \item Verifica se pacchetto ricevuto sia duplicato, grazie alla numerazione.
+    \end{enumerate}
+\end{enumerate}
+
+\vspace*{15px}
+
+\begin{figure}[htbp]
+    \center
+    \includegraphics[scale=0.4]{img/RDT2.1_mittente.png}
+\end{figure}
+
+\vspace*{15px}
+
+\begin{figure}[htbp]
+    \center
+    \includegraphics[scale=0.45]{img/RDT2.1_destinatario.png}
+\end{figure}
+
+\newpage
+
+\subsubsection{RDT 2.2 - Protocollo NAK-free}
+
+Il destinatario non invia NAK espliciti, ma invia gli ACK dell'ultimo pacchetto ricevuto correttamente. Quindi risulta importante includere il numero di sequenza del pacchetto da riscontrare.
+Quando il mittente riceve ACK duplicati, ritrasmette il pacchetto corrente.
+
+\begin{figure}[htbp]
+    \center
+    \includegraphics[scale=0.4]{img/RDT2.2.png}
+\end{figure}
+
+\subsubsection{RDT 3.0 - Timer in Attesa di ACK}
+
+Se la perdita pacchetti esiste nel canale sottostante, allora il mittente potrebbe non ricevere alcuna risposta dal destinatario.
+Il mittente dunque aspetta ogni ACK per un massimo di tempo detto \textbf{timeout}. Se il pacchetto non è perso ma solo in ritardo, allora la ristrasimssione invia un duplicato, che sarà individuabile grazie al numero di sequenza da riscontrare.
+
+\paragraph{Prestazioni e Reale Utilizzo del Canale} RDT3.0 risulta essere molto valido da un punto di vista funzionale, ma da un profilo di prestazioni notiamo che l'utilizzo del canale è molto ridotto a causa dell'attesa del mittente. Volendo quantificare l'utilizzo del canale possiamo definire questo schema con relativa formula:
+
+\begin{figure}[htbp]
+    \center
+    \includegraphics[scale=0.52]{img/RDT3.0.png}
+\end{figure}
+
+\vspace*{-15px}
+
+\[ \boxed{U_{send} = \frac{L/R}{RTT + L/R} = \text{tempo utilizzato dal mittente per inviare pacchetti} }\]
+
+Questo tipo di problematiche si risolvono con approcci di \textbf{pipelining}.
+
+\newpage
+
+\subsubsection{Approcci di Pipelining - Go-Back-N (GBN) e Selective Repeat (SR)}
+
+Esistono due approcci di pipelining: Go-Back-N (GBN) e Selective Repeat (SR).
+
+\paragraph{Go-Back-N (GBN)} Definiamo ogni responsabilità dei ruoli di mittente e destinatario.
+
+\begin{enumerate}
+    \item \textbf{Mittente}
+    \begin{enumerate}
+        \item Il mittente può inviare fino ad $n$ pacchetti, ossia la dimensione della sua finestra, senza ricevere ACK.
+        \item Si mantengono due puntatori sulla finestra:
+        \begin{enumerate}
+            \item $base$: primo pacchetto, il più vecchio non riscontrato.
+            \item $nextseqnum$: prossimo pacchetto da inviare.
+        \end{enumerate}
+        \item Possono essere riscontrati pacchetti in maniera cumulativa, scorrendo la finestra di n posizioni su cui si chiama la $ACK(n)$.
+        \item Il mittente ritrasmette il pacchetto e tutti quelli con un numero di sequenza maggiore di quello non riscontrato nel caso in cui scade il timer di quello puntato da $base$.
+        \begin{figure}[htbp]
+            \center
+            \includegraphics[scale=0.52]{img/GBN_mittente.png}
+        \end{figure}
+    \end{enumerate}
+    \item \textbf{Destinatario}
+    \begin{enumerate}
+        \item Invia un ACK ogni volta che riceve un pacchetto.
+        \item L'ACK è sempre riferito all'ultimo pacchetto ricevuto in ordine.
+        \item Mantiene un solo puntatore $rcv\_base$.
+        \item I pacchetti ricevuti fuori ordine vengono scartati.
+        \begin{figure}[htbp]
+            \center
+            \includegraphics[scale=0.6]{img/GBN_destinatario.png}
+        \end{figure}
+    \end{enumerate}
+\end{enumerate}
+
+Questo tipo di approccio ha problemi di prestazioni quando il livello di rete è soggetto a numerose perdite di pacchetti.
+
+\newpage
+
+\paragraph{Selective Repeat (SR)} Questo approccio utilizza ACK individuali per ciascun pacchetto ricevuto correttamente, si appoggia quindi ad un buffer da cui verranno estratti i pacchetti e consegnati in ordine all'applicazione.
+Nello specifico, vengono utilizzate \textbf{due finestre} di pacchetti, una \textbf{lato mittente} ed una \textbf{lato destinatario}.
+
+\begin{enumerate}
+    \item \textbf{Mittente}
+    \begin{enumerate}
+        \item Invocazione dall'alto, se c'è un numero di sequenza disponibile allora invia il pacchetto.
+        \item In caso di $timeout(n)$, il pacchetto $n$ viene ritrasmesso e risettato il timer.
+        \item La gestione di $ACK(n)$ in $[base, base+N+1]$ è definita come:
+        \begin{enumerate}
+            \item Segna $n$ come ricevuto.
+            \item Se $n = base$ allora si fa scorrere la finestra fino al prossimo pacchetto non riscontrato.
+        \end{enumerate}
+    \end{enumerate} 
+    \item \textbf{Destinatario}
+    \begin{enumerate}
+        \item Se $pktOk \in [rcv\_base, rcv\_base+N+1]$ allora:
+        \begin{enumerate}
+            \item Invia $ACK(n)$, quindi un nuovo pacchetto è stato correttamente ricevuto.
+            \item Se il pacchetto in questione è fuori ordine allora lo si salva nel buffer.
+            \item Se il pacchetto è in ordine allora si effettua una consegna di gruppo di pacchetti consecutivi in ordine nel buffer e si lascia scorrere la
+            finestra fino al prossimo pacchetto non ricevuto.
+        \end{enumerate}
+        \item Se $pktOk \in [rcv\_base-N, rcv\_base-1]$ allora:
+        \begin{enumerate}
+            \item Invia $ACK(n)$, per indicare che il pacchetto già è stato riscontrato.
+        \end{enumerate}
+        \item Altrimenti scarta il pacchetto.
+    \end{enumerate}
+\end{enumerate}
+
+\begin{figure}[htbp]
+    \center
+    \includegraphics[scale=0.55]{img/selectiveRepeat.png}
+\end{figure}
+
+\subsubsection{Riassunto Meccanismi Affidabili}
+
+Listiamo una serie di meccanismi riguardanti il trasferimento affidabile con le relative caratteristiche:
+
+\begin{enumerate}
+    \item \textbf{ACK}: Indica al mittente che un pacchetto è stato ricevuto correttamente dal destinatario.
+    \item \textbf{NAK}: Indica al mittente che un pacchetto è stato \textbf{non} ricevuto correttamente dal destinatario.
+    \item \textbf{Ritrasmissione}: Permette al ricevitore di ricevere un pacchetto che è stato corrotto o perso in una trasmissione precedente.
+    \item \textbf{Numeri di Sequenza}: Consente il rilevamento di duplicati lato ricevitore.
+    \item \textbf{Checksum}: Utilizzato dal ricevitore per rilevare i bit invertiti durante la trasmissione di un pacchetto.
+\end{enumerate}
 
 \newpage
 
