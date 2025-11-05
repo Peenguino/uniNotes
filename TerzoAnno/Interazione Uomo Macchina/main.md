@@ -462,3 +462,152 @@ Quindi se vogliamo sono due processi (HCD Process e Design Thinking) cercano di 
     - **Task**: La grande differenza è che ogni dipendente quindi è responsabile di tutte le sottofasi dello sprint elencate prima.
     - **Standup**: Si interazione tra Scrum Master e i membri del team che si confronta per capire cosa farà nella giornata e quale sottofase.
     - **Backlog**: Definisce le feature da implementare.
+
+# Lezione 11 - Wireframing & Responsive Design - 30/10/2025
+
+## Wireframing
+
+Se non stiamo lavorando da soli dobbiamo essere in grado di **comunicare quali siano le nostre intenzioni**. Quindi un **wireframe** è letteralmente uno schema fatto carta e penna per poter buttare giù un **primo schema**.
+
+Quindi sono schemi che permettono di comunicare tra team diversi, magari team di design e team di sviluppo. Vanno quindi messi in pratica i concetti dell'Information Architecture.
+
+Quindi definiamo schemi, e mentre li definiamo possiamo cambiarli, vantaggio di questo tipo iniziale di prototipazione.
+
+**Cosa può fare un Wireframe?**
+
+- Deve dare l'impressione di una prima forma dell'interfaccia, non il feeling della forma finale dell'UI.
+- Incoraggia la discussione tra i team, ma non definisce le funzionalità effettive.
+- Determina quali saranno le funzionalità esposte nell'AI.
+
+Solitamente si **utilizzano tanti placeholder**, ad esempio per immagini o per colori...
+
+### Tipi di Wireframe
+
+Esistono due macrotipologie di Wireframe
+
+- **Low-Fidelity Wireframe**: Sketch semplici, con focus sulla struttura generale.
+- **High-Fidelity Wireframe**: Sketch dettagliati.
+
+## Adaptability, Responsive Design & Accessibility
+
+Se il wireframing rappresentava un mock dei requisiti funzionali, allora questa sezione tratta i requisiti non funzionali. Quindi si caratterizzano dettagli non funzionali importanti per la UX.
+
+Il **ruolo del contesto è fondamentale**, quindi la struttura dell'**interfaccia** **mobile** sarà completamente diversa **da quella di un laptop**. 
+
+### Adaptability
+
+No ---- VEDI SLIDE
+
+## User Flows
+
+Permette la definizione di flussi di sequenza degli use cases.
+
+- Possiamo definire anche degli **wireflows**, ossia un diagramma dove gli stessi nodi sono dei wireframe.
+
+## Mockups
+
+Il **prototipo è diverso da mockup**, la **differenza fondamentale** è che **non è interattivo**, quindi un mockup è un passo successivo al wireframe, ma non è ancora un prototipo.
+
+E' quindi molto orientato alla UI.
+
+$$ Wireframe \rightarrow Mockup \rightarrow Prototipo $$
+
+Quindi i mockup sono utili in fase di comunicazione e di confronto tra il team di UI/UX per capire quale sia il mockup finale.
+
+## Responsive Design
+
+Il content dovrebbe adattarsi ad ogni dispositivo. Il front-end dovrebbe quindi adattarsi automaticamente al sistema. A volte definito anche come mobile first, aggiungendo dopo informazioni, mantenendo sempre le informazioni fondamentali.
+
+### Tecniche di Design Responsive
+
+- Interfaccia Flessibile
+- Immagini Flessibili
+- Media Queries & Breakpoint: Stili gestiti da condizioni basate sulle dimensioni.
+
+### Adaptive Design
+
+Ci adattiamo alle caratteristiche del dispositivo dell'utente, si crea in direzione di potersi adattare ad ogni tipo di dispositivo.
+
+# Lezione 12 - Pre/ProTyping - 31/10/2025
+
+Gestione moderna di prototipazione.
+
+## Pretotypes
+
+- **Thoughtland/Actionland**: Se abbiamo un idea, per capire se questa ha valore anche per gli altri, allora bisogna definire qualcosa di esistente che venga provato da persone.
+
+Quindi bisogna definire un pretotipo che ci permette di identificare una primissima forma di prodotto, e che se fallisce, non abbiamo ancora investito troppe risorse in esso.
+
+**Definizione**: Devo capire se voglio o meno dare interesse e risorse ad un idea, quindi "testo l'idea", prima ancora di definire ancora un alpha o una beta.
+
+### Pretotype Flow
+
+- **Step 1**: Isolare l'assunzione chiave dell'idea, ha senso?
+- **Step 2**: Scegliere un tipo di pretotipo, che tipo di pretotipo potrebbe mettere in discussione la nostra idea.
+- **Step 3**: Scelta di un segmento di mercato ipotetico per testare il pretotipo.
+- **Step 4**: Testare il pretotipo, iniziando da qualcosa di piccolo.
+- **Step 5**: Imparare dagli errori, definire nuovi segmenti e modificare il pretotipo su questi dati raccolti.
+
+### Tipi di Pretotype
+
+- **Fake Door**: Una semplice presentazione di un idea ed un submit per ricevere aggiornamenti. Noi ancora non abbiamo definito alcuna funzionalità, ma già abbiamo un dato che ci permette di capire se qualcuno sia o meno interessato alla nostra idea.
+- **Mechanical Turk**: Si finge l'esistenza di un prodotto, magari non implementando un prodotto ma fingendo la sua funzionalità, magari con delle persone dietro che simulino le funzionalità.
+- **Impersonator**: Un esempio è utilizzare un nuovo front-end su un API già esistente, per raccogliere le analytics riguardo il nostro front-end.
+- **Pinocchio**: Un dummy non funzionante del prodotto che abbiamo in mente. Ad esempio un cellulare finto che renda l'idea di cosa voglia dire andare in giro con un cellulare.
+- **One Night Stand**: ??? vedi slide ???
+- **Facade**: Noleggio di prodotti ed equipaggiamenti, per simulare un prodotto offerto da noi.
+
+### Minimum Viable Product
+
+Prima versione di prototipo, primo stato in uscita da pretotipo ma non ancora del tutto prototipo. Questa fase intermedia ci permette ulteriormente di testare un prodotto prima di investire risorse in esso.
+
+## Prototypes
+
+Un prototipo è un sample sperimentale ed iniziale del prodotto in questione.
+
+E' necessario per progettare il prodotto reale, testando le idee sugli users per ridefinire le nostre progettazioni in base al feedback ricevuto.
+
+**Definizione**: Ho già investito risorse e dato interesse all'idea, il prototipo è qualcosa su cui ho già investito tempo e potenziamente implementato qualcosa.
+
+### Perchè definire Prototipi
+
+Permette di definire solide basi alle idee, i cambiamenti vengono quindi fatti in fasi iniziali non costose in termini di risorse umane e di lavoro come sarebbe stato successivamente.
+
+Minimizza errori prima del rilascio effettivo sul mercato, per capire cosa funziona meglio per il nostro problema e relativa soluzione che stiamo cercando di fornire.
+
+### Prototype Fidelity e Tipi di Fidelity
+
+La fedeltà del prototipo è quanto questo si avvicina al prodotto finale, non solo da un punto di vista visivo ma anche dal punto di vista funzionale.
+
+1. **Low Fidelity Prototypes**: Bassa fedeltà, prototipi definiti molto velocemente su carta e penna, manca realismo d'interazione, creato in poco tempo.
+2. **High Fidelity Prototypes**: Alta fedeltà, possono essere realmente definiti implementandoli, permettono maggiore interazione e richiedono maggiori risorse.
+3. **Mid Fidelity Prototypes**: Esistono vie di mezzo tra le due tipologie viste sopra, 
+
+### 6 Dimensioni di Fidelity Prototype
+
+1. **Realismo Fisico/Visuale**: Quanto si avvicina al prodotto finale da un punto di vista grafico.
+2. **Scope**: Quanto il prototipo si avvicina, in verticale o in orizzontale, al prodotto finale.
+    - **Scope Orizzontale**: Quante funzionalità sono presenti nel nostro prototipo? Listo tutte le funzionalità ma non sto definendo se posso o meno utilizzarle.
+    - **Scope Verticale**: Definizione di tutta la funzionalità specifica in dettaglio.
+3. **Funzionalità**: Quante funzionalità del prototipo sono aderenti a quelle attese del prodotto finale
+4. **Data**: Dati (DB, Backend) su cui opera il prototipo se sono o meno dei mockup anche loro.
+5. **Autonomia**
+6. **Piattaforma**
+
+### Tipi di Prototypes
+
+1. **Paper Prototypes**: Poco costosi, utilizzati all'inizio dello sviluppo.
+2. **Wireframe Prototypes**: Fornisce il layout basic, più avanzato rispetto al tipo precedente.
+3. **Wizard of Oz/Mechanical Turk Prototype**: Si simula il comportamento di un prodotto o servizio utilizzando un umano alle spalle, in sostituzione alla tecnologia. Questo ad esempio può risultare utile se vogliamo testare un interfaccia grafica che ho ma di cui ancora non ho gestito i servizi backend alle spalle.
+4. **Functional Prototypes**: Prototipi parzialmente funzionanti, con quasi tutte le funzionalità attese, per testare anche le caratteristiche tecniche, per modificare. Questo chiaramente richiede sforzo e implementazioni, quindi solitamente arriva verso la fine dello sviluppo.
+5. **Non-Functional Prototypes**: Prototipi che sono comunque interattivi ma non funzionali, immagina un front-end che simula Amazon, ma a tempo di invio di ordine non invoca nessun servizio alle spalle.
+
+    Questo risulta molto utile per testare la UX o l'aspetto grafico.
+
+## Wireframe vs Mockup vs Prototypes
+
+- Wireframe: Non si testano, danno solo un idea grafica e la struttura del layout.
+- Mockup: Composizione di Wireframe per simulare l'esperienza. Solitamente ha anche immagini, colori, testi...
+- Prototipo: Interattivo e potenzialmente anche funzionale.
+
+    ??? IMMAGINE NELLE SLIDE CHE DEFINISCE BENE LE DIFFERENZE TRA QUESTI TRE ???

@@ -562,11 +562,11 @@ della superclasse.
 
 \vspace*{10px}
 
-\subsection{Algebra Relazionale}
+\section{Algebra Relazionale}
 
 Insieme di operatori su relazioni che restituiscono altre relazioni. La forza di questo sistema di operazioni è che sono componibili, e formano successivamente ulteriori operazioni.
 
-\paragraph{Operatori Primitivi} Elenchiamo gli operatori primitivi:
+\subsection{Operatori Primitivi} Elenchiamo gli operatori primitivi:
 
 \begin{enumerate}
     \item \textbf{Proiezione}: Data una tabella $R$, la funzione $\Pi_{A,B}(R)$ genera una nuova tabella in cui si mostrano solo le colonne $A,B$ della tabella $R$.
@@ -577,7 +577,7 @@ Insieme di operatori su relazioni che restituiscono altre relazioni. La forza di
     \item \textbf{Ridenominazione}: Ridenominazione $\delta_{A \rightarrow B}(R)$, consiste informalmente nella ridenominazione dei campi che definiscono le colonne dello schema. Questo perchè altre operazioni binarie richiedono che le colonne di schemi diversi non abbiano gli stessi nomi.
 \end{enumerate}
 
-\paragraph{Operatori Derivati} Elenchiamo gli operatori derivati:
+\subsection{Operatori Derivati} Elenchiamo gli operatori derivati:
 
 \begin{enumerate}
     \item \textbf{Intersezione}: Date due tabelle $R$ ed $S$, restituisce le righe (tuple) che sono sia in $R$ sia in $S$, dunque è necessario che le due tabelle abbiano lo \textbf{stesso schema}.
@@ -594,6 +594,512 @@ Insieme di operatori su relazioni che restituiscono altre relazioni. La forza di
     \center
     \includegraphics[scale=0.55]{img/groupBy.png}
 \end{figure}
+
+\newpage
+
+\section{Linguaggio SQL}
+
+Linguaggio di interrogazione su calcolo di multiset basato su delle clausole specifiche:
+
+\subsection{Clausole SQL}
+
+\begin{enumerate}
+    \item \textbf{SELECT}: Permette di selezionare specifici \textbf{campi della tabella} generata nella clausola FROM.
+    \item \textbf{FROM}: Permette la combinazione di tabelle. In questa clausola abbiamo modo di utilizzare anche la clausola JOIN per unire più tabelle tramite specifici campi.
+    Il modo più comune per l'utilizzo della JOIN è:
+    \[ FROM \:\: Studenti \:\: s \:\: JOIN \:\: Esami \:\: e \:\: ON \:\: s.SId = e.SId \]
+    \item \textbf{WHERE}: Permette di definire una restrizione sulle righe che soddisfano la condizione passata alla WHERE.
+    Accade spesso di impostare una condizione per la WHERE con una sottoquery come parte dell'espressione di controllo. Esistono diversi tipi di sottoquery:
+    \begin{enumerate}
+        \item \textbf{Sottoquery restituisce un singolo valore}: La sottoquery calcola un valore (AVG, MAX, MIN...) e la WHERE utilizza questo valore nel confronto.
+        \item \textbf{Sottoquery restituisce una colonna}: Vengono utilizzati operatori specifici come $IN, \: ANY, \: ALL$ con operando a destra il campo della colonna esterna e come operando a sinistra
+        il risultato della sottoquery.
+        \begin{lstlisting}
+    SELECT name
+    FROM employees
+    WHERE dept_id IN (
+        SELECT id
+        FROM departments
+        WHERE location = 'Rome'
+        );
+        \end{lstlisting}
+        \item \textbf{Sottoquery correlata}: Sottoquery che viene valutata per ogni riga della tabella in questione, in modo tale che si possa confrontare un valore a tutti quelli di un campo della tabella.
+        \begin{lstlisting}
+    SELECT e.name, e.salary
+    FROM employees AS e
+    WHERE e.salary > (
+        SELECT AVG(salary)
+        FROM employees
+        WHERE dept_id = e.dept_id
+        );
+        \end{lstlisting}
+    \end{enumerate}
+    \item \textbf{ORDER BY}: Permette l'ordinamento su un campo della tabella.
+    \newpage
+    \item \textbf{GROUP BY}: Si definisce come nell'algebra relazionale con delle \textit{dimensioni} e \textit{misure}. Le \textit{dimensioni} vanno riportate come argomenti della clausola \textbf{GROUP BY}, mentre le misure come \textit{argomenti} della \textbf{SELECT}.    
+    \begin{lstlisting}
+    SELECT s.Nome, AVG(e.Voto)
+    FROM Studenti s, Esami e
+    WHERE s.SId = e. SId
+    GROUP BY s. SId
+    \end{lstlisting}
+    \vspace*{-15px}
+    Quindi si genera per ogni gruppo una linea.
+    \item \textbf{HAVING}: Questa clausola può essere applicata solo su dimensioni esplicite della GROUP BY e operazioni su attributi non dimensionali. Quindi la HAVING permette
+    la cancellazione dei gruppi che violano la clausola HAVING.
+    Quindi riassumendo tutte le clausole presentate in una pseudoquery:
+    \begin{lstlisting}
+    SELECT ... 
+    FROM ...
+    WHERE ... 
+    GROUP BY ...
+    HAVING ... 
+    \end{lstlisting}
+    \vspace*{-15px}
+    Questa query eseguirà questi passi:
+    \begin{enumerate}
+        \item Esegue le clausole FROM e WHERE, calcolando quindi una tabella di partenza.
+        \item Partiziona la tabella eseguendo il GROUP BY in base alle dimensioni fornite a questa clausola. Ogni gruppo diventa quindi una linea.
+        \item Elimina i gruppi che violano le clausole passate alla HAVING.
+        \item Proietta le colonne specificate nella clausola SELECT.
+    \end{enumerate}
+\end{enumerate}
+
+\subsection{Valore NULL}
+
+In SQL è ammesso il valore \textit{NULL} che definisce la non conoscenza di un valore di un campo. Questo però causa problemi in vari contesti, dato che andrà regolato il suo comportamento.
+Il valore \textit{NULL} va letto come "non conosco il valore", quindi non si confronteranno i campi con un $= NULL$ ma esistono predicati appositi per verificare la presenza del \textit{NULL}, ad esempio $IS \: NULL$.
+
+\vspace*{10px}
+
+\subsection{Quantificazione Esistenziale/Universale in SQL}
+
+\vspace*{10px}
+
+\begin{enumerate}
+    \item \textbf{Quantificazione Esistenziale}: In SQL è presente l'operatore EXISTS che ci permette di descrivere una condizione esistenziale scorrendo una tabella.
+    \newpage
+    In linguaggio logico avremmo così definito la quantificazione esistenziale:
+    \[ \{ s.Nome \: | \: s \in Studenti \: \land \: \exists e \in Esami \: (e.SId = s.SId \land e.Voto = 27)  \} \]
+    Come viene tradotta in SQL? Presentiamo un esempio utilizzando l'operatore EXISTS.
+    \begin{lstlisting}
+    SELECT s.Nome
+    FROM Studenti s
+    WHERE EXISTS 
+        (SELECT *
+        FROM Esami e
+        WHERE e.SId = s.SId AND e.Voto > 27)
+    \end{lstlisting}
+    \item \textbf{Quantificazione Universale}: In SQL non esiste un operatore di quantificazione universale esplicito, quindi il modo più comune è quello di utilizzare un \textbf{NOT EXISTS} in combinazione con la \textbf{condizione negata alla query interna}. Presentiamo
+    anche in questo caso un esempio di quantificazione universale in linguaggio matematico e successivamente in SQL.
+    \vspace*{-5px}
+    \[ \{ s.Nome \: | \: s \in Studenti \land \forall e \in Esami (e.SId = s.SId \land e.Voto = 27) \} \]
+    In SQL questa viene tradotta in
+    \begin{lstlisting}
+    SELECT s.Nome
+    FROM Studenti s
+    WHERE NOT EXISTS
+        (SELECT *
+        FROM Esami e
+        WHERE e.SId = s.SId AND e.Voto <> 30)
+    \end{lstlisting}
+    \vspace*{-20px}
+    \paragraph{NULL e Quantificazione Universale} La quantificazione universale torna esito positivo sugli insiemi vuoti. Bisogna tener conto di questa caratteristica se non vogliamo nel risultato anche righe che erano nulle laddove si testava la condizione.
+\end{enumerate}
+
+\subsection{Outer Join}
+
+Citiamo prima il comportamento di una \textbf{Inner Natural Join}:
+
+\[
+\begin{array}{c}
+\text{R}
+\\[2mm]
+\begin{array}{|c|c|}
+\hline
+A & B \\
+\hline
+1 & a \\
+2 & b \\
+3 & c \\
+\hline
+\end{array}
+\end{array}
+\quad
+\text{NATURAL JOIN}
+\quad
+\begin{array}{c}
+\text{S}
+\\[2mm]
+\begin{array}{|c|c|}
+\hline
+A & C \\
+\hline
+1 & x \\
+3 & y \\
+5 & z \\
+\hline
+\end{array}
+\end{array}
+\quad
+\Longrightarrow
+\quad
+\begin{array}{c}
+\text{R} \bowtie \text{S}
+\\[2mm]
+\begin{array}{|c|c|c|}
+\hline
+A & B & C \\
+\hline
+1 & a & x \\
+3 & c & y \\
+\hline
+\end{array}
+\end{array}
+\]
+
+Si legano quindi solo in base alle chiavi esterne coincidenti.
+
+\newpage
+
+Diverso è invece il comportamento della Outer Join:
+
+\begin{enumerate}
+    \item \textbf{Left Outer Join}: Effettua una Natural Join e a questa aggiunge le righe della tabella a sinistra, aggiungendo nei \textit{NULL} dove necessario:
+    \[
+\begin{array}{c}
+\text{R}
+\\[2mm]
+\begin{array}{|c|c|}
+\hline
+A & B \\
+\hline
+1 & a \\
+2 & b \\
+3 & c \\
+\hline
+\end{array}
+\end{array}
+\quad
+\text{LEFT JOIN}
+\quad
+\begin{array}{c}
+\text{S}
+\\[2mm]
+\begin{array}{|c|c|}
+\hline
+A & C \\
+\hline
+1 & x \\
+3 & y \\
+5 & z \\
+\hline
+\end{array}
+\end{array}
+\quad
+\Longrightarrow
+\quad
+\begin{array}{c}
+\text{R} \bowtie \text{S}
+\\[2mm]
+\begin{array}{|c|c|c|}
+\hline
+A & B & C \\
+\hline
+1 & a & x \\
+3 & c & y \\
+5 &   & z \\
+\hline
+\end{array}
+\end{array}
+\]
+
+\vspace*{15px}
+
+\item \textbf{Full Join}: Effettua una Natural Join e a questa aggiunge le righe di entrambe le tabelle, aggiungendo nei \textit{NULL} dove necessario:
+
+    \[
+\begin{array}{c}
+\text{R}
+\\[2mm]
+\begin{array}{|c|c|}
+\hline
+A & B \\
+\hline
+1 & a \\
+2 & b \\
+3 & c \\
+\hline
+\end{array}
+\end{array}
+\quad
+\text{FULL JOIN}
+\quad
+\begin{array}{c}
+\text{S}
+\\[2mm]
+\begin{array}{|c|c|}
+\hline
+A & C \\
+\hline
+1 & x \\
+3 & y \\
+5 & z \\
+\hline
+\end{array}
+\end{array}
+\quad
+\Longrightarrow
+\quad
+\begin{array}{c}
+\text{R} \bowtie \text{S}
+\\[2mm]
+\begin{array}{|c|c|c|}
+\hline
+A & B & C \\
+\hline
+1 & a & x \\
+2 & b &  \\
+3 & c & y \\
+5 &   & z \\
+
+\hline
+\end{array}
+\end{array}
+\]
+
+\end{enumerate}
+
+Questi tipi di Join ci permettono di manipolare risultati nulli, ad esempio:
+
+\vspace*{15px}
+
+\begin{enumerate}
+    \item \textbf{Contare Esami di Ogni Studente, no Left Join}: Escludo chi non ha sostenuto alcun esame:
+\begin{lstlisting}
+    SELECT s.Nome, COUNT(*)
+    FROM Studenti s JOIN Esami e USING (SId)
+\end{lstlisting}
+\vspace*{-15px}
+    \item \textbf{Contare Esami di Ogni Studente, con Left Join}: Includo chi non ha sostenuto alcun esame:
+\begin{lstlisting}
+    SELECT s.Nome, COUNT(e.Voto)
+    FROM Studenti s LEFT JOIN Esami e USING (SId)
+    GROUP BY s.SId, s.Nome
+\end{lstlisting}
+\vspace*{-15px}
+\end{enumerate}
+
+\newpage
+
+\subsection{Programmazione e SQL}
+
+Si mostrano dei concetti più teorici riguardanti il SQL.
+
+\subsubsection{Approcci Integrazione SQL}
+
+Esistono vari approcci che permettono l'integrazione dell'SQL ai linguaggi di programmazione:
+
+\begin{enumerate}
+    \item \textbf{Linguaggio Integrato}: PL/SQL definito ad esempio da Oracle è SQL esteso fino a diventare un linguaggio completo, quindi viene compilato contemporaneamente sia l'SQL sia la parte di programmazione standard.
+    \begin{itemize}
+        \item \textbf{Vantaggio}: Viene compilato ed eseguito direttamente dal DBMS, permettendo operazioni come controlli per ruoli d'accesso in compilazione.
+        \item Oracle PL/SQL permette la lettura di tipi del database e il loro utilizzo per la dichiarazione di variabili. In questo caso il codice SQL viene utilizzato come \textit{template}, interpretato secondo SQL e sostituito sintatticamente, per poi eseguire il linguaggio esterno.
+    \end{itemize}
+
+    \item \textbf{Linguaggio Convenzionale + API}: Si utilizza una libreria più un'interfaccia per l'interazione tra il linguaggio convenzionale e il DBMS.
+    \begin{itemize}
+        \item In questo contesto, il linguaggio convenzionale non effettua controlli statici 
+        
+        sull'SQL, poiché esso viene considerato come una \textbf{normale stringa}.
+        \item \textbf{Vantaggio}: Le query vengono inviate al DBMS come stringhe.
+        \item Tuttavia, non si risolve il disallineamento semantico (mismatch) dovuto a elementi come \texttt{NULL} o \texttt{MAX\_INT}.
+    \end{itemize}
+
+    \item \textbf{SQL Ospitato}: Approccio che utilizza costrutti come \texttt{begin SQL} ed \texttt{end SQL}, permettendo la condivisione di variabili tra, ad esempio, Python e SQL.
+    \begin{itemize}
+        \item Il precompilatore si occupa di compilare e di chiamare l'API, quindi i controlli a tempo di compilazione sono effettuati anche per l'SQL (differenza rilevante rispetto al caso precedente).
+        \item Possono emergere problemi dovuti alla traduzione SQL, talvolta difficili da individuare.
+        \item Possono sorgere inoltre problemi di differenza di espressività tra SQL (insiemi, record) e il linguaggio ospite.
+    \end{itemize}
+\end{enumerate}
+
+\paragraph{Cursore/Buffer} Meccanismo che permette di scannerizzare elementi, è associato ad una espressione SQL e permette lo scorrimento di dati riga per riga con operazioni di \texttt{FETCH}.
+
+\newpage
+
+\subsubsection{Creazione Tabelle}
+
+La definizione di una tabella in SQL è importante da saper leggere, anche se raramente viene richiesto di crearne una esplicitamente.
+
+\vspace*{10px}
+
+\begin{lstlisting}
+    CREATE TABLE Employees( 
+        Code CHAR(8) NOT NULL,
+        Name CHAR(20),
+        Birthyear INTEGER CHECK (Birthyear < 2005),
+        Qualification CHAR(20) DEFAULT 'Employee',
+        Supervisor CHAR(8),
+        PRIMARY KEY pk_Employees (Code),
+        FOREIGN KEY fk_Employees (Supervisor)
+            REFERENCES Employees
+    );
+
+    CREATE TABLE Dependents(
+        Name CHAR(20),
+        Birthyear INTEGER,
+        EmployeeCode CHAR(8),
+        FOREIGN KEY fk_Dependents (EmployeeCode)
+            REFERENCES Employees
+    );
+\end{lstlisting}
+
+\vspace*{-10px}
+
+\begin{itemize}
+    \item Nella \textbf{foreign key} va specificato quale attributo punta a quale tabella.
+    \item I comandi \texttt{DROP} e \texttt{ALTER} permettono rispettivamente di cancellare e modificare una tabella.
+    \item \textbf{Vincolo di Foreign Key}: se un valore referenziato viene eliminato, è possibile definire comportamenti diversi, come:
+    \begin{itemize}
+        \item Impostare il valore a \texttt{NULL}.
+        \item Usare \texttt{ON DELETE CASCADE}, che propaga la cancellazione.
+    \end{itemize}
+\end{itemize}
+
+\subsubsection{Viste e Viste Materializzate}
+
+\paragraph{Viste Materializzate}
+
+Una vista materializzata è una \textbf{tabella fisica} costruita come risultato dell'esecuzione di una query su altre tabelle. 
+
+\vspace*{10px}
+
+\begin{lstlisting}
+    CREATE TABLE Name SelectExpression;
+
+    CREATE TABLE Supervisors AS
+    SELECT Code, Name, Qualification, Salary
+    FROM Employees
+    WHERE Supervisor IS NULL;
+\end{lstlisting}
+
+\vspace*{-10px}
+
+Questo approccio è utile quando i dati cambiano raramente, poiché le modifiche nella tabella originale non si riflettono automaticamente nella vista materializzata.
+
+\newpage
+
+\paragraph{Viste}
+
+Le viste standard sono \textbf{viste virtuali}, cioè query memorizzate che non vengono eseguite finché non vengono richieste.
+
+\vspace*{10px}
+
+\begin{lstlisting}
+    CREATE VIEW Name [(Attribute {, Attribute})]
+    AS SelectExpression [WITH CHECK OPTION];
+
+    CREATE VIEW Supervisors AS
+    SELECT Code, Name, Qualification, Salary
+    FROM Employees
+    WHERE Supervisor IS NULL;
+\end{lstlisting}
+
+\vspace*{-10px}
+
+Generalmente, le viste non vengono aggiornate direttamente perché non contengono dati reali.
+
+\subsection{Motivazioni per l'uso delle viste}
+
+\begin{itemize}
+    \item Permettono di nascondere dati, garantendo \textbf{indipendenza logica}.
+    \item Consentono \textbf{diverse rappresentazioni} degli stessi dati senza duplicazione.
+    \item Possono \textbf{semplificare query} complesse.
+    \begin{itemize}
+        \item Ad esempio, quando si devono comporre più operazioni \texttt{GROUP BY}, è possibile costruire una vista intermedia.
+        \item Con SQL moderno è possibile usare subquery nella \texttt{FROM}, quindi l'uso delle viste per questo scopo è meno frequente ma resta utile per chiarezza.
+    \end{itemize}
+\end{itemize}
+
+\subsubsection{Procedure e Funzioni}
+
+Alcuni DBMS permettono di definire procedure e funzioni interne. Un esempio è il linguaggio \texttt{PL/SQL} di Oracle.
+
+\vspace*{10px}
+
+\begin{lstlisting}
+    CREATE FUNCTION countStudents IS
+    DECLARE
+        total INTEGER;
+    BEGIN
+        SELECT COUNT(*) INTO total FROM STUDENTI;
+        RETURN (total);
+    END;
+\end{lstlisting}
+
+\newpage
+
+\subsubsection{Trigger}
+
+I \textbf{trigger} sono funzioni che vengono eseguite automaticamente al verificarsi di un determinato evento (ad esempio prima o dopo un \texttt{INSERT}, \texttt{UPDATE} o \texttt{DELETE}).
+
+\vspace*{10px}
+
+\begin{lstlisting}
+    CREATE TRIGGER SalaryCheck
+    BEFORE INSERT ON Employees
+    DECLARE
+        AvgSalary FLOAT;
+    BEGIN
+        SELECT AVG(Salary) INTO AvgSalary
+        FROM Employees
+        WHERE Department = :new.Department;
+
+        IF :new.Salary > 2 * AvgSalary THEN
+            RAISE_APPLICATION_ERROR(-2061, 'Salary too high');
+        END IF;
+    END;
+\end{lstlisting}
+
+\vspace*{-10px}
+
+\begin{itemize}
+    \item I trigger sono usati quando i vincoli coinvolgono \textbf{più tabelle}, poiché una semplice clausola \texttt{CHECK} opera solo sulla tupla corrente.
+    \item Possono essere usati per mantenere valori derivati o contatori aggiornati automaticamente.
+    \item I trigger possono vincolare anche operazioni di \texttt{DELETE}, mentre \texttt{CHECK} non può farlo.
+\end{itemize}
+
+\subsubsection{Access Control nel Database}
+
+Il creatore di un database ha permessi completi: \texttt{CREATE}, \texttt{ALTER}, \texttt{DROP}.  
+Può inoltre concedere permessi ad altri utenti, anche a livello di singola colonna.
+
+\vspace*{10px}
+
+\begin{lstlisting}
+    GRANT Privileges ON Object
+    TO Users [ WITH GRANT OPTION ];
+\end{lstlisting}
+
+\vspace*{-10px}
+
+\paragraph{Indici}
+
+Gli indici sono strutture dati utilizzate per velocizzare l'accesso ai dati nelle query.  
+Tuttavia, un numero eccessivo di indici rallenta \textbf{inserimenti, modifiche e cancellazioni}, poiché anche gli indici devono essere aggiornati.
+
+\paragraph{Catalogo - Metadata}
+
+Il \textbf{catalogo} (o dizionario dati) contiene metadati sul database.  
+Ad esempio:
+\begin{itemize}
+    \item Elenco delle tabelle del DB
+    \item Tipi degli attributi
+    \item Vincoli definiti
+\end{itemize}
+
+Ogni riga nella \emph{tabella delle tabelle} rappresenta una tabella del database.
 
 \newpage
 

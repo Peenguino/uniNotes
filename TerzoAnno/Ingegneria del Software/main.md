@@ -511,3 +511,85 @@ Progettazione delle componenti di un sistema più complesso
 </div>
 
 - **Process Coordinator**: Visto anche come pipeline, un client che invoca tanti servizi magari già preesistenti, li invoca nell'ordine giusto e rielabora fungendo da server per l'utente. Quindi una componente funge da coordinatore e le altre attendono quest'ultima.
+
+# Lezione 12 - Diagramma di Sequenza
+
+- Descrivono interazioni tra oggetti, organizzandole in una **sequenza temporale**.
+- Formalizzano la sequenza principale degli utenti.
+- Sintatticamente è uguale ad altri diagrammi, ma permette di raccontare la parte già vista con i casi d'uso in maniera dinamica rispetto al tempo.
+- Quindi permette la **rappresentazione grafica alternativa** a descrizioni di casi d'uso.
+
+## Descrizione Grafica
+
+- **Linee di Vita**: Rappresentano oggetti partecipanti, dove il rettangolo sopra rappresenta il tipo dell'oggetto e la linea verticale l'oggetto.
+- **Frecce**: Rappresentano le interazioni tra oggetti, come operazioni o segnali.
+    - Possono essere sincrone oppure asincrone.
+    - Possono essere etichettate, con un numero $n$, con un $nome$, ma sono tutte etichette opzionali.
+    - Le operazioni possono essere anche **creazioni/distruzioni** di altri oggetti, questo graficamente viene rappresentato come un rettangolo più basso rispetto a chi ha creato quell'oggetto.
+- **Frame Condizionali**: Permettono di descrivere un flusso in base a delle guardie, quindi eseguire operazioni o meno rispetto a delle condizioni.
+- **Frame Opzionali**: Se etichettate con `opt`, l'operazione viene fatta solo se vale un ramo della condizione.
+- **Frame Iterativo**: Nell'etichetta in alto a sinistra si indica il $min$ e $max$ di iterazioni, quindi anche se la guardia fosse ancora vera comunque si possono eseguire un massimo di iterazioni definite.
+
+    - Codifica while
+
+        $$ loop(0,*) [guardia]$$
+
+    - Codifica for
+
+        $$ loop(n) $$
+
+- **Inclusione di Frame**: Possibile includere interazioni da altri frame. Questo attraverso l'utilizzo di **gate** di ingresso/uscita. Questo, con l'utilizzo dell'etichetta $ref$, ci permette di utilizzare diagrammi specificati altrove.
+
+- **Vincoli di Durata**: Espressi tra parentesi graffe, permettono di specificare quando o quanto deve durare una specifica interazione.
+
+<div style="text-align: center;">
+    <img src="img/diagrammaSequenza1.png" width="450">
+</div>
+
+# Lezione 13 I - Principi Di Progettazione - Definizioni Iniziali
+
+- Le tecniche di progettazione mirano a produrre un sistema che realizzi i requisiti funzionali ed i requisiti di qualità, ma allo stesso tempo si vuole rendere il prodotto facilmente manutenibile e riusabile.
+
+- La **manutenzione** può essere di diversi tipi:
+    - **Correttiva**: Rimuove bug, lasciando identica la specifica.
+    - **Migliorativa**: Cambia anche la specifica e l'implementazione, ed in base alla quantità di cambiamenti si suddivide in altre due sottocategorie:
+        - **Perfettiva**: Modifiche applicate per migliorare la qualità del SW.
+        - **Adattiva**: Modifiche applicate a seguito di cambiamenti del contesto del prodotto, come ad esempio dei cambiamenti legislativi o nel sistema operativo.
+
+## Principi di Progettazione
+
+- **Information Hiding**: Permette la separazione tra **interfaccia visibile** come ciò che espone e **implementazione privata** definita in un corpo. Questo garantisce proprietà di comprensibilità, mautenibilità, possibilità di lavoro in team e sicurezza.
+    - **Information Hiding $\neq$ Incapsulamento**: L'incapsulamento è una proprietà dell'OOP, quindi può generare information hiding ma non lo garantisce a priori. Per questo vengono definiti degli **attributi privati** delle classi e degli **accessors (getter)** e **mutators (setter)**.
+- **Astrazione**: Permette la suddivisione di procedure in moduli, nascondendo la loro implementazione, costituendo librerie. In questo modo si possono definire interfacce stabili anche in caso di cambio di implementazioni.
+- **Coesione**: Criterio per il quale procedure vicine devono essere offerte in una singola unità di modulo/componente. Per questo esistono **tipologie diverse di coesione**:
+    - **Coesione Funzionale**: Gli elementi collaborano per realizzare una funzionalità
+    - **Coesione Comunicativa**: Gli elementi operano sugli stessi dati in input e contribuiscono agli stessi dati in output.
+    - **Coesione Procedurale**: Gli elementi realizzano i passi di una procedura.
+    - **Coesione Temporale**: Gli elementi sono azioni che devono essere fatte in uno stesso arco di tempo.
+    - **Coesione Logica**: Gli elementi sono correlati logicamente ma non funzionalmente.
+    - **Coesione Accidentale**: Peggior forma di coesione, gli elementi non sono correlati ma piazzati nella stessa unità.
+- **Disaccoppiamento**: Grado di indipendenza di un modulo dall'altro. L'obiettivo è quello di rendere il più indipendente un modulo da qualsiasi altro.
+
+In generale quindi è considerata una best practice quella di mantenere **High Cohesion & Low Coupling**, perchè questo favorisce manutenibilità, riduce le interazioni tra i sottosistemi e migliora la comprensibilità totale.
+
+Esistono quindi delle **collezioni** di **principi di progettazione**, come ad esempio **SOLID** e **GRASP**.
+
+## Prima Introduzione al SOLID
+
+Collezione di cinque principi di progettazione specifici:
+
+1. **Single Responsibility**: Una classe o metodo dovrebbe avere solo un motivo per cambiare.
+2. **Open Closed**: Estendere una classe non dovrebbe comportare modifiche su di essa.
+3. **Liskov Substitution**: Istanze di sottoclassi possono sostituire istanze della classe base.
+4. **Interface Segregation**: Interfaccia a grana fine e specifiche per ogni cliente.
+5. **Dependency Inversion**: Programmare guardando le interfacce e non le implementazioni.
+
+# Lezione 13 II - Principi Di Progettazione - In Verticale su SOLID & GRASP
+
+## SOLID: Analisi in dettaglio dei Cinque Principi
+
+- **Single Responsibility Principle**: Se una classe è adeguatamente coesa da un punto di vista funzionale allora un cambiamento deve impattare solo la classe che realizza la funzionalità in questione. Se dovessero esserci due motivi allora dobbiamo dividere in due classi.
+
+    Questo garantisce coesione funzionale alla classe in questione.
+
+    Si applicano delle eccezioni a queste regole solo se la separazione introducerebbe complessità non necessaria.
