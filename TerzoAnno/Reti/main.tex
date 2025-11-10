@@ -1336,11 +1336,11 @@ Quando il mittente riceve ACK duplicati, ritrasmette il pacchetto corrente.
 Se la perdita pacchetti esiste nel canale sottostante, allora il mittente potrebbe non ricevere alcuna risposta dal destinatario.
 Il mittente dunque aspetta ogni ACK per un massimo di tempo detto \textbf{timeout}. Se il pacchetto non è perso ma solo in ritardo, allora la ristrasimssione invia un duplicato, che sarà individuabile grazie al numero di sequenza da riscontrare.
 
-\paragraph{Prestazioni e Reale Utilizzo del Canale} RDT3.0 risulta essere molto valido da un punto di vista funzionale, ma da un profilo di prestazioni notiamo che l'utilizzo del canale è molto ridotto a causa dell'attesa del mittente. Volendo quantificare l'utilizzo del canale possiamo definire questo schema con relativa formula:
+\subsubsection{Prestazioni e Reale Utilizzo del Canale} RDT3.0 risulta essere molto valido da un punto di vista funzionale, ma da un profilo di prestazioni notiamo che l'utilizzo del canale è molto ridotto a causa dell'attesa del mittente. Volendo quantificare l'utilizzo del canale possiamo definire questo schema con relativa formula:
 
 \begin{figure}[htbp]
     \center
-    \includegraphics[scale=0.52]{img/RDT3.0.png}
+    \includegraphics[scale=0.48]{img/RDT3.0.png}
 \end{figure}
 
 \vspace*{-15px}
@@ -1430,13 +1430,332 @@ Nello specifico, vengono utilizzate \textbf{due finestre} di pacchetti, una \tex
 
 Listiamo una serie di meccanismi riguardanti il trasferimento affidabile con le relative caratteristiche:
 
-\begin{enumerate}
+\begin{itemize}
     \item \textbf{ACK}: Indica al mittente che un pacchetto è stato ricevuto correttamente dal destinatario.
     \item \textbf{NAK}: Indica al mittente che un pacchetto è stato \textbf{non} ricevuto correttamente dal destinatario.
     \item \textbf{Ritrasmissione}: Permette al ricevitore di ricevere un pacchetto che è stato corrotto o perso in una trasmissione precedente.
     \item \textbf{Numeri di Sequenza}: Consente il rilevamento di duplicati lato ricevitore.
     \item \textbf{Checksum}: Utilizzato dal ricevitore per rilevare i bit invertiti durante la trasmissione di un pacchetto.
+\end{itemize}
+
+\subsection{Protocollo TCP}
+
+Iniziamo la descrizione in verticale sul protocollo TCP.
+
+\paragraph{Proprietà del Protocollo TCP} Il protocollo TCP garantisce queste proprietà:
+
+\begin{itemize}
+    \item \textbf{Orientato alla Connessione}: Si effettuano handshake prima dell'inizio della connessione, e lo stato della connessione risiede sui punti terminali della connessione e non su quelli intermedi.
+    \item \textbf{Connessione Full Duplex}: La connessione punto a punto è per definizione bidirezionale.
+    \item \textbf{Multiplexed}: Consente l'assegnamento di una connessione ad un determinato processo.
+    \item \textbf{Controllo della Connessione}: Fornisce meccanismi di inizio e fine trasmissione.
+    \item \textbf{Trasferimento di Dati Ordinato e Affidabile}: Permette il controllo di tutti i tipi d'errore quindi dati corrotti, segmenti persi, segmenti duplicati e segmenti fuori sequenza.
+    \item \textbf{Controllo di Flusso}: Evita di spedire più dati di quanti non ne possa handlare il destinatario.
+    \item \textbf{Controllo di Congestione}: Permette di recuperare da situazioni di sovraccarico della rete.
+\end{itemize}
+
+\newpage
+
+\paragraph{Bufferizzazione del Trasferimento} Il flusso di dati in byte fornito dall'applicativo viene suddiviso in segmenti TCP, e per poter permettere questo si utilizzano \textbf{due buffer} uno lato \textbf{mittente} ed uno lato \textbf{destinatario}.
+Quindi il flusso di byte viene partizionato in segmenti, ciascuno di essi avrà un header e viene consegnato al livello IP.
+
+\begin{figure}[htbp]
+    \center
+    \includegraphics[scale=0.55]{img/bufferizzazioneTCP.png}
+\end{figure}
+
+\subsubsection{Formato Segmento TCP}
+
+Dato un flusso di \textbf{byte numerati} TCP suddivide questo stream in segmenti, mantenendo quindi un enumerazione sui segmenti in base a specifici byte, quindi un \textbf{segmento}
+è \textbf{identificato dal suo primo byte} di dati \textbf{nel segmento}. In questo modo il riscontro è rappresentato dall'ultimo byte ricevuto correttamente $+1$.
+
+\begin{figure}[htbp]
+    \center
+    \includegraphics[scale=0.55]{img/segmentoTCP.png}
+\end{figure}
+
+Descriviamo a pagina successiva questa struttura passo passo.
+
+\newpage
+
+\begin{itemize}
+    \item \textbf{Porte sorgente e Destinazione}
+    \item \textbf{Numero di Sequenza}: Si riferisce al primo byte nel flusso che caratterizza il segmento.
+    \item \textbf{Numero di ACK}: Numero di sequenza del prossimo byte atteso, se \texttt{FLAG = 1} allora è un ACK.
+    \item \textbf{FLAGS di Bit Codice}: Sei FLAGS che hanno specifiche funzionalità:
+    \begin{itemize}
+        \item \textbf{URG}: Campo puntatore urgente, da utilizzare se ci sono dati da trasferire in via prioritaria.
+        \item \textbf{ACK}: Se settata ad 1 indica che il numero di riscontro contiene dati significativi.
+        \item \textbf{PSH}: Se settata ad 1 causa il trasferimento dei dati immediatamente 
+        
+        all'applicativo.
+        \item \textbf{RST}: Richiede il reset della connessione.
+        \item \textbf{SYN}: Sincronizza il Numero di Sequenza.
+        \item \textbf{FIN}: Se settata ad 1 indica la richiesta di chiusura della connessione.
+    \end{itemize}
+    \item \textbf{Finestra di Ricezione}: Numero di byte che il destinatario\footnote{Il destinatario in questo caso è chi sta componendo questo segmento, in veste di futuro destinatario, comunica all'altra parte quanto può ricevere nel suo buffer. Questo appiattimento dei ruoli di mittente e destinatario è causato dal fatto che dopo l'handshake i due attori sono posti allo stesso livello.} può ricevere.
+    \item \textbf{Checksum}.
+    \item \textbf{Opzioni TCP}: Permette la negoziazione di paramentri, come ad esempio la dimensione massima di un segmento (MSS).
+\end{itemize}
+
+\vspace*{15px}
+
+\subsubsection{Gestione della Connessione TCP - Handshaking e Chiusura}
+
+Analizziamo le fasi di setup, di effettivo trasferimento di dati e chiusura di una connessione TCP.
+
+\vspace*{8px}
+
+\paragraph{Three Way Handshake} Prima di trasmettere effettivi dati mittente e destinatario si concordano sull'apertura di una connessione, stabilendo anche i parametri della connessione.
+I primi segmenti quindi non sono di dati effettivi, permettono anche l'inizializzazione dei due buffer, necessari per il controllo del flusso e della congestione. Al momento di arrivo del terzo segmento la connessione è instaurata.
+
+\vspace*{35px}
+
+Mostriamo a pagina successiva passo passo i dettagli dello scambio di questi $3$ segmenti iniziali.
+
+\newpage
+
+\begin{figure}[htbp]
+    \center
+    \includegraphics[scale=0.45]{img/handshakeTCP.png}
+\end{figure}
+
+\begin{itemize}
+    \item Il \textbf{client} invia una \textbf{richiesta di connessione} ad un \textbf{server TCP}, settando come attiva la flag \texttt{SYN} e trasmettendo anche un \textbf{numero di sequenza iniziale}.
+    \item Il server alloca i buffer e risponde con un segmento di connessione garantita detto \texttt{SYNACK}, nello specifico:
+    \begin{itemize}
+        \item Con \texttt{SYN} attivo è significativo il valore di sequenza, che è il valore iniziale.
+        \item Anche \texttt{ACK} è attivo.
+    \end{itemize}
+    \item Il client alloca il buffer dal suo fato e invio un riscontro positivo del messaggio del server.
+    \begin{itemize}
+        \item Si setta \texttt{SYN = 0} per fare in modo che dopo questo terzo segmento inizi l'effettivo scambio di dati.
+    \end{itemize}
+    Quindi da questo momento in poi server e client sono sullo stesso livello.
+\end{itemize}
+
+\paragraph{Chiusura di Connessione TCP} Client e server chiudono ciascuno il loro lato della connessione, inviando segmenti dove \texttt{FIN = 1}. Ciascuno risponderà ad un segmento del genere con un \texttt{ACK}.
+
+\begin{figure}[htbp]
+    \center
+    \includegraphics[scale=0.375]{img/chiusuraTCP.png}
+\end{figure}
+
+\newpage
+
+Si noti che sulla precedente rappresentazione erano riportati degli stati di una connessione TCP. Ne esistono diversi e in particolare
+lo stato \texttt{TIME\_WAIT} è lo stato finale in cui chi sta richiedendo la chiusura resta prima di passare alla reale chiusura. Questo stato è caratterizzato dalla presenza di un timer
+che lo fa terminare, e la durata di questo timer è correlata alla MSL, ossia \textbf{Maximum Segment Lifetime}. L'esistenza di questo stato garantisce l'implementazione 
+in maniera affidabile della terminazione di una connessione in entrambe le direzioni e l'eliminazione di segmenti duplicati in rete.
+
+\subparagraph{Chiusura Parziale di Connessione TCP} Se uno dei due lati lancia un segmento con \texttt{FIN = 1}, allora non potrà inviare dati ma potrà ancora riceverli mettendosi quindi in stato di \texttt{FIN\_WAIT\_2}.
+
+\subsubsection{Trasferimento Affidabile del TCP}
+
+Un segmento può essere smarrito o corrotto, quindi il TCP crea un servizio di trasferimento affidabile basandosi su questi meccanismi:
+
+\begin{itemize}
+    \item \textbf{Checksum}: Permette di scartare segmenti corrotti.
+    \item \textbf{Numero di Sequenza}: Enumerazione di segmenti basata sui primi byte di ciascun segmento.
+    \item \textbf{Numero di Riscontro}: Numero di sequenza del byte che l'host sta attendendo dall'altro.
+    \item \textbf{Riscontro Cumulativo}: Si riscontra fino al primo byte mancante nel flusso.
+    \item \textbf{Timer}.
+\end{itemize}
+
+\paragraph{Eventi Lato Mittente} Descriviamo il comportamento del mittente:
+
+\begin{itemize}
+    \item Riceve i dati dall'applicativo.
+    \item Incapsula di dati in segmenti e li numera con la logica a byte definita prima.
+    \item Avvia il timer di ritrasmissione RTO solo se non è già assegnato a qualche altro precedente segmento.
+    \item Viene effettuata una \textbf{ritrasmissione} se:
+    \begin{itemize}
+        \item Scade un timeout: Ritrasmette il segmento che non è stato riscontrato, riavviando il timer.
+        \item Riceve tre \texttt{ACK} duplicati: Questo è indice di perdita del segmento successivo all'ultimo riscontrato, quindi viene effettuata una \textbf{fast transmission} prima della scadenza del timer.
+    \end{itemize}
+\end{itemize}
+
+I segmenti ottenuti fuori sequenza possono essere temporaneamente memorizzati dal destinatario, ma la loro gestione dipende dall'implementazione del TCP a cui stiamo facendo riferimento.
+
+\newpage
+
+\paragraph{Eventi Lato Destinatario} Descriviamo il comportamento del destinatario:
+
+\begin{itemize}
+    \item Tutti i segmenti inviati contengono ACK.
+    \item Se il destinatario \textbf{non ha dati da inviare} e \textbf{riceve un segmento in ordine} allora ritarda l'invio di \texttt{ACK} di $500ms$
+    \item Se il destinatario \textbf{riceve il segmento atteso} e il \textbf{precedente non è stato riscontrato} allora invia immediatamente un \texttt{ACK}.
+    \item Se il destinatario riceve un \textbf{segmento fuori sequenza}, \textbf{mancante in una sequenza} oppure \textbf{duplicato} allora invia immediatamente un \texttt{ACK}.
+\end{itemize}
+
+\subsubsection{TCP RTT, RTO, Stime Timeout e Finestre di Ricezione}
+
+Il tempo di timeout \texttt{RTO} è fondamentale per il funzionamento del TCP e non può essere ne troppo breve ne troppo lungo, va quindi accuratamente stimato. Ci basiamo quindi su due misure:
+
+\begin{itemize}
+    \item \texttt{SampleRTT}: Misura del tempo trascorso da quando si invia un segmento a quando si riceve il suo riscontro.
+    \item \texttt{EstimatedRTT}: Stima del valore precedente calcolata iterativamente come:
+    \[ \boxed{EstimatedRTT_{i+1} = (1-\alpha) EstimatedRTT_{i} + \alpha SampleRTT} \]
+    \item \texttt{$RTT_{DEV}$}: Stima della variabilità di RTT determinata con:
+    \[ \boxed{RTT_{DEV} = (1-\beta) RTT_{DEV} + \beta | RTT_{SAMPLE} - RTT_{ESTIMATED} |} \]
+    \item \texttt{RTO}: Una volta ottenuti questi valori il timeout viene calcolato come:
+    \[ \boxed{RTO = RTT_{ESTIMATED} + 4RTT_{DEV}} \]
+\end{itemize}
+
+\paragraph{Finestra di Ricezione TCP} I dati inviati dall'applicativo sono mantenuti nel buffer di invio, e la trasmissione si basa su una sliding window che viene fatta scorrere a tempo di ricezione di un \texttt{ACK}.
+
+\vspace*{10px}
+
+\begin{figure}[htbp]
+    \center
+    \includegraphics[scale=0.4]{img/slidingWindowTCP.png}
+\end{figure}
+
+\newpage
+
+\subsubsection{Controllo di Flusso del TCP}
+
+Assumendo che sia mittente sia destinatario abbiano buffer, bisogna valutare cosa succeda nel caso in cui il \textbf{livello di rete} fornisca i dati a \textbf{velocità maggiore}
+rispetto a quella dell'\textbf{applicativo a consumarli} dal buffer.
+
+\vspace*{10px}
+
+L'obiettivo del \textbf{controllo di flusso} è quindi quello di mettere in \textbf{relazione} la \textbf{frequenza di invio del mittente} con la \textbf{frequenza di lettura} dell'applicazione \textbf{ricevente}.
+
+Questo meccanismo è implementato tramite una variabile caratteristica \texttt{rwnd} mantenuta dal mittente calcolata come:
+
+\[ \boxed{rwnd = RcvBuffer - (LastByteReceived - LastByteRead)} \]
+
+\vspace*{10px}
+
+Il mittente fornirà questa variabile al destinatario nell'header del segmento e quest'ultimo verficherà se:
+
+\[ \boxed{LastByteSent - LastByteAcked \leq rwnd} \]
+
+Esistono anche dei segmenti sonda di dimensione $1byte$ che il mittente invia per ottenere la dimensione della \texttt{rwnd}.
+
+\subsubsection{Controllo di Congestione del TCP}
+
+Il fenomeno della congestione è causato da più sorgenti che tentano l'invio di dati tramite lo stesso percorso. Questo può provocare lunghi ritardi e perdita di pacchetti.
+
+\paragraph{Approcci per Controllo Congestione} Esistono due tipologie di controllo di congestione di rete:
+
+\begin{enumerate}
+    \item \textbf{End To End}: I mezzi intermedi non forniscono alcun feedback, sono quindi gli host terminali tramite sintomi a rilevare la congestione della rete.
+    \item \textbf{Assistito dalla Rete}: I router segnalano la congestione\footnote{Questo infrange gli schemi impostati fino ad ora di totale isolamento tra i vari livelli del TCP/IP.}. 
+    Definito anche come \textbf{ECN} (Explicit Congestion Notification), dove si utilizzano \texttt{2bit} nell'\textbf{header IP} per indicare \textbf{congestione}. Nello specifico abbiamo un bit \texttt{ECE} settata dalla \textbf{destinazione} nel segmento di riscontro e un bit \texttt{CWR} \textbf{lato mittente} per indicare di aver ricevuto la notifica di congestione.
 \end{enumerate}
+
+In TCP quindi il controllo di congestione è implementato imponendo a ciascun mittente di \textbf{limitare la frequenza di invio di pacchetti} sulla connessione in funzione della \textbf{congestione percepita}.
+
+\vspace*{10px}
+
+La dimensione della finestra di invio sarà quindi $min\{ rwnd, cwnd \}$ con \texttt{rwnd} receiver window e \texttt{cwnd} congestion window.
+Quindi il rate di invio sarà:
+
+\[ \boxed{rate_{invio} \leq \frac{min\{ rwnd, cwnd \}}{RTT}} \]
+
+\newpage
+
+\paragraph{Algoritmo Controllo Congestione di TCP} Si compone di tre fasi:
+
+\begin{itemize}
+    \item Slow Start
+    \item AIMD (Additive Increase Multiplicative Decrease)
+    \item Reazione agli Eventi Perdita:
+    \begin{itemize}
+        \item Fast Recovery
+        \item Reazione al Timeout
+    \end{itemize}
+\end{itemize}
+
+Prima della descrizione effettiva delle fasi è utile definire la \texttt{cwnd} (Congestion Window) misurata solitamente in \texttt{MSS} (Maximum Segment Size), ossia la massima quantità di dati trasportabile da un segmento.
+
+\paragraph{AIMD} Fase in cui TCP mittente aumenta proporzionalmente la propria finestra di congestione ad ogni ACK ricevuto:
+
+\begin{itemize}
+    \item Ad ogni ACK la finestra di congestione viene incrementata, nello specifico aumento di \texttt{1 MSS} per ogni \texttt{RTT}, quindi $cwnd += \frac{1}{cwnd}$.
+\end{itemize}
+
+\paragraph{Slow Start} Fase in cui ad ogni \texttt{ACK} la cwnd viene incrementata di \texttt{1 MSS}, quindi si raddoppia ad ogni \texttt{RTT}. Segue quindi un andamento esponenziale.
+
+\subsubsection{Tipologie di TCP che Istanziano Algoritmo di Controllo Congestione - (Reno, Tahoe, Cubic e Vegas)}
+
+\paragraph{TCP Reno} Istanza delle fasi che abbiamo appena definito, aggiungendo anche gli eventi di perdita:
+
+\begin{itemize}
+    \item \textbf{Gestione cwnd}: Viene definita una variabile soglia ad un valore alto.
+    \begin{itemize}
+        \item Se \texttt{cwnd < soglia} allora si incrementa \texttt{cwnd} aumenta esponenzialmente in \textbf{Slow Start}.
+        \item Se \texttt{cwnd > soglia} allora si incrementa \texttt{cwnd} aumenta linearmente in \textbf{Additive Increase}.
+    \end{itemize}
+    \item \textbf{Eventi di Perdita}: Esistono varie condizioni:
+    \begin{itemize}
+        \item \textbf{Timeout}: Si setta \texttt{soglia = cwnd} e \texttt{cwnd = 1 MSS} in \textbf{Slow Start}.
+        \item \textbf{3 ACK Duplicati}: \texttt{soglia = 1/2cwnd} e \texttt{cwnd = soglia + 3MSS} in \textbf{Fast Recovery}. In particolare in questa fase possono anche accadere altri eventi:
+        \begin{itemize}
+            \item Se avviene un \textbf{timeout} si va in \textbf{Slow Start}.
+            \item Fino a che arrivano \textbf{ACK duplicati} allora \texttt{cwnd = cwnd + 1MSS}.
+            \item Se arriva un \textbf{ACK non duplicato} allora \texttt{cwnd = soglia} e si va in \textbf{Congestion Avoidance}.
+        \end{itemize}
+    \end{itemize}
+\end{itemize}
+
+A pagina successiva si mostra un esempio di controllo congestione in TCP Reno.
+
+\newpage
+
+\begin{figure}[htbp]
+    \center
+    \includegraphics[scale=0.4]{img/TCP_Reno.png}
+    \caption{Gestione di congestione in TCP Reno}
+\end{figure}
+
+Si notano quindi i tre possibili stati ossia Slow Start \texttt{SS}, Congestion Avoidance \texttt{CA} e Fast Recovery \texttt{FR}.
+
+\paragraph{TCP Tahoe} Versione meno recente che comprende solo gli stati di Slow Start e Congestion Avoidance ed è così definito:
+
+\begin{itemize}
+    \item \textbf{Timeout} e \textbf{3 ACK Duplicati} sono gestiti allo stesso modo, ossia in \textbf{Slow Start} settando \texttt{soglia = cwnd/2} e \texttt{cwnd = 1MSS}.
+\end{itemize}
+
+\begin{figure}[htbp]
+    \center
+    \includegraphics[scale=0.4]{img/TCP_Tahoe.png}
+    \caption{Gestione di congestione in TCP Tahoe}
+\end{figure}
+
+\newpage
+
+\paragraph{TCP Cubic} Cerca di ottimizzare l'andamento "a dente di sega" del TCP Reno settando degli intervalli di ampiezza \texttt{k} e gli incrementi vengono così gestiti:
+
+\begin{itemize}
+    \item Incrementi maggiori quando siamo lontani da \texttt{k}.
+    \item Incrementi minori quando siamo vicini a \texttt{k}.
+\end{itemize}
+
+\vspace*{-15px}
+
+\begin{figure}[htbp]
+    \center
+    \includegraphics[scale=0.6]{img/TCP_Cubic.png}
+\end{figure}
+
+\subsubsection{Throughput, Equità e Cenni di Attacchi TCP}
+
+Avendo mostrato i tre stati di TCP Reno, possiamo dire che macroscopicamente il TCP ha un andamento "a dente di sega". Da questo possiamo analizzarne il throughput, assumendo che il rate di trasmissione
+sia circa costante. Quindi:
+
+
+\begin{itemize}
+    \item $W$: Finestra di taglia massima.
+    \item $w$: Finestra di taglia minima, ossia $w = \frac{W}{2}$.
+    \item \textbf{Throughput}: Se la finestra è $W$ allora è $\frac{W}{RTT}$, invece dopo un evento di perdita quando la finestra è $w$ il throughput diventa $\frac{W}{2RTT}$.
+\end{itemize}
+
+Calcolando quindi una media tra le due possibili casistiche otteniamo:
+
+\[ \boxed{throughput = \frac{1}{2} \left( \frac{W}{RTT} + \frac{w}{RTT} \right) = \frac{3}{4} \frac{W}{RTT}} \]
 
 \newpage
 

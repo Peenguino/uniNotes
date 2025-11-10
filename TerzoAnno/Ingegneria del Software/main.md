@@ -440,7 +440,7 @@ Questi possono essere sia sequenziali sia paralleli, quindi sottostati attivati 
 
 Esistono quindi best practices per la buona definizione di Macchine a Stati/Attività.
 
-# Progettazione Software
+# Lezione 11 - Progettazione Architettura Software
 
 Progettazione delle componenti di un sistema più complesso
 
@@ -593,3 +593,343 @@ Collezione di cinque principi di progettazione specifici:
     Questo garantisce coesione funzionale alla classe in questione.
 
     Si applicano delle eccezioni a queste regole solo se la separazione introducerebbe complessità non necessaria.
+
+- **Open Closed Principle**: Quando i requisiti cambiano, bisogna aggiungere classi ma non bisogna modificare quelli già esistenti. Quindi una buona progettazione permette facilmente questo comportamento.
+
+    Questo principio si basa sull'utilizzo di classi astratte che permettono modifiche di classi senza effetti su chi chiama quelle classi.
+
+    - Aperti alle estensioni, tramite interfacce e classi astratte.
+    - Chiusi al cambiamento, tramire delega e astrazioni.
+
+- **Liskov Substitution Principle**: Questo principio è ben definito se un sottotipo $S$ di $T$, può sempre sostituire $T$. Ad esempio $Quadrato$ è sottotipo di $Rettangolo$. Quindi un Quadrato è sempre un Rettangolo. Ma questo può portare problemi in caso di `@Override`
+
+- **Interface Segregation Principle**: I clienti non devono dipendere da interfacce che non usano, quindi **bisogna esporre solo i metodi necessari**. Quindi vogliamo evitare le **fat-interfaces**. 
+
+    Quindi non voglio che una classe implementi un interfaccia che non la rappresenta, magari colmando buchi con implementazioni dummy su metodi di cui abbiamo definito la segnatura nell'interfaccia.
+
+- **Dependency Inversion Principle**: Bisogna far riferimento alle interfacce e a ciò che espongono e non direttamente ad una classe reale.
+
+    - **Iniezione di Dipendenza**: Si delega un iniettore, che definisce a chi sta invocando, cosa deve invocare nello specifico. Quindi conosce l'interfaccia e viene passato il riferimento all'oggetto da utilizzare.
+
+## GRASP: General Responsibility Assignment Software Patterns
+
+- Classi definite su uno schema più **Responsibility-Driven**.
+
+Vanno quindi definite delle responsabilità di **due tipi**:
+
+- **Fare**:
+    - Fare qualcosa, creare ad esempio oggetto.
+    - Iniziare l'azione di altri oggetti.
+- **Conoscere**:
+    - Conoscere i riferimenti agli oggetti da utilizzare.
+
+Definizione di oggetti e relativi metodi seguendo dei pattern di assegnazione di responsabilità:
+
+- Creator
+- Information Expert
+- High Cohesion
+- Low Coupling
+- Controller
+- Polymorphism
+- Indirection
+- Pure Fabrication
+- Protected Variations
+
+## Delega vs Ereditarietà
+
+- Ereditarità: La classe A estende il tipo definito dalla classe B, utilizzando l'interfaccia di B e aggiungendo campi e metodi specifici.
+- Delega la classe A estende il comportamento di B incorporandone le funzionalità, utilizzando un istanza di B e chiamandone i metodi.
+
+Un esempio è quello di una `MyStack` implementata ereditando da un `Vector` **(Ereditarietà)** oppure utilizzando una `Vector` nella sua implementazione privata **(Delega)**.
+
+1. **Ereditarietà**:
+
+```
+MyStack extends Vector {
+ public void push(Object element) { insertElementAt(element,0); }
+ public Object pop () {
+    Object result = firstElement();
+    removeElementAt(0);
+    return result;
+ }
+}
+```
+
+2. **Delega**:
+
+```
+class MyStack {
+ // Campo privato per contenere l'istanza di Vector
+ private Vector _vector = new Vector();
+
+ // Metodi delegati semplici per le operazioni di base
+ public int size() { return _vector.size(); }
+ public boolean isEmpty() { return _vector.isEmpty(); }
+
+ // Nuovi metodi specifici della pila
+ public void push(Object element) { _vector.insertElementAt(element, 0); }
+ public Object pop() {
+    if (_vector.isEmpty()) { throw new IllegalStateException("La pila è vuota"); }
+    Object result = _vector.firstElement();
+    _vector.removeElementAt(0);
+    return result;
+ }
+}
+```
+
+Quindi si eredita se la nuova classe "è un tipo" della classe vecchia, ma se la relazione è di "è un ruolo di" allora è meglio la delega.
+
+Da un punto di vista prestazionale è meno performante, non definisce una struttura definita seguendo la gerarchia delle classi, taglia un po' in diagonale questa gestione.
+
+## Qualità del Software secondo la ISO 25010
+
+<div style="text-align: center;">
+    <img src="img/qualitaDelSoftware.png" width="700">
+</div>  
+
+Nelle slide (#13) è presente una descrizione accurata di ogni punto.
+
+## Stili Architetturali e Caratteristiche Proprietà di Qualità del SW
+
+- **Client/Server**
+    - **Disponibilità**: I server di ciascun tier può essere replicato, quindi anche se uno fallisse non risulterebbe essere un grande problema.
+    - **Fault Tollerance**: La richiesta ad un server che fallisce può essere reindirizzata ad una replica, di conseguenza non risulta essere un problema.
+    - **Modificabilità**: Molto alta dato il disaccoppiamento e coesione tipici di questa architettura.
+    - **Performance**: Di base buona, ma dipende fortemente dalle velocità o dai thread sul server.
+    - **Scalabilità**: I server sono replicabili a piacimento, l'unica cosa che potrebbe non scalare facilmente è il DB.
+
+- **Pipes And Filter**
+    - **Disponibilità**: Bisogna avere tutti i componenti che formano la catena.
+    - **Fault Tollerance**: Un componente rotto deve essere sostituito da una replica.
+    - **Modificabilità**: Si, ma solo se riguardano poche componenti.
+    - **Performance**: Dipende dalla capacità del canale di comunicazione e dal filtro più lento che potrebbe fare da bottleneck.
+    - **Scalabilità**: Può scalare.
+
+- **Publish/Subscribe**
+    - **Disponibilità**: Si possono creare cluster di dispatcher.
+    - **Fault Tollerance**: Si creano dei dispatcher replica.
+    - **Modificabilità**: Si può creare un numero arbitrario di publisher e subscribers, l'unica cosa da dover tenere costante è il formato del messaggio tra i due ruoli.
+    - **Performance**: Performance buone ma che devono scendere a compromessi con requisiti come affidabilità e sicurezza.
+    - **Scalabilità**: Buona scalabilità, con alta replicazione di dispatcher possono essere gestiti tanti messaggi.
+
+- **P2P**
+    - **Disponibilità**: Dipende dal numero di nodi attivi in rete.
+    - **Fault Tollerance**: Gratis.
+    - **Modificabilità**: Si, se si parla della parte di comunicazione.
+    - **Performance**: Dipende dal numero di nodi attivi in rete.
+    - **Scalabilità**: Gratis.
+
+# Lezione 14 - Design Pattern Comportamentali (Strategy e State)
+
+- Si suddividono in creazionali, strutturali e comportamentali
+
+## 01 - Design Pattern - Strategy
+
+Pattern Comportamentale
+
+Problemi causati da un `@Override` per cui una sottoclasse si trova a forzare un metodo che ha ereditato. Una soluzione alternativa sarebbe definire un interfaccia specifica per contenere quel comportamento, ma questo implicherebbe la riscrittura dello stesso metodo per ogni classe che lo implementa.
+
+Serve quindi una **strategia** dove si **utilizzano classi intermedie** di **behaviour** tra le **classi finali e l'interfaccia**, modellando quindi i comportamenti uniformi in una classe specifica.
+
+Le classi foglia manterranno privata quindi un istanza del tipo della classe intermedia che permette la modellazione di quel comportamento.
+
+Questo permette di cambiare dinamicamente il comportamento variando il tipo dell'oggetto istanza della classe intermedia.
+
+<div style="text-align: center;">
+    <img src="img/patternStrategy1.png" width="350">
+</div>
+
+Quindi l'invocazione al metodo `quack()`, in base alla classe foglia, passerà per l'oggetto istanziato di tipo `Behaviour` che mantiene il comportamento e quindi invocherà l'implementazione fornita nel `Behaviour oggettoComportamento`.
+
+Stiamo quindi utilizzando il concetto di delega presentato durante la lezione precedente.
+
+- **Quando si usa questo pattern?**
+    - Quando più classi correlate differiscono solo nel comportamento.
+    - Quando servono più varianti diverse di uno stesso algoritmo.
+    <div style="text-align: center;">
+    <img src="img/patternStrategy2.png" width="380">
+    </div>
+    - Quando bisogna definire comportamenti diversi fornendo alternativa all'estensione della classe.
+    - Si eliminano costrutti condizionali per determinare il comportamento.
+    - Chiaramente richiede l'allocazione di oggetti di supporto che rappresentino il behaviour tramite il tipo.
+
+- **Gestione dei parametri passati al costruttore della classe Context**: Chiaramente se i metodi delle classi reali, se hanno implementazioni diverse, avranno anche una segnatura diversa. Quindi devo gestire i problemi dei parametri del metodo.
+
+## 02 - Design Pattern - State
+
+Pattern Comportamentale
+
+L'**invocazione di metodo** che può variare in base al tipo di comportamento (come in Strategy) **dipende** interamente dal **tipo di stato corrente**.
+
+Ho quindi una struttura simile a prima, il `Context` delega ad un oggetto di tipo `State` definito dall'interfaccia `State`.
+
+La differenza con `Strategy` è che il **metodo definito negli oggetti può causare un cambio di stato**, quindi è come se fosse che lo stato viene modificato dall'interno, come se in `Strategy` venisse **autoiniettato il comportamento** in base all'ultimo **metodo invocato**.
+
+<div style="text-align: center;">
+    <img src="img/patternState1.png" width="400">
+</div>
+
+Quindi senza gestione dello stato lo `State` sarebbe uno `Strategy`
+
+Un invocazione di metodo potrebbe anche portare solo ad un cambiamento di stato.
+
+Ogni oggetto di tipo `State` allora potrebbero scegliere di tenersi un riferimento all'oggetto di tipo Context come `final` invece di richiederlo come parametro nel costruttore.
+
+Posso anche scegliere se lo State sia un `Interfaccia` o una `Abstract Class`.
+
+### Definizione in 6 passi di un Pattern State
+
+Potrebbe essere definita in 6 passi:
+- Si crea una **classe** che funzioni da **macchina a stati**.
+- Creare una **classe** `State` che replichi i **metodi dell'interfaccia della macchina a stati**.
+- Creare delle **sottoclassi** di `State` **per ogni stato del dominio**.
+- La classe `Context` **mantiene** lo **stato corrente**.
+- Le **richieste del client** sono delegate **dalla classe allo stato corrente**.
+- I metodi della classe `State` modificano lo stato corrente.
+
+
+### Esempio di Traduzione Automa in Pattern State in UML
+
+Dato questo automa:
+
+<div style="text-align: center;">
+    <img src="img/patternState2.png" width="350">
+</div>
+
+Lo traduciamo in queste classi:
+
+<div style="text-align: center;">
+    <img src="img/patternState3.png" width="550">
+</div>
+
+# Lezione 15 - Design Pattern Creazionali (Factory e Singleton)
+
+## 03 - Design Pattern - Factory
+
+Pattern Creazionali astraggono il processo di istanziazione di oggetti.
+
+Quindi una classe factory ha il ruolo di istanziare oggetti di altre classi.
+
+Di base il comportamento standard per istanziare un oggetto sarebbe:
+
+```JAVA
+List list = new ArrayList()
+```
+
+Ma in questo modo stiamo violando il principio code to an interface, perchè stiamo invocando il costruttore della classe effettiva e non interagiamo solo con l'interfaccia.
+
+In questo modo posso invocare la factory delle liste, separando l'utilizzatore della lista dall'implementatore della lista.
+
+### Tre Tipi di Factory
+
+- **Simple Factory (aka Concrete Factory)**: Si delega ad un oggetto Factory che gestisce la creazione di istanze delle classi in questione. Possiamo gestire in maniera migliore la factory, splittando le responsabilità indipendenti da quelle comuni.
+
+    Non è una formale classificazione di Factory, ma una **semplificazione della Abstract Factory**.
+
+    ```java
+    public class PizzaStore {
+            // ===== PARTE INDIPENDENTE AL TIPO
+            Pizza orderPizza(String type){
+            Pizza pizza;
+            // ===== PARTE DIPENDENTE AL TIPO
+            if (type == "cheese")
+            pizza = new CheesePizza();
+            else if (type == "pepperoni")
+            pizza = new PepperoniPizza();
+            else if (type == "pesto")
+            pizza = new PestoPizza();
+            // ===== PARTE INDIPENDENTE AL TIPO
+            pizza.prepare();
+            pizza.bake();
+            pizza.package();
+            return pizza
+        }
+    }
+    ```
+    Possiamo quindi ottimizzare questo schema separando la gestione della parte dipendente e quella della parte indipendente.
+
+- **Factory Method**: Ho una classe `Creator` e si **basa sull'ereditarietà**. Si definiscono quindi:
+    - `Creator`: Classe astratta che ha due metodi:
+        - `FactoryMethod`: Azioni non specificate nella superclasse, varieranno dopo nelle sottoclassi.
+        - `AnOperation`: Azioni condivise, nell'esempio delle slide erano boxare pizza, tagliare pizza ecc... che sono le stesse per ogni tipo di pizza.
+    - `ConcreteCreator`: Implementazione reale di Creator
+        - `FactoryMethod` in `@Override`: Azioni indipendenti, nell'esempio delle slide erano i vari tipi di pizza ed i loro costruttori e metodi specifici.
+    
+    Quindi `FactoryMethod` cambia tra le varie Classi Concrete mentre `AnOperation` resta identica tra tutte le classi concrete, essendo implementato nella classe astratta.
+
+    <div style="text-align: center;">
+    <img src="img/patternFactory1.png" width="450">
+    </div>
+
+    **Commentiamo la rappresentazione classe per classe**:
+
+    - **Product**: Definisce l'interfaccia del tipo di oggetti prodotti dalla `Factory Method`.
+    - **Concrete Product**: Implementa l'interfaccia `Product`.
+    - **Creator**: Dichiara il **Factory Method** che verrà **implementato** dalle sottoclassi **ConcreteCreator** e implementa con `AnOperation` tutte le operazioni indipendenti dai sottotipi, che le sottoclassi erediteranno.
+    - **Concrete Creator**: Sottotipo che sovrascrive il Factory Method per restituire un istanza del preciso sottotipo.
+
+    Chi **opera da interfaccia** in questo caso quindi è la **classe astratta** `Creator.`
+- **Abstract Factory**: Basato sulla delega.
+
+    Il client conosce solo l'interfaccia dei prodotti `AbstractProductA` e `AbstractProductB` e l'interfaccia della factory `AbstractFactory` che garantisce la presenza di metodi di **creazione di ciascuno di quei prodotti**.
+
+    <div style="text-align: center;">
+    <img src="img/patternFactory2.png" width="350">
+    </div>
+
+### Esempio su Simple Factory vs Factory Method vs Abstract Factory
+
+Assumiamo di voler modellare la produzione di due prodotti: Una TV ed un Remote Control di due Tipi: Philips e Samsung, assumendo questa gerarchia delle classi:
+
+<div style="text-align: center;">
+<img src="img/patternFactory6.png" width="150">
+</div>
+
+- Versione in **Simple Factory**:
+
+    <div style="text-align: center;">
+    <img src="img/patternFactory3.png" width="500">
+    </div>
+
+- Versione in **Factory Method**:
+
+    <div style="text-align: center;">
+    <img src="img/patternFactory4.png" width="500">
+    </div>
+
+- Versione in **Abstract Factory**:
+
+    <div style="text-align: center;">
+    <img src="img/patternFactory5.png" width="500">
+    </div>
+
+
+## 04 - Design Pattern - Singleton
+
+Si basa sul concetto per cui un oggetto fisico se ha un controllore allora questo deve essere uno, per evitare race conditions sull'oggetto.
+
+### Istanziazione di un Singleton
+
+Le fasi principali sono 3:
+
+- Si rende il costruttore privato
+- Si aggiunge un oggetto statico privato, che conterrà l'unica istanza disponibile
+- Si rende l'unica istanza disponibile accessibile tramite un metodo statico
+
+Questa è la sequenza formale per istanziare un singleton, ma esiste anche un inizializzazione lazy.
+
+### Singleton e Multithread
+
+Può avere problemi se più thread controllassero la condizione posta nel istanziazione lazy. Esistono quindi tre approcci per risolvere:
+
+- Istanziazione eager
+- Sincronizzazione a grana grossa sul metodo che genera il singleton
+- Approccio di double locking.
+
+### Singleton e Sottoclassi
+
+Che succede se estendiamo un singleton? Dovrei gestire il metodo che ritorna l'istanza in base al nome della classe o qualche soluzione simile.
+
+In ogni caso vado a infrangere principi di buona progettazione.
+
+Il singleton permette di passare un riferimento ad una classe, invece una classe non posso riferirla direttamente. Quindi è proprio un problema concettuale, non ha senso generare più sottoclassi di una classe di un oggetto caratterizzato dall'essere uno solo.

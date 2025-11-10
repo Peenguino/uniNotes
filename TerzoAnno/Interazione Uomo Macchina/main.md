@@ -611,3 +611,292 @@ La fedeltà del prototipo è quanto questo si avvicina al prodotto finale, non s
 - Prototipo: Interattivo e potenzialmente anche funzionale.
 
     ??? IMMAGINE NELLE SLIDE CHE DEFINISCE BENE LE DIFFERENZE TRA QUESTI TRE ???
+
+# Lezione 13 - Design for Everyone and Everywhere - 06/11/2025
+
+- Vogliamo che le interfacce moderne siano funzionali **per tutti**, in base alle abilità e necessità, **ovunque** ossia mobile, desktop ed in **maniera consistente** tra le varie sue forme di interfaccia.
+
+## Principi di Design Scalabile
+
+Definizione dei **principi del Design Scalabile**:
+
+1. **Accessibilità**: Standard di progettazione di interfacce per tutti gli utenti, includendo anche chi ha disabilità
+2. **Responsive Design**: Tecniche per creare interfacce che si adattino ad ogni tipo di device o dimensione dello schermo.
+3. **Design Systems**: Frameworks che ci permettono di mantenere consistenza tra tutti i tipi di interfacce.
+
+## Accessibilità
+
+Guardando le percentuali, è molto probabile che l'utente abbia delle forme di disabilità, anche se minime. Questo potrebbe essere già un motivo per progettare interfacce accessibili per poter includere quante più persone possibili.
+
+Esiste uno standard di riferimento, ossia il `WCAG 2.2`, che viene aggiornato periodicamente ed ha una **struttura ben definita**:
+- **4 principles**:
+    - **Perceivable**: Le informazioni devono essere presentabili in modo tale da essere notate anche in maniera alternativa, tramite alt text oppure captions.
+    - **Operable**: Le componenti dell'UI devono essere operabili sempre, quindi ad esempio accesso tramite tastiera o tempo sufficiente per interagire.
+    - **Understandable**: Informazioni e operazioni devono essere chiare.
+    - **Robust**: Il content deve essere accompagnato da labels.
+
+    L'**utilizzo di questi principi** viene **classificato in livelli**:
+    - **Level A**: Minimo, alcuni utenti sono completamente impossibilitati nell'utilizzo dell'interfaccia.
+    - **Level AA**: Raccomandato, spesso utilizzato come standard richiesto legalmente.
+    - **Level AAA**: Alto, interfaccia molto inclusiva.
+
+- **13 guidelines**: Le guidelines per un Level AA sono ad esempio:
+    - Contrasto dei colori
+    - Accesso con Tastiera ovunque
+    - Alt text per le immagini
+    - HTML semantico, la cui gerarchia ha senso
+    - Consistenza della navigazione
+    - Zoom permesso senza perdita di funzionalità dell'interfaccia
+
+    Esistono dei **tool automatizzati di testing**, come WAVE, axe DevTools, che permettono di effettuare test automatici all'accessibilità. Alcune non sono applicabili automaticamente, ad esempio la navigazione con la tastiera e simili sono richiesti gli utenti per testare (user study).
+
+- **78 success criteria**
+- **3 conformacnce levels**
+
+## Responsive Design
+
+Ogni device ha il proprio form factor, quindi si hanno una miriade di tipi di dispositivi con input diversi ed output diversi. Il **Responsive Design** **permette alle interfacce di adattarsi in base alle caratteristiche** di dove si stanno fruendo queste ultime.
+
+
+### Tecniche Chiave del Responsive Design
+- **Griglie fluide** invece che fisse
+- **Media** ed immagini **flessibili**
+- **Media Queries**, ossia CSS basato sul contesto dell'interfaccia
+- **Mobile First**: 
+    - Prima ci mettiamo un sacco di paletti e mano mano li rimuoviamo in base a quanto il contesto di permette di fare. E' molto più facile iniziare a progettare con un sacco di vincoli e poi toglierli, che non il contrario. 
+    - Oltre a questo attualmente l'utenza è spostata molto su mobile.
+    - Mira quindi molto al miglioramento progressivo.
+
+### Strategia di Breakpoint
+
+- Setto breakpoints in base alla larghezza dello schermo in `px`.
+- Questo funziona fino ad un certo punto, se viene messo sul mercato un nuovo dispositivo allora devo aggiungere nuovi breakpoint.
+- **Non** devo quindi effettuare **design in base al dispositivo**, **ma** faccio **design per il contenuto**.
+
+### Grid System
+
+Divido tutto il mio schermo in un numero $n$ di colonne.
+
+Inizio quindi a piazzare regole sugli elementi e la loro dimensione in colonne.
+
+Abbiamo quindi modo di assegnare colonne ai contenuti e non allo schermo. Lo schermo ha infatti un numero di colonne che deve riempire.
+
+Lo span di colonne può essere anche adattivo in base al contesto, quindi un elemento è da 6 colonne su mobile ma 8 su fisso.
+
+Bootstrap e Tailwind utilizzano questo sistema.
+
+### Responsive Patterns
+
+In tutti questi pattern presentati si assume di iniziare a progettare da mobile.
+E non sono mutualmente esclusivi, quindi possono essere usati in combinazione.
+
+- **Tiny Tweaks**:
+    - Layout che resta simile tra tutti gli schermi
+    - Magari abbiamo progettato un interfaccia per mobile, ma si adatta involontariamente bene al fisso, quindi sistemo solo qualcosa, in maniera ridotta.
+    <img src="img/pattern1.png" width="450">
+
+- **Column Drop**:
+    - Si inizia con una sola colonna per mobile e aggiungendo larghezza allora si aggiungono colonne e gli elementi scivolano alla riga precedente affiancandosi alla colonna.
+    - Viene utilizzato in contesti content-heavy, diventa multicolonna solo in contesti più larghi.
+- **Mostly Fluid**:
+    - Quando aumento la dimensione di schermo non aumento in proporzione la dimensione degli elementi, definendo ad esempio una larghezza massima agli elementi, si lasciano quindi aumentare i margini vuoti da un certo breakpoint.
+- **Layout Shifter**:
+    - Interfacce che cambiano in maniera consistente tra i vari breakpoint.
+    - Viene effettuata una riorganizzazione totale dell'interfaccia.
+    - Si usa quando l'esperienza lo necessita, differenziando quella mobile da quella desktop.
+    - Richiede più impegno, dato che si disegna una nuova interfaccia quasi da capo da un certo breakpoint in poi.
+- **Off Canvas**:
+    - Si sceglie di nascondere il contenuto quando la dimensione dello schermo non ci permette di mostrarlo.
+    - Si utilizza molto in contesti di tanta navigazione, lasciando spazio per il contenuto principale
+
+### Touch vs Mouse Interaction
+
+Dato che varia il paradigma d'interazione, perdiamo ad esempio con il touch del tutto lo stato di `hover`, ma si aggiungono nuove gesture come `swipe`, `pinch`, `long-press`.
+
+Molto importante diventa anche la `thumb-zone`.
+
+### Responsive Images e Media
+
+Inviare immagini desktop media verso mobile spreca banda. Quindi le soluzioni potrebbero essere:
+- Fornire attributi di negoziazione di `src`, magari tramite `srcset`.
+- Caricamento lazy dei media dopo l'interfaccia.
+- Grafica vettoriale dove possibile.
+
+Un esempio di **Tecniche CSS**:
+
+```CSS
+/* Mobile first */
+.container { display: flex; flex-direction: column; }
+
+/* Tablet and up - MEDIA QUERIES */
+@media (min-width: 768px) {
+.container { flex-direction: row; }
+}
+```
+
+### Performance Considerations
+
+Preferendo la piattaforma mobile bisogna ridurre le richieste HTTP, ottimizzare le immagini, effettuando caricamenti lazy delle immagini.
+
+## Design System
+
+Le inconsistenze tendono ad accumularsi e la qualità può degradare nel tempo. Quindi bisogna anche porsi dei vincoli nella progettazione.
+
+### What is a Design System
+
+Solitamente questo include:
+- Libreria dei componenti (Vedi Atomic Design Methodology)
+- Design token (palette colori, spaziatura, font, ombre)
+- Guide d'utilizzo e Documentazione
+- Principi di sviluppo e pattern
+- Implementazione del codice
+
+Quindi l'idea è quello di non utilizzare dei componenti a priori ma bisogna contestualizzarli.
+
+### Benefits of Design Systems
+
+Consistenza, Efficienza, Qualità, Scalabilità e Manutenzione sono proprietà garantite dall'utilizzo di Design System
+
+### Atomic Design Methodology
+
+Metodologia di progettazione di Design System.
+
+Si basa su una gerarchia di
+
+- **Atomi**: Bottoni, Campi Input, Label.
+- **Molecole**: Composizione di Atomi, come ad esempio una Search Bar.
+- **Organismi**: Header del sito, composizione di Molecole.
+- **Templates**: Permette di mostrare la struttura del content della pagina.
+- **Pagine**: Istanza di template con content reale.
+
+### Design Tokens
+
+Un esempio può essere:
+
+```CSS
+color-primary-500: #3B82F6
+spacing-md: 16px
+font-size-lg: 18px
+shadow-md: 0 4px 6px rgba(0,0,0,0.1)
+border-radius-sm: 4px
+```
+
+Non dipendono dalla piattaforma, e da questi possono essere esportati i formati per CSS, Android, IOS...
+
+### Guide di Stile
+
+Documentazione per applicazioni web, per pattern visivi, tramite codice per implementazioni reali.
+
+# Lezione 14 - Usability ...  - 07/11/2025
+
+## Definizione di Usability di Nielsen
+
+Questa definizione potrebbe essere utile da un punto di vista formativo per il progetto.
+
+- Learnability: Quanto è facile capire come si utilizza un interfaccia la prima volta
+- Efficiency: Quanto velocemente, una volta capito il design dell'interfaccia, l'utente può concludere un task in quanto tempo?
+- Memorability: Passato un po' di tempo, quanto è facile per l'utente ricordarsi come utilizzare il sistema.
+- Errors: Quanto l'interfaccia evita all'utente di fare errori.
+- Satisfaction: Quanto è piacevole l'utilizzo di quell'interfaccia.
+
+## Definizione di Usability secondo la ISO9241-11
+
+L'idea è quella di definire utenti specifici che hanno obiettivi specifici con proprietà di **Effectiveness** (Efficacia), **Efficiency** e **Satisfaction**.
+
+Questa non è misurabile a priori, ma solo a posteriori di specifici test.
+
+### Effectiveness ISO9241-11
+
+Misurare l'efficacia e la completezza di ogni utente nel completare un task correttamente.
+
+- Successo dei task in percentuale
+- Rate degli errori
+- Completezza a task completato correttamente
+
+### Efficiency ISO9241-11
+
+Risorse utilizzate in relazione al risultato ottenuto.
+Si misura assieme efficienza del sistema ed efficienza dell'utente nello svolgere un task.
+
+- Time on task
+- Throughput di click/steps per ogni task
+- Human Effort, ossia quanto un utente debba sforzarsi per utilizzare l'interfaccia.
+
+### Satisfaction ISO9241-11
+
+Come l'utente si è sentito durante l'utilizzo dell'intefaccia.
+
+- SUS (System Usability Scale) che misura la Satisfaction della Usability chiedendolo all'utente.
+- UMUX-Lite che è simile alla SUS ma più breve.
+
+## Usability and Utility
+
+- **Usability**: Quanto uno specifico utente ottiene specifici obiettivi in uno specifico contesto.
+- **Utility**: Individuare la necessità di utilizzo, le funzioni che servono ad utenti.
+- **Useful**: La giusta combinazione tra le due.
+
+## Usability Testing
+
+Parte in cui si testa il testing tramite utenti. Presentiamo ogni tipologia di Testing in questo contesto:
+
+1. **Heuristic Evaluation**: Questa valutazione solitamente impiega un piccolo gruppo di valutatori. Da una prima valutazione sommaria senza alcuni fondamenti oggettivi. Esistono le 10 euristiche di Nielsenn
+    - Visibilità del sistema, se interagisco con esso
+    - Match tra sistemi e mondo reale in cui sta l'utente, cose date da cultura generale e conoscenze pregresse
+    - Controllo dell'utente e libertà d'utilizzo
+    - Consistency and Standards
+    - Error Prevention
+    - Recognition Rather Than Recall
+    - Flexibility (utilizzo di shortcut)
+    - Estetica e Design Minimalista
+    - Riconoscimento, Diagnosi e Recupero da Errore
+    - Aiuto e Documentazione
+
+2. **Cognitive Walkthrough**: Un utente esperto si mette nei panni di un utente comune. Questo processo si basa su 4 elementi su cui dovrà basarsi l'esperto, ossia:
+    - Descrizione dell'utente
+    - Descrizione del sistema
+    - Descrizione del task
+    - Sequenza delle azioni
+
+    E subito dopo l'esperto dovra porsi specifiche domande:
+
+    - E' il prossimo obiettivo chiaro?
+    - L'azione da eseguire è ovvia?
+    - E' chiaro che le azioni portino a quel risultato?
+    - Che problemi ci sono nello svolgimento del task?
+
+3. **User and Usability Testing**: Si basa su tre protagonisti
+    - **Facilitatore**: Guida l'utente tramite istruzioni, risponde alle domande dell'utente. L'obiettivo del facilitatore è produrre dati riguardanti il test che siano consistenti, validi, senza influenzare il partecipante.
+    - **Task**: I task devono essere più realistici possibili, non bisogna suggerire il comportamento da assumere, ma solo il compito che deve svolgere l'utente. Bisogna quindi isolare task e come si fa il task.
+    - **Partecipante**: Idealmente bisognerebbe sceglierli in base alle personas definite prima. Il facilitatore potrebbe richiedere al partecipante di descrivere vocalmente cosa stanno per fare, bisogna però fare attenzione a questo approccio perchè i partecipanti potrebbero essere influenzati da questa richiesta.
+
+### Tipi di Usability Testing 
+
+- **Test Qualitativo**: Se dovessi registrare un esito simile in una variabile allora probabilmente sarà una stringa che lo descrive.
+- **Test Quantitativo**: Quantità definibili da un numero, magari tempo oppure dati simili.
+
+Si sceglie qualitativo o quantitativo anche in base allo stato del prodotto, alla fase in cui si trova il prodotto. 
+
+Un esito qualitativo è qualcosa che faremmo all'inizio dello sviluppo di un prodotto, ha anche bisogno di meno utenti. Definisce perchè qualcosa avviene.
+
+Un esito quantitativo invece può produrre dati, studiarli attraverso dei trend e strumenti analitici. Definisce se e quanto qualcosa avviene.
+
+### Pianificazione di un Usability Test
+
+**The Goal**: Bisogna per prima cosa definire quale sia l'obiettivo della ricerca, e questo può guidarci sul cosa utilizzare (se qualitativo o quantitativo).
+
+**The Format**: In un laboratorio o in campo reale? Gestito o non gestito? Di persona o da remoto.
+
+**Number Of Partecipants**: Nielsen definiva che per studi qualitativi sono sufficienti già dalle 5 persone, mentre per studi quantitativi dalle 20 persone.
+
+**Recruit Right Partecipants**: Bisogna definire un tipo aderente a chi utilizzerà il prodotto, il segmento target del prodotto.
+
+**Write Right Task**: Bisogna definire il task, senza dare soluzione all'interno del task stesso.
+
+**Reharse It First**: Bisognerebbe prima effettuare un piccolo studio pilot, per testare il test, prima di andare in verticale sul test reale.
+
+**Decide The Metrics**: Bisogna definire listener e simili per poter raccogliere dati quantitativi. In caso di dati qualitativi invece devo studiare bene le domande da porre agli utenti.
+
+**Write Down Plan**: Documentare il processo.
+
+**Don't Do It Alone**: Per raccogliere tutti i dati è difficile farlo da soli, cercando di evitare di scaricare tutto il lavoro su una sola persona.
+
