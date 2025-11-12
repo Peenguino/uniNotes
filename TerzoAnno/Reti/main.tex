@@ -1170,7 +1170,7 @@ ossia $(IP_{sorg}, porta_{sorg}, IP_{dest}, porta_{dest})$, mentre il protocollo
 
 \newpage
 
-\subsection{Trasporto UDP}
+\subsection{Protocollo UDP}
 
 Servizio di trasporto best effort, i datagrammi UDP possono essere persi o consegnati fuori sequenza. Questo protocollo è orientato al messaggio, quindi ogni datagramma è indipendente e di dimensioni limitate.
 Questo garantisce però una semplicità non indifferente, risultando vantaggioso in contesti di applicazioni time-sensitive.
@@ -1661,7 +1661,7 @@ Quindi il rate di invio sarà:
 
 \begin{itemize}
     \item Slow Start
-    \item AIMD (Additive Increase Multiplicative Decrease)
+    \item AIMD (Additive Increase Multiplicative Decrease/Congestion Avoidance)
     \item Reazione agli Eventi Perdita:
     \begin{itemize}
         \item Fast Recovery
@@ -1671,13 +1671,14 @@ Quindi il rate di invio sarà:
 
 Prima della descrizione effettiva delle fasi è utile definire la \texttt{cwnd} (Congestion Window) misurata solitamente in \texttt{MSS} (Maximum Segment Size), ossia la massima quantità di dati trasportabile da un segmento.
 
-\paragraph{AIMD} Fase in cui TCP mittente aumenta proporzionalmente la propria finestra di congestione ad ogni ACK ricevuto:
+\paragraph{Slow Start} Fase in cui ad ogni \texttt{ACK} la cwnd viene incrementata di \texttt{1 MSS}, quindi si raddoppia ad ogni \texttt{RTT}. Segue quindi un andamento esponenziale.
+
+\paragraph{AIMD (Congestion Avoidance)} Fase in cui TCP mittente aumenta proporzionalmente la propria finestra di congestione ad ogni ACK ricevuto:
 
 \begin{itemize}
     \item Ad ogni ACK la finestra di congestione viene incrementata, nello specifico aumento di \texttt{1 MSS} per ogni \texttt{RTT}, quindi $cwnd += \frac{1}{cwnd}$.
 \end{itemize}
 
-\paragraph{Slow Start} Fase in cui ad ogni \texttt{ACK} la cwnd viene incrementata di \texttt{1 MSS}, quindi si raddoppia ad ogni \texttt{RTT}. Segue quindi un andamento esponenziale.
 
 \subsubsection{Tipologie di TCP che Istanziano Algoritmo di Controllo Congestione - (Reno, Tahoe, Cubic e Vegas)}
 
@@ -1687,7 +1688,7 @@ Prima della descrizione effettiva delle fasi è utile definire la \texttt{cwnd} 
     \item \textbf{Gestione cwnd}: Viene definita una variabile soglia ad un valore alto.
     \begin{itemize}
         \item Se \texttt{cwnd < soglia} allora si incrementa \texttt{cwnd} aumenta esponenzialmente in \textbf{Slow Start}.
-        \item Se \texttt{cwnd > soglia} allora si incrementa \texttt{cwnd} aumenta linearmente in \textbf{Additive Increase}.
+        \item Se \texttt{cwnd > soglia} allora si incrementa \texttt{cwnd} aumenta linearmente in \textbf{Additive Increase (Congestion Avoidance)}.
     \end{itemize}
     \item \textbf{Eventi di Perdita}: Esistono varie condizioni:
     \begin{itemize}
@@ -1756,6 +1757,93 @@ sia circa costante. Quindi:
 Calcolando quindi una media tra le due possibili casistiche otteniamo:
 
 \[ \boxed{throughput = \frac{1}{2} \left( \frac{W}{RTT} + \frac{w}{RTT} \right) = \frac{3}{4} \frac{W}{RTT}} \]
+
+\paragraph{Equità} Il TCP è equo perchè ipotizzando un bottleneck settato ad una quantità $R$ e un numero di host $k$, allora ciascuna delle connessioni TCP trasmetterà $\frac{R}{k} bit/sec$, seguendo quindi un andamento simile a quello rappresentato in figura.
+
+\begin{figure}[htbp]
+    \center
+    \includegraphics[scale=0.415]{img/equitaTCP.png}
+\end{figure}
+
+\newpage
+
+\paragraph{Throughput e Connessioni TCP Parallele} Nel paragrafo precedente ipotizzavamo che ciascun applicativo aprisse esattamente una connessione TCP. Questo in un contesto reale potrebbe risultare una semplificazione, ed un applicativo potrebbe richiedere l'apertura di più connessioni TCP.
+Quindi ciascuna di queste connessioni sarà alla pari delle altre, ed è a questo livello che si considera l'equità tra le connessioni stesse.
+
+\paragraph{Attacco SYN Flood e Potenziale Mitigazione} Attacco DDoS basato sul funzionamento del handshake TCP:
+
+\begin{itemize}
+    \item L'attaccante finge di essere una moltitudine di client, i quali inviano un segmento di \texttt{SYN} al server.
+    \item Il server, per handlare queste richieste, alloca un buffer per ogni \texttt{SYN} e risponde con dei \texttt{SYN-ACK}.
+    \item L'attaccante non riscontra mai i \texttt{SYN-ACK} del server, lasciando le risorse del server allocate. Questo può quindi causare un esaurimento di risorse del server.
+\end{itemize}
+
+\subparagraph{Mitigazione dell'Attacco} Invece di allocare direttamente il buffer, il server genera un numero di sequenza iniziale detto \textbf{cookie}. Successivamente il server risponde con un \texttt{SYN-ACK} senza memorizzare informazioni sullo stato della connessione. Un client normale risponderà quindi con un \texttt{ACK = cookie + 1}. A questo punto il server
+calcola il risultato con il valore contenuto nell'\texttt{ACK} del client, e solo se c'è corrispondenza crea la connessione ed alloca le risorse.
+
+\subsection{Protocollo QUIC e Approfondimento HTTP/2 HTTP/3}
+
+In questo sottocapitolo definiamo come migliorare il tempo di caricamento di una pagina agendo a livello di protocollo. Quindi definiremo un "wrapper" di UDP, ossia QUIC, e i suoi utilizzi nel protocollo applicativo HTTP/3.
+
+\subsubsection{HTTP/1.1 e Head of Line Blocking}
+
+Utilizzando HTTP/1.1 in pipelining, la richiesta di grandi oggetti potrebbe ritardare 
+
+l'ottenimento di oggetti piccoli richiesti dopo. Questo fenomeno è detto HOL Blocking (Head Of Line). Una possibile alternativa sarebbe quella di aprire \textbf{più connessioni TCP per browser}, ma questo porterebbe ad un sistema \textbf{poco equo}.
+
+\subsubsection{HTTP/2}
+
+Questo protocollo applicativo permette maggiore flessibilità lato server, permettendo:
+
+\begin{itemize}
+    \item \textbf{Ordine di trasmissione} basata sulla \textbf{priorità} degli oggetti richiesti.
+    \item \textbf{Push} di oggetti \textbf{dal server al client}, che non corrispondono a richieste esplicite dal client.
+    \item \textbf{Suddivisione} dei \textbf{messaggi HTTP} in \textbf{frame HTTP}, e schedulazione dei frame per mitigare la HOL Blocking.
+\end{itemize}
+
+\newpage
+
+\paragraph{Stream e Multiplexing} Vengono definiti dei flussi bidirezionali tra client e server 
+
+all'interno di una singola connessione TCP. Questo meccanismo permette quindi il multiplexing di oggetti sui vari stream della connessione.
+
+\begin{figure}[htbp]
+    \center
+    \includegraphics[scale=0.4]{img/HTTP2.png}
+\end{figure}
+
+\paragraph{Limiti dell'HTTP/2} questo approccio ottimizza l'utilizzo di risorse del protocollo TCP, ma non risolve del tutto il problema del HOL Blocking, dato che la gestione a Frame HTTP non è nota al protocollo TCP stesso. Per il TCP stanno passando solo una quantità generica di byte, senza dare a questi
+ultimi un interpretazione. È infatti responsabilità degli applicativi dare una semantica alla suddivisione dei messaggi. Quindi un problema comune potrebbe essere quello dei tre timeout, che provoca uno stallo per tutti gli stream della connessione.
+
+\subsubsection{HTTP/3 e QUIC}
+
+Evoluzione del protocollo HTTP/2 basato sul protocollo di trasporto UDP "wrappato" dal protocollo QUIC.
+
+\begin{figure}[htbp]
+    \center
+    \includegraphics[scale=0.4]{img/HTTP3.png}
+\end{figure}
+
+\vspace*{-5px}
+
+\paragraph{QUIC (Quick UDP Internet Connections)} Protocollo di trasporto che sfrutta UDP ed è connection-oriented. Aggiunge al protocollo UDP elementi come:
+
+\begin{itemize}
+    \item Trasmissione affidabile, controllo di errori e congestione.
+    \item Apertura delle connessioni, affidabilità, autenticazione e cifratura.
+    \item Lo stato della connessione è stabilito in un solo \texttt{RTT}, a differenza di TCP che ne richiede due\footnote{Abbiamo sempre definito il costo in RTT dell'Handshake TCP come 1 \texttt{RTT}, ma in realtà vanno considerati anche il protocollo aggiuntivo per cifratura ed autenticazione TLS, che porta il costo complessivo a 2 \texttt{RTT}.}.
+\end{itemize}
+
+\newpage
+
+\paragraph{Stream QUIC} Più stream a livello applicazione vengono multiplexati su un unica connessione QUIC. Questo garantisce trasferimento dati affidabile, controllo di flusso e controllo comune della congestione. Il concetto di stream è un astrazione al livello di trasporto, quindi ciascuno di essi è indipendente dall'altro e noto al protocollo di trasporto utilizzato.
+
+\begin{figure}[htbp]
+    \center
+    \includegraphics[scale=0.4]{img/QUIC_streams.png}
+\end{figure}
+
+\subparagraph{Confronto Prestazioni QUIC vs TCP} In generale QUIC performa meglio di TCP, ma le performance di QUIC diminuiscono in contesti mobile e reti cellulari.
 
 \newpage
 

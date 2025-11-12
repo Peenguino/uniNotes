@@ -1103,6 +1103,206 @@ Ogni riga nella \emph{tabella delle tabelle} rappresenta una tabella del databas
 
 \newpage
 
+\section{Teoria della Normalizzazione}
+
+La teoria della normalizzazione permette di definire equivalenze tra schemi relazionali ed anomalie in essi.
+
+\paragraph{Buona Progettazione di Schemi Relazionali} Si basa sull'analisi di quattro proprietà:
+
+\begin{itemize}
+    \item \textbf{Semantica degli Attribuiti}: Progettazione mirata all'utilizzo di attributi che appartengano solo alla classe di quello schema.
+    \item \textbf{Ridondanza}: Progettazione mirata a schemi in cui non siano presenti anomalie in caso di inserimento, cancellazione o modifica.
+    \item \textbf{Valori Nulli}: Per quanto possibile, si progettano schemi in modo tale da evitare attributi che possono essere frequentemente nulli.
+    \item \textbf{Tuple Spurie}: Le giunzioni tra schemi non dovrebbero mai generare tuple spurie.
+\end{itemize}
+
+\paragraph{Obiettivi della Teoria Normalizzazione} Fornire strumenti formali per la progettazione di basi di dati che non presentino anomalie, e grazie all'equivalenza,
+permettere anche la ricerca di uno schema equivalente ad uno già esistente ma senza anomalie. I \textbf{problemi} quindi di cui si occupa la \textbf{teoria della normalizzazione} sono:
+
+\begin{itemize}
+    \item \textbf{Equivalenza tra Schemi}: Definire quando due schemi siano equivalenti.
+    \item \textbf{Qualità degli Schemi}: Definire criteri di bontà di schemi.
+    \item \textbf{Trasformazione di Schemi}: Definire metodi algoritmici per ottenere da uno schema un altro schema che sia migliore di quello di partenza.
+\end{itemize}
+
+\paragraph{Schema di Relazione Universale} Definiamo formalmente l'insieme universo degli attributi. Lo schema di relazione universale $U$ di una base di dati relazionale ha come attributi l'unione
+degli attributi di tutte le relazioni della base di dati.
+
+\paragraph{Notazione} Definiamo un po' di notazione utile:
+
+\begin{itemize}
+    \item $A,B,C,A_{1},A_{2}$ indicano singoli attributi.
+    \item $T,X,Y,X_{1}$ indicano insiemi di attributi.
+    \item Potenziali Abbreviazioni:
+    \begin{itemize}
+        \item $XY$ è abbreviazione per $X \cup Y$.
+        \item $AB$ è abbreviazione per $\{ A,B \}$.
+        \item $XA$ è abbreviazione per $X \cup \{A\}$.
+    \end{itemize}
+    \item $R(T)$ è un generico schema, $r$ è una sua istanza e $t$ è una n-upla di $r$.
+    \item Se $X \subseteq T$ allora $t[X]$ indica l'n-upla ottenuta da $t$ considerando solo gli attributi in $X$.
+\end{itemize}
+
+\newpage
+
+\subsection{Dipendenze Funzionali}
+
+Vogliamo formalizzare la \textbf{nozione di schema senza anomalie}, occorre quindi \textbf{descrivere formalmente} la \textbf{semantica} dei dati in una istanza dello schema relazionale. Quindi definiamo come \textbf{aspetto estensionale} quello che si riferisce al \textbf{contenuto dei dati},
+ed \textbf{aspetto intensionale} quello che si riferisce al \textbf{significato dei dati}.
+
+\subsubsection{Definizione Formale di Dipendenza Funzionale e Significato}
+
+Dato uno schema $R(T)$ e $X,Y \subseteq T$, una dipendenza funzionale \texttt{DF} è un \textbf{vincolo} su $R$ del tipo $X \rightarrow Y$, ossia
+\vspace*{-2px}
+\[ X \: \text{determina funzionalmente} \: Y \]
+\[\text{o in maniera equivalente}\]
+\[ Y \: \text{è determinata funzionalmente da} \: X \]
+
+se vale che per ogni $r$ istanza valida di $R$ un valore di $X$ determina in modo univoco un valore di $Y$, formalmente definito come:
+
+\begin{itemize}
+    \item $\forall r$ istanza valida di $R$.
+    \item $\forall t_{1}, t_{2} \in r \: \text{vale che} \: t_{1}[X] = t_{2}[X] \Rightarrow t_{1}[Y] = t_{2}[Y] $
+\end{itemize}
+
+\paragraph{Spiegazione Definizione} In un istanza $r$ di $R(T)$ è soddisfatta la dipendenza $X \rightarrow Y$ se per ogni coppia
+di n-uple $t_1, t_2 \in r$  è vero che $t_{1}[X] = t_{2}[X] \Rightarrow t_{1}[Y] = t_{2}[Y]$.
+
+\paragraph{Caratteristiche Dipendenze Funzionali} Queste dipendenze sono definite solo 
+
+all'interno di uno schema di relazione e non possono esistere tra attributi di schemi diversi. Oltre a questo sono proprietà intensionali, sono legate alla semantica assegnata all'attributo e non possono quindi essere
+inferite sulla base dell'osservazione di alcune istanze della relazione.
+
+\subsubsection{Definizioni Formali di Chiave, Superchiave e Chiave Primaria}
+
+Dato un insieme $K$ di attributi per uno schema di relazione $r$:
+
+\begin{itemize}
+    \item \textbf{Superchiave}: L'insieme $K$ è superchiave se \textbf{non contiene} due n-uple distinte $t_{1}, t_{2}$ con $t_{1}[K] = t_{2}[K]$. Quindi l'insieme di attributi $K$ identifica univocamente una n-upla.
+    \item \textbf{Chiave}: L'insieme $K$ è \textbf{chiave se è superchiave minimale}, ossia non contiene un altra superchiave al suo interno. Quindi se eliminassimo degli attributi questa non sarebbe più una superchiave.
+    \item \textbf{Chiave Primaria}: Una delle chiavi dello schema di relazione, solitamente si preferisce quella con meno attributi.
+\end{itemize}
+
+\newpage
+
+\subsubsection{Dipendenza Funzionale e Soddisfacibilità su Istanze}
+
+Introduciamo un nuovo operatore $\models$ (soddisfa):
+
+\begin{itemize}
+  \item un'istanza $r_0$ di $R$ \textbf{soddisfa} la DF $X \to Y$
+  se:
+  \[
+  r_0 \models X \to Y
+  \]
+  cioè se:
+  \[
+  \forall t_1, t_2 \in r_0,\ t_1[X] = t_2[X] \Rightarrow t_1[Y] = t_2[Y]
+  \]
+  \item un istanza $r_0$ \textbf{soddisfa} un insieme $F$ di $DF$ se:
+  \[ \forall X \to Y \in F vale r_0 \models X \to Y \]
+  cioè se
+  \[ r_0 \models X \to Y \: \text{se} \: \forall t_1,t_2 \in r_0 \: \text{vale che} \: t_1[X] = t_2[X] \Rightarrow t_1[Y] = t_2[Y] \]
+\end{itemize}
+
+\subsubsection{Dipendenze Funzionali Atomiche e Banali}
+
+\begin{itemize}
+    \item \textbf{Atomica}: Ogni dipendenza del tipo $X \to A_1 A_2 \cdots A_n$ è scomponibile in $X \to A_1, X \to A_2 \cdots, X \to A_n$. La seconda tipologia è detta \textbf{atomica}.
+    \item \textbf{Banale}: Una dipendenza del tipo $Progetto \to Progetto$ è detta \textbf{banale}.
+\end{itemize}
+
+\subsection{Utilizzo di Dipendenze Funzionali}
+
+Vogliamo utilizzare uno schema di relazione e le sue dipendenze per ricavarne altre, quindi definiamo da adesso in poi lo schema come $R(T,F)$ con $F$ insieme di
+dipendenze funzionali su $T$.
+
+\subsubsection{Derivazione di Dipendenze Funzionali}
+
+Basandoci sulla definizione data prima di soddisfacibilità di istanze, dato $R(T,F)$ diciamo che $F \models X \to Y$ se ogni istanza $r \in R(T)$ che soddisfa $F$ soddisfa anche $X \to Y$.
+
+\subsubsection{Assiomatizzazione delle Dipendenze Funzionali} Sia $RI$ un insieme di regole di inferenza per $F$, utilizzeremo $RI$ per derivare altre dipendenze funzionali a partire da $F$.
+
+Indichiamo con $F \vdash X \to Y$ il fatto che $X \to Y$ sia derivabile da $F$ usando $RI$.
+
+\paragraph{Correttezza e Completezza di un Insieme di Regole di Inferenza} Esistono due proprietà principali di un sistema d'inferenza:
+
+\begin{itemize}
+    \item \textbf{Correttezza}: L'insieme $RI$ se $F \vdash X \to Y$ implica $F \models X \to Y$.
+    \item \textbf{Completezza}: L'insieme $RI$ se $F \models X \to Y$ implica $F \vdash X \to Y$.
+\end{itemize}
+
+\newpage
+
+\subsubsection{Assiomi di Armstrong e Derivazioni}
+
+Gli assiomi di Armstrong sono l'insieme noto corretto e completo di regole di inferenza. Elenchiamo queste regole:
+
+\begin{itemize}
+    \item \textbf{Riflessività}: se $Y \subseteq X$ allora $X \to Y$.
+    \item \textbf{Arricchimento}: se $X \to Y$, $Z \subseteq T$ allora $XZ \to YZ$.
+    \item \textbf{Transitività}: se $X \to Y$, $Y \to Z$ allora $X \to Z$
+\end{itemize}
+
+Da queste possiamo derivarne altre:
+
+\begin{itemize}
+    \item \textbf{Unione}: $\{ X \to Y, X \to Z \} \vdash X \to YZ$
+    \item \textbf{Decomposizione}: $\{ X \to YZ \} \vdash X \to Y$
+    \item \textbf{Indebolimento}: $\{ X \to Y \} \vdash XZ \to Y$
+    \item \textbf{Identità}: $\{ \} \vdash X \to Y $
+\end{itemize}
+
+\paragraph{Teorema di Correttezza e Completezza Assiomi di Armstrong} Gli assiomi di Armstrong sono corretti e completi. Attraverso gli assiomi stessi si può mostrare l'equivalenza tra
+implicazione logica $\models$ e derivazione $\vdash$. Questo perchè se una dipendenza è derivabile con gli assiomi di Armstrong allora è anche implicata logicamente (per la correttezza degli assiomi), e viceversa se una dipendenza
+è implicata logicamente allora è anche derivabile dagli assiomi (per completezza degli assiomi).
+
+\begin{itemize}
+    \item \textbf{Correttezza}: $\forall f \:\: F \vdash f \Rightarrow F \models f$
+    \item \textbf{Completezza}: $\forall f \:\: F \models f \Rightarrow F \vdash f$
+\end{itemize}
+
+\subsubsection{Chiusura di un Insieme}
+
+Dato un insieme $F$ di $DF$ la chiusura di $F$ è $F^{+} = \{ X \to Y \: | \: F \vdash X \to Y \}$. 
+
+\vspace*{10px}
+
+Contestualizzando ad una $R(T,F)$ data con $X \subseteq T$ la chiusura di $X$ rispetto ad $F$ denotata con $X_{F}^{+}$ è \[ X_{F}^{+} = \{ A_{i} \in T \: | \: F \vdash X \to A_{i} \} \]
+
+\subsubsection{Algoritmo della Chiusura Lenta}
+
+Vogliamo decidere, data una $DF$, se questa appartiene a $F^+$. Applicare ripetutamente gli assiomi di Armstrong ha una complessità esponenziale rispetto al numero di attributi dello schema. Si preferisce quindi utilizzare un algoritmo basato su uno specifico teorema.
+
+\paragraph{Teorema} La $DF: X \to Y$ è derivabile da $F$ se e solo se $Y$ è sottoinsieme della chiusura di $X$ rispetto ad $F$ formalmente definito come:
+
+\[ F \vdash X \to Y \Leftrightarrow Y \subseteq X_{F}^{+} \]
+
+\newpage
+
+\paragraph{Definizione di Chiavi tramite Dipendenze e Chiusura}
+
+\begin{itemize}
+    \item \textbf{Superchiave}: Dato lo schema $R(T,F)$, un insieme di attributi $W \subseteq T$ è una \textbf{superchiave} di $R$ se $W \to T \in F^{+}$.
+    \item \textbf{Chiave}: Dato lo schema $R(T,F)$, un insieme di attributi $W \subseteq T$ è una \textbf{chiave} di $R$ se $W$ è una superchiave e non esiste un sottoinsieme stretto di $W$ che sia superchiave di $R$.
+    \item \textbf{Attributo Primo}: Dato lo schema $R(T,F)$, un attributo $A \in T$ si dice \textbf{attributo primo} se e solo se appartiene ad almeno una chiave, altrimenti si dice non primo.
+\end{itemize}
+
+\paragraph{Proprietà Interessanti per Ricerca di Chiavi} L'algoritmo per trovare tutte le chiavi si basa su due proprietà:
+
+\begin{itemize}
+    \item Se un attributo $A$ di $T$ \textbf{non appare a destra} di alcuna dipendenza in $F$, allora $A$ \textbf{appartiene} ad ogni chiave di $R$, altrimenti non può essere determinato.
+    \item Se un attributo $A$ di $T$ \textbf{appare a destra} di qualche dipendenza in $F$, \textbf{ma non appare a sinistra} di alcuna dipendenza non banale, allora A \textbf{non appartiene ad alcuna chiave}.
+\end{itemize}
+
+\paragraph{Esempio di Derivazione} Dato $F = \{ DB \to E, B \to C, A \to B \}$ trovare $(AD)^+$:
+
+\[ X^+ = AD = ADB = ADBE = ADBEC \]
+
+Quindi data questa produzione, possiamo ad esempio notare che $AD$ è superchiave perchè contiene tutti gli attributi ed $A$ \textbf{non è superchiave} perchè la produzione $A \to B, A \to BC$ si ferma.
+
+\newpage
+
 %\begin{figure}[htbp]
     %\center
     %\includegraphics[scale=0.4]{img/classiComplessita2.png}
