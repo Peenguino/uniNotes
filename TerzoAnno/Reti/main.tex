@@ -1845,6 +1845,223 @@ Evoluzione del protocollo HTTP/2 basato sul protocollo di trasporto UDP "wrappat
 
 \subparagraph{Confronto Prestazioni QUIC vs TCP} In generale QUIC performa meglio di TCP, ma le performance di QUIC diminuiscono in contesti mobile e reti cellulari.
 
+\section{Livello Rete}
+
+L'obiettivo di questo livello di astrazione è quello di trasferire pacchetti da un host ad un altro, \textbf{offrendo servizi} al \textbf{livello di trasporto} ed \textbf{utilizzando} servizi del \textbf{livello collegamento}.
+
+\vspace*{10px}
+
+Quindi il livello rete è presente negli host di mittente e destinatario e nei router intermedi. Questo livello interconnette reti eterogenee, implementando poche funzioni.
+
+\subsection{Servizi e Modelli di Servizio - Forwarding/Routing}
+
+Questo livello offre due principali servizi:
+
+\begin{itemize}
+    \item \textbf{Forwarding}: Spostamento di pacchetti dal collegamento di ingresso a quello corretto tra gli $n$ in uscita.
+    \item \textbf{Routing}: Determinazione del percorso seguito dai pacchetti da sorgente a destinazione.
+\end{itemize}
+
+\paragraph{Ipotetici Servizi di Rete e Offerta Protocollo IP} I servizi di rete potrebbero offrire servizi come:
+
+\begin{itemize}
+    \item Garanzia di consegna.
+    \item Consegna con garanzia temporale.
+    \item Consegna in ordine.
+    \item Disponibilità di banda garantita.
+    \item Servizi di sicurezza.
+\end{itemize}
+
+Il protocollo IP è di tipo \textbf{best-effort} da questo punto di vista, quindi \textbf{non garantisce alcuna di queste proprietà}\footnote{Esistono degli standard basati su IP, come \texttt{INTSERV} e \texttt{DIFFSERV} che garantiscono o possono garantire proprietà come tempo, banda, ordine e perdite. }.
+
+\newpage
+
+\subsection{Protocollo IP}
+
+Protocollo di tipo connection-less, non esiste alcun circuito fisico o virtuale tra host sorgente e destinazione. In origine il livello di rete si riferiva esclusivamente a questo protocollo, attualmente
+invece attualmente si compone di più protocolli.
+
+\begin{figure}[htbp]
+    \center
+    \includegraphics[scale=0.6]{img/livelloReteRappresentazione.png}
+\end{figure}
+
+Quindi come definito prima non si ha nessun tipo di garanzia sulla qualità del servizio.
+
+\subsubsection{Funzioni IP}
+
+Come già definito prima, il protocollo IP fornisce due principali tipi di funzioni:
+
+\begin{itemize}
+    \item \textbf{Forwarding (Inoltro)}: Trasferimento del pacchetto sull'appropriato collegamento di uscita.
+    \begin{figure}[htbp]
+        \center
+        \includegraphics[scale=0.33]{img/forwardingIP.png}
+    \end{figure}
+    Questa tabella d'inoltro va però prima popolata, questa si determina infatti tramite la funzione di instradamento.
+    \item \textbf{Instradamento}: Processo \textbf{decisionale} di scelta del percorso verso una destinazione, tramite \textbf{algoritmi di routing}.
+    \begin{figure}[htbp]
+        \center
+        \includegraphics[scale=0.33]{img/instradamentoIP.png}
+    \end{figure}
+\end{itemize}
+
+\newpage
+
+\subsubsection{Meccanismi IP}
+
+Il protocollo IP definisce due meccanismi:
+
+\begin{itemize}
+    \item \textbf{Indirizzamento}: Strumento per identificare gli host.
+    \item \textbf{Modello Datagram}: Consegna dei dati in segmenti basata su specifiche fasi:
+    \begin{itemize}
+        \item Frammentazione e riunificazione dei pacchetti.
+        \item Controllo degli errori.
+        \item Verifica TTL\footnote{Con TTL si intende Time To Live, ossia quanti salti il pacchetto può fare al massimo.}.
+    \end{itemize}
+    \item \textbf{Multiplexing/Demultiplexing}: Anche al livello di rete si effettua multiplexing, infatti grazie ad un campo presente nel datagramma IP si riesce a capire a quale protocollo del livello superiore debba essere inviata l'informazione decapsulata.
+\end{itemize}
+
+\subsubsection{Formato Datagramma IP}
+
+Descriviamo i campi significativi di un datagramma IP:
+
+\begin{table}[h!]
+\centering
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{|c|c|c|c|}
+\hline
+\multicolumn{1}{|c|}{\textbf{4 bits}} &
+\multicolumn{1}{c|}{\textbf{4 bits}} &
+\multicolumn{1}{c|}{\textbf{8 bits}} &
+\multicolumn{1}{c|}{\textbf{16 bits}} \\
+\hline
+Version & Header Length & Type of Service & Total Length \\
+\hline
+\multicolumn{3}{|c|}{Identification (16 bits)} & \\
+\cline{1-3}
+Flags (3 bits) & \multicolumn{2}{c|}{Fragment Offset (13 bits)} & \\
+\cline{1-3}
+\multicolumn{1}{|c|}{Time To Live (8 bits)} &
+\multicolumn{1}{c|}{Protocol (8 bits)} &
+\multicolumn{2}{c|}{Header Checksum (16 bits)} \\
+\hline
+\multicolumn{4}{|c|}{Source IP Address (32 bits)} \\
+\hline
+\multicolumn{4}{|c|}{Destination IP Address (32 bits)} \\
+\hline
+\multicolumn{4}{|c|}{Options (variable, if any)} \\
+\hline
+\multicolumn{4}{|c|}{Data (variable length, typically TCP/UDP segment)} \\
+\hline
+\end{tabular}
+\caption{Formato del Datagramma IP (IPv4 Header)}
+\end{table}
+
+\begin{itemize}
+    \item \textbf{Versione}: Indica la versione utilizzata del protocollo IP.
+    \item \textbf{Header Length}: Lunghezza dell'intestazione espressa in parole da \texttt{32 bit}.
+    \item \textbf{Service Type}: Permettono la caratterizzazione di Datagrammi IP:
+    \begin{itemize}
+        \item \textbf{Differentiated Services}: I pacchetti vengono caratterizzati per la loro classe di servizio o tipi di accodamento ai router (\texttt{6 bit}).
+        \item \textbf{Explicit Congestion Notification (ECN)}: Supporto a livello rete della gestione della congestione a livello di trasporto (\texttt{2 bit}).
+    \end{itemize}
+    \item \textbf{Lunghezza del datagramma (16 bit)}: è la lunghezza di tutto il datagramma in byte, header incluso.
+    \begin{itemize}
+        \item Dim. Max 65535 byte (nella pratica 1500 byte)
+    \end{itemize}
+    \item \textbf{Identificatore, flag, offset}: sono campi per la frammentazione (vedi più avanti).
+    \item \textbf{Tempo di vita (8 bit)}: ad ogni passaggio da un router viene decrementato, quando raggiunge lo zero viene scartato. Assicura che eventuali percorsi ad anello non 
+    
+    provochino traffico perpetuo nella rete.
+        \begin{itemize}
+            \item Valore iniziale dipende dal S.O.: esempi 30, 64, 128, 255
+        \end{itemize}
+    \item \textbf{Protocollo (8 bit)}: in ricezione all'host destinatario indica quale protocollo dello strato superiore deve ricevere i dati. Inizialmente la tabella era nella RFC1700 (STD2), attualmente è un database online che si trova su iana.org
+        \begin{itemize}
+            \item Demux, es. TCP 6, UDP 17
+        \end{itemize}
+    \item \textbf{Checksum dell'intestazione (16 bit)}: viene calcolato il checksum della sola intestazione (ponendo questo campo pari a zero) ad ogni router (il TTL cambia ad ogni hop!). Se si ottiene un errore si scarta il datagramma.
+    \item \textbf{Indirizzi sorgente e destinazione (32 bit)}: indirizzi IP del mittente e del destinatario.
+    \item \textbf{Opzioni (lunghezza variabile, multiplo di 32 bit)}: uso sporadico, da 0 a 40 byte
+    \item \textbf{Dati}: dati trasportati dal datagramma IP.
+\end{itemize}
+
+\subsubsection{Frammentazione di Datagramma IP}
+
+Dato che il livello rete dipenderà dal livello collegamento dovrà scendere a compromessi con la dimensione Maximum Transfer Unit (MTU), ossia la dimensione massima di invio del collegamento. Quindi l'idea è quella di suddividere un \textbf{Datagramma IP} in tanti \textbf{segmenti diversi}, che dovranno poi essere riassemblati
+nel sistema di destinazione.
+
+\vspace*{10px}
+
+Ovviamente questa gestione si porta dietro vari \textbf{punti critici}:
+
+\begin{itemize}
+    \item Se uno solo dei frammenti si perde, il sistema terminale è costretto a scartare tutto il resto del datagramma ricevuto.
+    \item I frammenti possono arrivare fuori ordine e di conseguenza vanno riordinati tramite \textbf{identificazione}, \textbf{offset} e\textbf{flag}:
+    \begin{itemize}
+        \item \textbf{Identificazione}: Mantiene un riferimento al \textbf{datagramma IP originale}, conservando anche IP sorgente e IP destinazione.
+        \item \textbf{Offset}: Indica la posizione relativa al frammento nel datagramma in multipli di \texttt{8 byte}.
+        \begin{figure}[htbp]
+            \center
+            \includegraphics[scale=0.35]{img/offsetFrammentoDiDatagrammaIP.png}
+        \end{figure}
+        \item \textbf{Flag}: Tre bit dedicati a dettagli specifici:
+        \begin{itemize}
+            \item \textbf{Primo Bit}: Bit riservato.
+            \item \textbf{Secondo Bit}: Not fragment, se settato ad 1 non si frammenta il datagramma.
+            \item \textbf{Terzo Bit}: Se settato ad 1 indica che quello è l'ultimo frammento del datagramma.
+        \end{itemize}
+    \end{itemize}
+\end{itemize}
+
+Dati tutti questi elementi di complessità, il \textbf{processo di frammentazione è critico}, quindi in tante occasioni si preferisce non frammentare.
+
+\subsubsection{Indirizzi IP}
+
+Ogni host è connesso ad Internet tramite un \textbf{interfaccia di rete}, ossia il \textbf{confine tra host e collegamento} su cui vengono trasmessi i datagrammi.
+Ogni indirizzo IP, secondo il protocollo IPv4, è definito da \texttt{4 byte}, quindi 32 bit che solitamente vengono riportati nella seguente notazione decimale puntata:
+
+\begin{figure}[htbp]
+    \center
+    \includegraphics[scale=0.55]{img/IPv4.png}
+\end{figure}
+
+Qgnuno di questi indirizzi si compone di due parti, ossia un \textbf{Network ID} ed un \textbf{Host ID}, che identificano rispettivamente una rete su Internet e l'host su quella rete IP.
+
+\begin{figure}[htbp]
+    \center
+    \includegraphics[scale=0.55]{img/IPv4_2.png}
+\end{figure}
+
+L'assegnazione di specifici bit alla rete ed i restanti agli host determina un tipo di indirizzamento detto \textbf{Classful Addressing}.
+
+\newpage
+
+\subsubsection{Classful/Classless Addressing e Subnet Mask}
+
+Definiamo delle \textbf{classi di indirizzi IPv4} in base ai byte dedicati all'identificazione di reti:
+
+\begin{itemize}
+    \item \textbf{Indirizzamento Classful}:
+    \begin{itemize}
+        \item \textbf{Classe A}: Si dedica il primo byte all'identificazione di una rete e i restanti tre per gli host.
+        \item \textbf{Classe B}: Si dedicano due byte alla rete e gli altri due per gli host.
+        \item \textbf{Classe C}: Si dedicano tre byte alla rete ed il restante per gli host.
+        \item \textbf{Classe D}: Riservata al multicasting.
+        \item \textbf{Classe E}: Riservata ad usi futuri.
+    \end{itemize}
+    \item \textbf{Indirizzamento Classless}: Definiamo un modo custom per indicare il numero di bit dedicati alla rete, ossia \texttt{x.x.x.x/num\_bit\_rete}.
+\end{itemize}
+
+\paragraph{Subnet Mask} Basandoci sulla notazione classless, possiamo definire una maschera di sottorete, che se messa in \texttt{AND} con un indirizzo IPv4 permette di ricavare l'indirizzo della rete:
+
+\begin{figure}[htbp]
+    \center
+    \includegraphics[scale=0.4]{img/subnetMask.png}
+\end{figure}
+
 \newpage
 
 %\begin{figure}[htbp]

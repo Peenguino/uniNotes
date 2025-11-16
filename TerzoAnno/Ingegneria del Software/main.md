@@ -933,3 +933,69 @@ Che succede se estendiamo un singleton? Dovrei gestire il metodo che ritorna l'i
 In ogni caso vado a infrangere principi di buona progettazione.
 
 Il singleton permette di passare un riferimento ad una classe, invece una classe non posso riferirla direttamente. Quindi è proprio un problema concettuale, non ha senso generare più sottoclassi di una classe di un oggetto caratterizzato dall'essere uno solo.
+
+# Lezione 16 - Design Pattern Strutturali (Decorator e )
+
+## 05 - Design Pattern - Decorator
+
+Vogliamo preservare il principio Open Closed, cercando di gestire la proliferazione di classi e design rigido oppure funzionalità aggiunte alla classe base ma inappropriate per alcune sottoclassi.
+
+Questo design pattern è anche detto **wrapper**.
+
+<div style="text-align: center;">
+    <img src="img/decorator1.png" width="500">
+</div>
+
+Le classi foglia **in questo esempio** sono classi reali e radice e nodi intermedi sono classi astratte. Le classi reali decoratori mantengono un riferimento grazie ad una variabile di tipo della classe astratta radice.
+
+<div style="text-align: center;">
+    <img src="img/decorator2.png" width="450">
+</div>
+
+In questo modo si definisce anche come il comportamento è definito per delega, data la variabile mantenuta nelle classi decoratrici, il fatto che siano tutte classi che ereditano da `Beverage` è solo una questione di tipo.
+
+### Pro e Contro dell'Utilizzo di Decorator
+
+- **Pro**:
+    - Più flessibile rispetto all'ereditarietà statica.
+    - Più semplice rispetto all'ereditarietà multipla.
+    - Permette la combinazione tra proprietà, anche se stessa.
+    - Favorisce l'aggiunta incrementale di feature.
+- **Contro**:
+    - Se aumenta la complessità, il decorator diventa costoso.
+    - Si aumenta la frammentazione del sistema, tendiamo alla definizione di un sistema come composizione di elementi molto piccoli.
+
+## 06 - Design Pattern - Adapter
+
+Converte l'interfaccia di una classe nell'interfaccia attesa dal cliente, tramite delega riferisce al metodo reale ma tramite un metodo che lo invoca.
+
+<div style="text-align: center;">
+    <img src="img/adapter1.png" width="450">
+</div>
+
+- Target: Interfaccia utilizzata da client.
+- Client: Interagisce con oggetti conformi all'interfaccia.
+- Adaptee: Definisce un interfaccia esistente da adattare.
+- Adapter: Adatta l'interfaccia di Adaptee per renderla conforme a quella di Target.
+
+## 07 - Accenno Design Pattern - Facade
+
+Design pattern per il quale, se si hanno molte classi ed interazioni con esse, si definisce un **punto di accesso unico**, semplice, nascondendo i dettagli complessi del sottosistema.
+
+## 08 - Design Pattern - Proxy
+
+Un client comunica con un interfaccia, ed un proxy è dello stesso tipo dell'interfaccia originale. Questo permette al client di non accorgersi dell'utilizzo di un proxy grazie all'utilizzo della stessa interfaccia.
+
+<div style="text-align: center;">
+    <img src="img/proxy1.png" width="450">
+</div>
+
+Si nota infatti che entrambe le classi `Proxy` e `OriginalService` sono dello stesso tipo, ossia l'interfaccia `ServiceInterface`.
+
+### Tipi di Proxy
+
+- **Remote Proxy**: Permette l'accesso ad oggetti remoti tramite serializzazione e deserializzazione.
+- **Protection Proxy**: Implementa dei controlli.
+- **Cache Proxy**: Mantiene coppie di richieste-risposta.
+- **Synchronization Proxy**: Gestisce accessi concorrenti ad un servizio.
+- **Virtual Proxy**: Permette di interfacciarsi al servizio prima che il servizio sia realmente in funzione.

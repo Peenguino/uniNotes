@@ -900,3 +900,152 @@ Un esito quantitativo invece può produrre dati, studiarli attraverso dei trend 
 
 **Don't Do It Alone**: Per raccogliere tutti i dati è difficile farlo da soli, cercando di evitare di scaricare tutto il lavoro su una sola persona.
 
+# Lezione 15 - UX per IoT  - 13/11/2025
+
+Internet è stato costruito per comunicare, per semplificare la comunicazione tra punti. Internet è quindi un mezzo di comunicazione, dove si è iniziato a trasferire ogni tipo di media, non solo audio come nel caso del telefono.
+
+L'obiettivo quindi era quello di mettere in comunicazione persone, in modo tale che queste potessero scambiare informazione, a prescindere dal media e dalla piattaforma.
+
+## Internet of Things (Output/Outcome)
+
+Andrebbe letto al contrario, quindi "le cose su internet", specchiando il paradigma, in ogni caso vogliamo che sia sempre la persona al centro. 
+
+Differenti sono quindi output ed outcome di portare "le cose" su Internet, l'importante è l'outcome che ho riguardante l'utilizzo effettivo di quell'oggetto su internet.
+
+Bisogna quindi valutare vantaggi e svantaggi di connettere un frigorifero ad Internet. Questo ha dell'output, ma anche degli svantaggi perchè dobbiamo tenere conto di tanti problemi, come la manutenibilità del software e del servizio che permette la gestione di questi dispositivi IoT.
+
+Quindi la complessità di progettazione e l'aftersales peggiore in termini di ordini di complessità. Quindi va fatto il rapporto $\frac{output}{outcome}$.
+
+### Industry 4.0
+
+Industria basata sull'integrazione orizzontale e verticale:
+- **Verticale**: Ogni robot di una fabbrica ha il proprio software e questo viene controllato da un utente. 
+- **Orizzontale**: La versione 4.0 permette direttamente da una zona centrale che orchestra tutti i roboti settoriali. L'orchestratore è detto **MES** e l'**IRP** ancora più sopra permette l'organizzazione in generale non solo di produzione effettiva.
+
+In realtà attualmente si sta virando alla 5.0, che permette l'analisi anche di dati di un layer superiore, non solo relativi a costi reali, ma anche a costi futuri, conseguenze sull'ambiente, quindi una gestione multidominio.
+
+Fino ad ora il passaggio da 1.0 a 2.0 a 3.0 a 4.0 in **Sustaining Innovation**. Da un punto di vista dei processi gestionali non è stato cambiato nulla, seguendo le stesse fasi di sviluppo dei processi.
+
+Quindi l'idea di passaggio da 4.0 a 5.0 dovrebbe essere in **Disruptive Innovation**, non cercando di creare output dall'IoT ma outcome, rendendole utili per le persone, cercando di orchestrare questi oggetti connessi ad internet.
+
+### Digital Twin
+
+Un digital twin è una rappresentazione digitale nell'infrastruttura di un oggetto fisico connesso ad internet. Quindi devono essere presenti non solo i dati dei sensori, ma tanti altri, come stato salute oggetto, analytics. Va modellato nello schema concettuale.
+
+L'obiettivo è sempre quello di mappare i bisogni del utente sul prodotto, quindi generare valore e outcome per l'utente utilizzando l'oggetto.
+
+### IoT come Tecnologia Abilitante
+
+Non va visto l'IoT come qualcosa di innovativo che va per forza di cose aggiunto al nostro progetto perchè appunto innovativo. È uguale a tutte le altre tecnologie ed esistono contesti in cui rende molto, ma non va sempre utilizzato a priori.
+
+### Oggetti Servitizzati: Valutazione del Rapporto Output/Outcome con Modello Concettuale e Preview della User Experience
+
+- Gli oggetti fisici IoT vengono servitizzati, ossia basati su un servizio ad abbonamento, quindi gli utenti definiranno questo rapporto non solo sul modello concettuale ma anche una preview dell'esperienza utente, perchè non valuteremo più feature tecniche dell'oggetto, ma dell'esperienza utente di cui usufruiremo di quell'oggetto servitizzato. L'oggetto diventa quindi solo uno strumento tramite cui ci viene erogato un servizio.
+
+### UX per IoT - Caratteristiche
+
+- La progettazione per interfacce IoT è più complesso di progettazione interfacce web. Progettare l'UX di una lampadina non è banale, quindi si imposta in maniera "IoT First", e le piattaforme web e mobile dovrebbero letteralmente riportare l'esperienza di essersi interfacciati all'IoT.
+
+- Andrebbe mantenuta coerenza quindi tra ipotetiche interfacce mobile/web e interfaccia IoT dello stesso prodotto.
+
+- **IoT e Distribuzione**: Spesso non cerchiamo di gestire un singolo dispositivo, ma più dispositivi, quindi dobbiamo immaginare un architettura di questi dispositivi, ad esempio un termostato che funziona da "Main" e tutte le valvole sono dispositivi dumb per questioni di consumo energetico. La progettazione dell'interfaccia però non deve rappresentare questa architettura implementativa, ma l'utente vuole solo gestire la temperatura delle stanze. Quindi **non** dobbbiamo **raccontare come funziona il sistema**, ma **come lo si usa**.
+
+- **Inesistenza di Azione di Undo**: In ambito IoT e dispositivi fisici non esiste in `CTRL+Z`. L'azione viene eseguita se startata. Quindi programmare azioni da remoto è più complesso in ordini, perchè il sistema non è affidabile, perche non esiste l'undo e anche perchè causiamo azioni di sistemi fisici che possono avere conseguenze.
+
+- **Condizioni della Rete in Progettazione**: In un prodotto web non teniamo in considerazione se l'utente riesca o meno a raggiungere il sito, lo si assume. In contesto IoT si considera esattamente l'opposto, quindi non si da per scontato che il dispositivo sia sempre perfettamente raggiungibile. Questo porta anche a progettare più reazioni da parte del sistema, dato che potrei avere la necessità di aspettare più tempo a causa del esecuzione dell'azione fisica.
+
+- **Design per Power Saving**: La comunicazione bidirezionale ad esempio potrebbe non essere data per scontata, se siamo in contesto di dispositivi a consumo. Quindi varie problematiche del genere potrebbero necessitare di soluzioni hardware.
+
+# Lezione 16 - UX per AI  - 14/11/2025
+
+L'AI opera secondo un criterio non deterministico, di conseguenza bisognerebbe guidare l'utente a formare un modello mentale su qualcosa del genere. Questo perchè sono sistemi probabilistici, che allo stesso input forniscono output diversi.
+
+Quindi ad un utente comune l'AI è visto come una black box a cui forniscono input e viene loro restituito dell'output.
+
+Devo quindi progettare l'interfaccia anticipando il fatto che il sistema può fallire e sbagliare.
+
+## Human Centered AI
+
+Il vecchio approccio poneva il focus sul modello, cercando di migliorarlo da un punto di vista tecnico. L'approccio nuovo cerca invece di facilitare la **collaborazione tra umano ed AI**, non mirando a sostituire l'umano ma di supportarlo quanto più possibile. Quindi l'obiettivo è far sentire l'utente come se avesse il controllo della situazione.
+
+Quindi prestazione umana che viene supportata tramite AI, con amplificazioni, supporti. Questo permette comunque alle persone di poter mantenere stabilità di cosa sta sviluppando.
+
+## Appropiate Intelligence
+
+L'AI deve essere forte anche nello sviluppo in contesti reali e non solo in contesti demo. Quindi l'obiettivo è quello di renderla il più deterministica possibile, quindi dovrebbe:
+
+- Essere corretta quante più volte possibili
+- Quando corretta deve anche essere una buona soluzione
+
+Quindi l'interfaccia deve ammettere anche il caso in cui l'AI fallisce, dato che questo può accadere.
+
+## Building Appropriate Reliance
+
+Con Reliance si intende quante volte un utente si riferisce ad un sistema nel caso in cui ha una necessità. Spesso definita in italiano anche come fiducia.
+
+### Reliance vs Trust
+
+- **Trust**: Definita come quanto un utente è confidente in un sistema di AI, è molto personale e psicologica.
+- **Reliance**: Definita come quantità misurabile oggettivamente, quanto effettivamente l'utente usa lo strumento AI.
+
+### Reliance Problem
+
+- **Over Reliance**: Gli utenti dipendono dall'AI anche in contesti in cui non dovrebbe.
+- **Under Reliance**: Gli utenti ignorano l'AI quando potrebbe essere utile.
+- **Appropriate Reliance**: Gli utenti si affidano all'AI rispetto alla sua reale funzionalità.
+
+Questo match della reliance è correlata molto alla system capability:
+
+- **High Accuracy + Low Stakes Domains**: Alta affidabilità su contesti non critici, allora dovrei affidarmi molto all'AI.
+- **Low Accuracy + High Stakes Domains**: Bassa affidabilità su contesti critici, allora non dovrei affidarmi molto all'AI.
+
+### The Reliance Toolkit
+
+Per costruire adeguata reliance andrebbero seguiti questi passi:
+
+1. **Explainability**: Aiutare gli utenti a capire come funzioni l'AI, cercando di "aprire" la black box, cercarndo di matcharlo ad un modello che può risultare chiaro all'utente.
+2. **Transparency**: Cercare di essere trasparenti con l'utente sulle percentuali di successo in specifici contesti, magari avvisando quando si sta lavorando fuori dal dominio su cui il modello è stato allenato.
+3. **Control**: Automazione e controllo sono pesantemente correlati, ma non in maniera monodimensionale, il livello di controllo ed automazione dipende quindi dal contesto e dai tipi di task.
+
+<img src="img/control_in_AI.png" width="450">
+
+## Feedback & Learning
+
+I sistemi AI si basano molto sull'acquisizione di feedback per formare il proprio comportamente, quindi si parla di 3 tipologie di feedback:
+
+- **Feedback Esplicito**: Correzioni, analytics di attività, like e dislike
+- **Feedback Implicito**: Inferito dal comportamento del feed, quindi pattern di click, tempo di visione di media, skip rate...
+- **Feedback Duale**: Si combinano le due categorie appena definite per sintetizzare un feedback complessivo.
+
+Il feedback andrebbe **acquisito nella maniera più facile possibile**, cercando anche di **mostrare l'impatto di aver condiviso quelle informazioni** e **mai cercando troppo di forzare questa acquisizione di feedback**.
+
+## Design Principles for AI
+
+- **Principio 1 - Set Clear Expectations**: Maneggiare le aspettative, non promettendo nulla di troppo, cercando di spiegare come funziona durante l'onboarding. E anche durante il suo funzionamento va mostrato come si sta cambiando, indicando quando un risultato potrebbe essere incerto.
+- **Principio 2 - Design For Errors**: Bisogna supportare l'handling di errore tramite strategie specifiche, come indicare quando avviene un errore, spiegare cosa sia successo, lasciare il controllo in mano all'utente in caso di errore, utilizzare gli errori stessi come feedback.
+- **Principio 3 - Balance Complexity and Control**: 
+    - Scoperta delle funzionalità complesse esplorando il sistema, scoprendo gradualmente il sistema stesso.
+    - Rispetto dell'autonomia dell'utente, potendo sempre cancellare o modificare i dati forniti dall'AI.
+    - Il pattern è quindi dare all'inizio tanto controllo e poca automatizzazione all'utente e gradualmente aumentare l'automazione mantenendo il controllo.
+
+## Context & Tradeoffs
+
+È fondamentale il contesto del rischio e del contesto, quindi low e high stakes.
+
+È fondamentale capire anche la precisione e la possibilità di errore in relazione a falsi positivi e falsi negativi.
+
+<img src="img/errors_in_AII.png" width="450">
+
+I problemi sono quindi casi di falsi negativi e falsi positivi.
+
+È quindi capire se siamo in Precision oppure Recall.
+
+- Precision: Se la cosa peggiore è un falso allarme (falso positivo), come nel caso dello spam detection, anche se dovesse capitare un falso positivo non sarebbe un problema.
+- Recall: Contesto in cui la cosa peggiore è missare una detection, quindi i falsi negativi, come nei casi di medical screening.
+
+## Design Process
+
+- **AI Design Process**: Vanno seguiti criteri per cui scegliere di utilizzare o meno l'AI, non utilizzarlo solo perchè disponibile. Dovrei sempre preferire soluzioni deterministiche anche se non ottimali alle soluzioni inverse.
+
+- **Testing AI Systems**: Capire tramite test se realmente necessario l'utilizzo di AI.
+
