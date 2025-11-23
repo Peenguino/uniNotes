@@ -1596,11 +1596,13 @@ Il tempo di timeout \texttt{RTO} è fondamentale per il funzionamento del TCP e 
     \item \texttt{SampleRTT}: Misura del tempo trascorso da quando si invia un segmento a quando si riceve il suo riscontro.
     \item \texttt{EstimatedRTT}: Stima del valore precedente calcolata iterativamente come:
     \[ \boxed{EstimatedRTT_{i+1} = (1-\alpha) EstimatedRTT_{i} + \alpha SampleRTT} \]
-    \item \texttt{$RTT_{DEV}$}: Stima della variabilità di RTT determinata con:
-    \[ \boxed{RTT_{DEV} = (1-\beta) RTT_{DEV} + \beta | RTT_{SAMPLE} - RTT_{ESTIMATED} |} \]
+    \item \texttt{RTT\_{DEV}}: Stima della variabilità di RTT determinata con:
+    \[ \boxed{RTT_{DEV_{k+1}} = (1-\beta) RTT_{DEV_{k}} + \beta | RTT_{SAMPLE} - RTT_{ESTIMATED} |} \]
     \item \texttt{RTO}: Una volta ottenuti questi valori il timeout viene calcolato come:
     \[ \boxed{RTO = RTT_{ESTIMATED} + 4RTT_{DEV}} \]
 \end{itemize}
+
+Le quantità $\alpha$ e $\beta$ sono determinate arbitrariamente, spesso nello svolgimento di esercizi si settano come $\alpha = \frac{1}{8}$ e $\beta = \frac{1}{4}$.
 
 \paragraph{Finestra di Ricezione TCP} I dati inviati dall'applicativo sono mantenuti nel buffer di invio, e la trasmissione si basa su una sliding window che viene fatta scorrere a tempo di ricezione di un \texttt{ACK}.
 
@@ -1608,7 +1610,7 @@ Il tempo di timeout \texttt{RTO} è fondamentale per il funzionamento del TCP e 
 
 \begin{figure}[htbp]
     \center
-    \includegraphics[scale=0.4]{img/slidingWindowTCP.png}
+    \includegraphics[scale=0.325]{img/slidingWindowTCP.png}
 \end{figure}
 
 \newpage
@@ -2061,6 +2063,327 @@ Definiamo delle \textbf{classi di indirizzi IPv4} in base ai byte dedicati all'i
     \center
     \includegraphics[scale=0.4]{img/subnetMask.png}
 \end{figure}
+
+\subsubsection{Assegnazione a Blocchi e Indirizzi Speciali}
+
+\paragraph{Assegnazione Blocchi di Indirizzi} Se un ISP deve suddividere un blocco in $8$ blocchi di indirizzi.
+
+\begin{figure}[htbp]
+    \center
+    \includegraphics[scale=0.4]{img/assegnazione_a_blocchi.png}
+\end{figure}
+
+\begin{itemize}
+    \item Il numero di indirizzi N in ogni sottoreti deve essere una potenza di 2.
+    \item La lunghezza del prefisso di ogni sottorete va calcolata con la seguente formula $n = 32 - log_2 N$ dove $N$ è il numero di indirizzi della sottorete.
+    \item Si assegnano blocchi di indirizzi contigui.
+    \item Se i blocchi sono di dimensioni diverse allora si parte dai blocchi più grandi.
+\end{itemize}
+
+\newpage
+
+\paragraph{Indirizzi Speciali} Esiste una serie di indirizzi riservati:
+
+\begin{itemize}
+    \item \texttt{This-Host 0.0.0.0}: Usato come placeholder quando un host ancora non conosce il proprio indirizzo IP.
+    \item \texttt{Limited Broadcast 255.255.255.255}: Usato quando un router o un host deve inviare un pacchetto a tutti gli host in una rete.
+    \begin{itemize}
+        \item \texttt{Directed Broadcast}: Serve per indirizzare tutti i nodi di una specifica sottorete esterna.
+    \end{itemize}
+    \item \texttt{Loopback 127.0.0.1} Il datagramma con questo indirizzo di destinazione non lascia l'host locale.
+\end{itemize}
+
+\subsubsection{IP Forwarding - Diretto vs Indiretto}
+
+Ogni diagramma IP è soggetto a forwarding, ossia inoltro verso l'uscita. Esistono due tipi diversi di inoltro:
+
+\begin{itemize}
+    \item \textbf{Inoltro Diretto}: Il pacchetto IP ha come destinazione un host nella propria rete, quindi \textbf{non viene interpellato alcun} router di quella rete.
+    \begin{itemize}
+        \item L'Host A deve inviare un pacchetto ad un Host B, conoscendone l'indirizzo IP.
+        \item L'Host A confronta il proprio indirizzo con quello del destinatario, capisce che si tratta di un host della stessa sottorete e quindi sceglie un inoltro diretto.
+        \item L'Host A consulta quindi una tabella di corrispondenza \texttt{IP\_ADD -> MAC\_ADD}.
+        \item L'Host A passa il pacchetto al livello di trasporto, che gestirà il frame con header contenente gli indirizzi MAC sorgente e destinatario.
+    \end{itemize}
+    \item \textbf{Inoltro Indiretto}: Il pacchetto IP ha come destinazione un host di un'altra rete IP. Quindi il pacchetto viene inoltrato \textbf{almeno ad un} router.
+    \begin{itemize}
+        \item L'Host A deve inviare un pacchetto ad un Host B, conoscendone l'indirizzo IP.
+        \item L'Host A confronta il proprio indirizzo con quello del destinatario, capisce che si tratta di un host di un altra sottorete e quindi sceglie un inoltro indiretto.
+        \item L'Host A quindi recupera l'indirizzo MAC del router dalla tabella di corrispondenza e passa il pacchetto a livello inferiore in sua direzione.
+        \item Il pacchetto viene costruito e spedito dall'interfaccia del router.
+    \end{itemize}
+\end{itemize}
+
+\vspace*{5px}
+
+\paragraph{Longest Prefix Matching} Quando si cerca una voce della tabella di inostro per un dato indirizzo di destinazione, in caso di più match nella tabella, si seleziona la entry con il prefisso di indirizzo più lungo tra tutte quelle che matchano. Questo perchè
+un prefisso più lungo per la rete garantisce che sia più specifico rispetto agli altri match.
+
+\newpage
+
+\paragraph{Aggregazione di Indirizzi e Routing Gerarchico} Assumiamo che un ISP abbia assegnato $4$ piccoli blocchi di indirizzi ad organizzazioni. L'ISP può aggregare questi blocchi in uno singolo e annuncia alla rete il singolo blocco per questioni di efficienza.
+
+\subsection{Protocollo DHCP - Dynamic Host Configuration Protocol}
+
+Un indirizzo IP può essere \textbf{configurato manualmente} tramite assegnazione di indirizzo IP, indirizzo gateway/router, netmask e indirizzo IP di un server DNS.
+
+\vspace*{10px}
+
+In alternativa alla configurazione manuale esiste un assegnazione automatica tramite DHCP, ossia quando un host si aggiunge ad una rete ottiene dinamicamente un indirizzo IP da un programma server nella rete.
+
+\paragraph{Protocollo DHCP secondo Paradigma Client/Server} L'assegnazione dinamica si basa su queste fasi:
+
+\begin{itemize}
+    \item L'host invia in broadcast un messaggio \texttt{DHCP discover}.
+    \item Il server DHCP risponde con un messaggio \texttt{DHCP offer}.
+    \item L'host richiede un indirizzo IP tramite un messaggio \texttt{DHCP request}.
+    \item Il server DHCP invia un messaggio \texttt{DHCP ack} se la richiesta va a buon fine.
+\end{itemize}
+
+\begin{figure}[htbp]
+    \center
+    \includegraphics[scale=0.5]{img/DHCP1.png}
+\end{figure}
+
+Il DHCP il basa sul protocollo UDP e non si occupa solo di assegnazioni di IP ma anche di informazioni riguardanti indirizzo gateway/router, netmask ed indirizzo IP di almeno un server DNS.
+
+\newpage
+
+\subsection{NAT - Network Address Translation}
+
+Questo meccanismo permette di trasmettere su Internet il traffico proveniente da sistemi di sottoreti private, dove l'accesso ad Internet è \textbf{abilitato} da un \textbf{router} che ha abbia \textbf{almeno} un \textbf{IP pubblico}.
+
+\vspace*{10px}
+
+Quindi tutto il traffico proveniente da ciascuno degli host della sottorete apparirà come in uscita dall'IP pubblico, e tutto il traffico in entrata avrà come destinazione l'IP del router. Ciascun host sarà quindi differenziato da una porta, ma si esporrà all'esterno della sottorete con lo stesso IP di tutti gli altri host della sottorete.
+
+\paragraph{Tabella di Traduzione NAT} Il router di accesso alla sottorete ha quindi in memoria una tabella di associazioni per riferire ad un host specifico della sua sottorete.
+
+\begin{figure}[htbp]
+    \center
+    \includegraphics[scale=0.55]{img/tabellaNAT.png}
+\end{figure}
+
+\paragraph{Critiche al NAT} Il NAT è stato visto in modo controverso da chi definiva formalmente le specifiche di Internet per questioni quali ad esempio l'utilizzo di porte per riferire host e non processi, violazione dell'argomento end-to-end, carenza di indirizzi già risolta da IPv6 e attraversamento del NAT per connettersi ad un server nattato.
+
+\subsection{ICMP - Internet Control Message Protocol}
+
+Il \textbf{meccanismo IP} di base \textbf{non ha} alcun meccanismo integrato per \textbf{notifica di errori}. Oltre a questo è anche sprovvisto di meccanismi per effettuare richieste sullo stato di un sistema remoto.
+
+\paragraph{Alcune Caratteristiche Messaggi ICMP} I pacchetti ICMP sono incapsulati all'interno di datagrammi IP. Per pacchetti IP frammentati, i messaggi ICMP sono relativi solo al frammento con offset $0$. I messaggi ICMP non sono mai inviati in risposta a pacchetti IP con destinazione IP broadcast o multicast, e allo stesso tempo non sono mai inviati in risposta ad altri messaggi di errore ICMP ma possono essere utilizzati in risposta a messaggi ICMP di interrogazione.
+
+\newpage
+
+\paragraph{Tipi di Messaggio ICMP} I messaggi si distinguono in:
+
+\begin{itemize}
+    \item \textbf{Messaggi di Segnalazione Errore}
+    \item \textbf{Messaggi di Richiesta/Risposta}
+\end{itemize}
+
+Oltre alla tipologia, ogni messaggio ICMP è caratterizzato anche da due attributi 
+
+\texttt{tipo 8bit} e \texttt{codice 8bit}, che indicano il significato dei messaggi.
+
+\begin{figure}[htbp]
+    \center
+    \includegraphics[scale=0.6]{img/ICMP_messages.png}
+\end{figure}
+
+\paragraph{Esempi di Utilizzo ICMP - Ping e Traceroute} Descriviamo l'utilizzo di questi due meccanismi che si basano su messaggi ICMP:
+
+\begin{itemize}
+    \item \textbf{Ping}: Si basa su uno scambio di messaggi ICMP richiesta/risposta di tipo \texttt{ECHO}, rispettivamente \texttt{tipo 8, codice 0} dal mittente e \texttt{tipo 0, codice 0} dal destinatario se raggiungibile.
+    \begin{enumerate}
+        \item \textbf{Versione UNIX}: Traceroute si basa sulla configurazione che permette di 
+        
+        scatenare l'invio di messaggi di errore correlati a tempo scaduto o porte di destinazione non raggiungibili.
+        \item \textbf{Versione Windows}: Tracert utilizza invece messaggi echo ICMP di tipo request/reply.
+        \begin{figure}[htbp]
+            \center
+            \includegraphics[scale=0.4]{img/tracert.png}
+        \end{figure}
+    \end{enumerate}
+\end{itemize}
+
+\newpage
+
+\subsection{Architettura di Router}
+
+Come già accennato, un router deve occuparsi di due tipologie di operazione:
+
+\begin{itemize}
+    \item \textbf{Forwarding}: Trasferire i pacchetti sull'appropriato collegamento in uscita, \textbf{utilizzando} una \textbf{tabella di inoltro}, l'operazione è detta anche di tipo \textbf{data plane}.
+    \item \textbf{Routing}: Processo \textbf{decisionale} di scelta del percorso verso una destinazione, \textbf{popola} quindi la \textbf{tabella di inoltro}, azione definita da algoritmi di routing, definita anche come di tipo \textbf{control plane}.
+\end{itemize}
+
+\begin{figure}[htbp]
+    \center
+    \includegraphics[scale=0.4]{img/dataPlane_controlPlane.png}
+\end{figure}
+
+Possiamo quindi definire due tipi di routing:
+
+\begin{itemize}
+    \item \textbf{Routing Decentralizzato}: L'algoritmo di routing è eseguito su ciascuno dei router, e questi ultimi si scambiano messaggi.
+    \item \textbf{Routing Logicamente Centralizzato}: Un controller remoto con Control Agents \texttt{CA} locali si occupa delle informazioni sui collegamenti e sul traffico, ed invia ai singoli \texttt{CA} i valori da inserire nella tabella di inoltro. Questo tipo di gestione è definita
+    anche come \textbf{Software-defined Networking SDN}.
+\end{itemize}
+
+\subsubsection{Descrizione Fisica dell'Architettura di un Router}
+
+Si basa su delle componenti principali quali porte di input, porte di output, processore di routing e struttura di commutazione detta anche switching fabric.
+
+\begin{figure}[htbp]
+    \center
+    \includegraphics[scale=0.4]{img/archRouter1.png}
+\end{figure}
+
+\newpage
+
+\begin{itemize}
+    \item \textbf{Porte di Input}: Si compone di tre parti, una ricezione dei bit, un livello di collegamento ed un modulo per la gestione di lookup, forwarding ed accodamento.
+    \begin{figure}[htbp]
+        \center
+        \includegraphics[scale=0.4]{img/archRouter2.png}
+    \end{figure}
+    \item \textbf{Porte di Output}: Si occupa del buffering dei datagrammi quando arrivano dalla struttura di commutazione ad una velocità maggiore rispetto a quella di trasmissione del collegamento in uscita. Oltre a questo devono anche definire delle drop policy per scegliere quali datagrammi scartare in caso di mancanza di spazio e politiche di scheduling per definire l'ordine di trasmissione dei datagrammi in coda.
+    \begin{figure}[htbp]
+        \center
+        \includegraphics[scale=0.4]{img/archRouter3.png}
+    \end{figure}
+    \item \textbf{Struttura di Commutazione}: Si occupa del trasferimento del pacchetto dal buffer di input al buffer di output appropriato, caratterizzata da una velocità con cui i pacchetti possono essere trasferiti da un buffer ad un altro.
+    \begin{figure}[htbp]
+        \center
+        \includegraphics[scale=0.4]{img/archRouter4.png}
+    \end{figure}
+\end{itemize}
+
+\paragraph{Ritardi e Perdite} Si possono formare delle code di pacchetti sia presso porte di ingresso che di uscita, la lunghezza delle code dipende da vari fattori come traffico di rete, velocità della struttura di comunicazione e velocità della linea.
+
+\newpage
+
+\subsection{Protocolli di Routing}
+
+L'obiettivo del routing è quello di determinare buoni percorsi da host mittenti ad host destinatari attraverso host intermedi, definendo quindi percorsi come sequenza di host intermedi tra sorgente e destinazione. Con buono intendiamo che abbia un costo minore.
+
+\paragraph{Astrazione del Grafo} Immaginiamo che la rete sia un grafo, ciascun arco ha un peso, quindi ci chiediamo quale sia il \textbf{cammino di costo minimo} tra sorgente e destinazione. Un \textbf{algoritmo di routing calcola} quindi il \textbf{cammino} a \textbf{costo minimo} tra i due nodi.
+
+\paragraph{Routing Statico/Dinamico} Esistono due tipi di routing:
+
+\begin{itemize}
+    \item \textbf{Statico}: Un admin definisce il path ottimale, popolando manualmente le entry delle tabelle di routing. Questo approccio viene utilizzato per reti di piccole dimensioni.
+    \item \textbf{Dinamico}: Definito da protocolli specifici che popolano automaticamente le tabelle di routing con i possibili percorsi. Utilizzato in reti di media/grande dimensione.
+\end{itemize}
+
+\paragraph{Algoritmi di Routing Globali/Decentralizzati} Classifichiamo gli algoritmi di instradamento in:
+
+\begin{itemize}
+    \item \textbf{Globali}: Basati sulla conoscenza dell'intera topologia di rete, il calcolo può essere fatto in un unico sito, utilizzando informazioni su tutti i nodi e gli archi. Ne è un esempio l'\textbf{algoritmo Link State}.
+    \item \textbf{Decentralizzati}: Nessun nodo conosce l'intera topologia di rete, di conseguenza si distribuisce il calcolo e si reitera. Ne è un esempio l'\textbf{algoritmo Distance Vector}.
+\end{itemize}
+
+\subsubsection{Algoritmo Distance Vector}
+
+L'algoritmo Distance Vector è distribuito, iterativo ed asincrono.
+
+\paragraph{Equazione di Bellman-Ford} Formula per trovare il percorso a costo minimo tra un nodo sorgente $x$ ed una destinazione $y$ attraversando nodi intermedi, detti vicini $v$.
+
+\begin{figure}[htbp]
+    \center
+    \includegraphics[scale=0.4]{img/equazioneBellmanFord.png}
+\end{figure}
+
+\begin{itemize}
+    \item \textbf{Costo}: Definito un costo $c(x,v)$ tra nodo sorgente $x$ e vicino $v$.
+    \item \textbf{Distanza Minima $d_{vy}$}: Sia nota la distanza minima tra vicino $v$ e destinazione $y$.
+\end{itemize}
+
+Da questo definiamo quindi:
+
+\[ \boxed{d_{xy} = min_v\{ c(x,v) + d_{vy} \}} \]
+
+dove $c(x,v)$ è il costo da $x$ al vicino $v$ e $d_{vy}$ è la distanza dal vicino $v$ alla destinazione $y$.
+
+\newpage
+
+\paragraph{Funzionamento Algoritmo Distance Vector} L'algoritmo del Distance Vector si basa su queste fasi:
+
+\begin{itemize}
+    \item Ogni nodo calcola il proprio vettore distanza e ne invia una copia a ciascuno dei suoi vicini.
+    \item Quando un nodo riceve un vettore distanza, lo salva ed applica l'equazione di Bellman-Ford per aggiornare il proprio vettore distanza, quindi:
+    \[ D_{xy} = min_v \{ c(x,v) + D_{vy} \} \: \text{per ogni} \: y \in N \]
+    \item Finchè tutti i nodi continuano a cambiare i propri Distance Vector in maniera asincrona, ciascuna stima dei costi $D_{xy}$ converge all'effettivo costo del percorso a costo minimo $d_{xy}$.
+\end{itemize}
+
+Per questo ad inizio sottocapitolo si definiva questo algoritmo distribuito, ciascun nodo infatti:
+
+\begin{enumerate}
+    \item Attende un \textbf{cambiamento di costo} di un \textbf{arco locale} oppure un \textbf{messaggio da un vicino}.
+    \item \textbf{Ricalcola} la \textbf{stima} dei \textbf{propri Distance Vector} usando il Distance Vector ottenuto dal vicino.
+    \item Se il \textbf{proprio Distance Vector varia} allora lo \textbf{notifica} ai \textbf{vicini}.
+\end{enumerate}
+
+\paragraph{Notifica Cambiamento Costo} Questo algoritmo ha due diversi comportamenti in caso di variazione di costo degli archi:
+
+\begin{itemize}
+    \item \textbf{Decremento - "Good News Travels Fast"}: Se il cambiamento del costo di un arco è un decremento, allora questa informazione è facilmente propagata ai nodi vicini.
+    \item \textbf{Incremento - "Bad News Travels Slow"}: Se il cambiamento del costo è un incremento si ricade nella problematica del \textbf{count to infinity}, sono necessarie molte iterazioni prima che l'algoritmo si stabilizzi. Questa condizione si risolve con due approcci, che possono anche essere combinati:
+    \begin{itemize}
+        \item \textbf{Split Horizon}: Tutte le rotte ricevute tramite un interfaccia \textbf{non devono} essere ritrasmesse a quell'interfaccia.
+        \item \textbf{Poisoned Reverse}: Se un nodo $x$ trasmette pacchetti a $v$ che sono diretti ad $y$ allora li etichetta come irragiungibili da $x$, passando ad esempio un etichetta $\infty$.
+    \end{itemize}
+\end{itemize}
+
+\subsubsection{Algoritmo Link-State}
+
+Tipo di \textbf{algoritmo globale}, la \textbf{topologia di rete} ed i suoi collegamenti sono \textbf{noti a tutti} i nodi. Si calcola quindi il cammino a costo minimo da un nodo origine a tutti gli altri nodi tramite l'utilizzo dell'\textbf{Algoritmo di Dijkstra}.
+
+\newpage
+
+\paragraph{Notazione Algoritmo di Dijkstra} Utilizzeremo questa notazione:
+
+\begin{itemize}
+    \item $c(x,y)$: Costo dei collegamenti dal nodo $x$ al nodo $y$, settato ad $\infty$ se non sono collegati.
+    \item $D(v)$: Costo del cammino dal nodo origine alla destinazione $v$ per l'iterazione corrente.
+    \item $p(v)$: immediato predecessore di $v$ lungo il cammino.
+    \item $N'$: Sottoinsieme di nodi per cui il cammino a costo minimo dall'origine è definitivamente noto.
+\end{itemize}
+
+\paragraph{Complessità Algoritmo di Dijkstra} Dati $n$ nodi, per ogni iterazione è necessario controllare $w$ non presenti in $N$. La complessità è quindi $O(n^2)$ ma esistono versione che scendono ad $O(nlogn)$. Da un punto di vista dei messaggi, ogni router deve trasmettere le informazioni sullo stato del proprio collegamento ad altri $n$ router.
+
+\subsubsection{Confronto Distance Vector e Link State}
+
+Analizziamo alcune caratteristiche mettendo a confronto i due algoritmi:
+
+\begin{itemize}
+    \item \textbf{Complessità Messaggi}:
+    \begin{itemize}
+        \item \textbf{Distance Vector}: Richiede scambi tra nodi adiacenti.
+        \item \textbf{Link State}: Con $n$ nodi richiede l'invio di $O(n^2)$ messaggi.
+    \end{itemize}
+    \item \textbf{Velocità di Convergenza}:
+    \begin{itemize}
+        \item \textbf{Distance Vector}: Può convergere lentamente, può presentare cicli 
+        
+        nell'instradamento e problemi di conteggio all'infinito.
+        \item \textbf{Link State}: L'algoritmo $O(n^2)$ richiede $O(n^2)$ messaggi.
+    \end{itemize}
+    \item \textbf{Robustezza}: Immaginiamo una condizione in cui un router funzioni male:
+    \begin{itemize}
+        \item \textbf{Distance Vector}:
+        \begin{enumerate}
+            \item Un nodo può comunicare cammini a costo minimo errati a tutte le destinazioni.
+            \item La tabella di ciascun nodo può essere usata dagli altri.
+            \item Un calcolo errato si può diffondere per l'intera rete.
+        \end{enumerate}
+        \item \textbf{Link State}:
+        \begin{itemize}
+            \item Un router potrebbe inviare in broadcast un costo sbagliato per uno dei suoi collegamenti.
+            \item In nodi si occupano di calcolare soltanto le proprie tabelle.
+        \end{itemize}
+    \end{itemize}
+\end{itemize}
 
 \newpage
 

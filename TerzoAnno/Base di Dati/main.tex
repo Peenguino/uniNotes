@@ -12,6 +12,8 @@
 \usepackage{framed}
 \usepackage[dvipsnames]{xcolor}
 \usepackage{tcolorbox}
+\usepackage{fancyvrb} %utilizzato per mathmode in verbatim mode
+
 
 %Define the listing package
 \usepackage{listings} %code highlighter
@@ -1300,6 +1302,168 @@ Vogliamo decidere, data una $DF$, se questa appartiene a $F^+$. Applicare ripetu
 \[ X^+ = AD = ADB = ADBE = ADBEC \]
 
 Quindi data questa produzione, possiamo ad esempio notare che $AD$ è superchiave perchè contiene tutti gli attributi ed $A$ \textbf{non è superchiave} perchè la produzione $A \to B, A \to BC$ si ferma.
+
+\subsection{Copertura Canonica e Decomposizione}
+
+L'obiettivo di questo sottocapitolo è quello di definire schemi che siano equivalenti, dopo operazioni di decomposizione.
+
+\paragraph{Definizione Copertura/Equivalenza} Due insiemi di $DF$, $F$ e $G$ sullo schema $R$ sono \textbf{equivalenti} $F \equiv G$ se e solo se $F^+ = G^+$. Se vale questa condizione allora si dice che $F$ è \textbf{copertura} di $G$ e viceversa.
+
+\subsubsection{Definizioni Formali di Attributo Estraneo e Dipendenza Ridondante}
+
+\begin{itemize}
+    \item \textbf{Definizione Copertura Canonica}: Data una $X \to Y \in F$, si dice che $X$ contiene un \textbf{attributo estraneo} se e solo se $(X - \{ A_i \}) \to Y \in F^+$, quindi vale 
+    
+    che $F \vdash (X - {A_{i}}) \to Y $.
+    \item \textbf{Dipendenza Funzionale Ridondante}: $X \to Y$ è detta ridondante se e solo se $(F - \{ X \to Y \})^+ = F^+$ o equivalentemente $F - \{ X \to Y \} \vdash X \to Y$.
+\end{itemize}
+
+\newpage
+
+\subsubsection{Definizione Copertura Canonica}
+
+$F$ è detta \textbf{copertura canonica} se rispetta queste condizioni:
+
+\begin{itemize}
+    \item Tutte le dipendenze $DF$ in $F$ sono atomiche.
+    \item Non esistono attributi estranei.
+    \item Nessuna dipendenza in $F$ è ridondante.
+\end{itemize}
+
+Sulla base di questa definizione è possibile definire il seguente teorema:
+
+\paragraph{Teorema} Per ogni insieme di dipendenze $F$ esiste una copertura canonica.
+
+\vspace*{10px}
+
+Quindi avendo un teorema per l'esistenza di copertura canonica, possiamo definire un algoritmo per calcolare una copertura canonica, che attraversa tre fasi per validare le proprietà richieste dalla definizione di copertura canonica:
+
+\begin{itemize}
+    \item Trasformare tutte le dipendenze in forma atomica.
+    \item Eliminare tutti gli attributi canonici.
+    \item Eliminare tutte le dipendenze ridondanti.
+\end{itemize}
+
+\paragraph{Tipi di Ridondanza} Esistono due tipi differenti di ridondanza:
+
+\begin{itemize}
+    \item \textbf{Ridondanza Concettuale}: Non esistono informazioni duplicate ma informazioni che sono ricavabili da altre già presenti nella base di dati.
+    \item \textbf{Ridondanza Logica}: Esistono informazioni duplicate.
+\end{itemize}
+
+\subsubsection{Definizione di Decomposizione di Schemi e Proprietà Attese - Conservazione Dati e Dipendenze}
+
+Dato uno schema $R(T)$, $\rho\{ R_1(T_1), \cdots, R_k(T_k) \}$ è una \textbf{decomposizione} di $R$ se e solo se $T_1 \cup \cdots \cup T_k = T$.
+
+\paragraph{Proprietà Attese} Dopo una buona operazione di decomposizione ci aspettiamo che siano rispettate due condizioni:
+
+\begin{itemize}
+    \item \textbf{Conservazione dei Dati}: $\rho\{ R_1(T_1), \cdots, R_k(T_k) \}$ è una decomposizione di uno schema $R(T)$ che preserva i dati se e solo se per ogni istanza valida $r$ di $R$ vale che:
+    \[ r = (\pi_{T1}r) \bowtie (\pi_{T2}r) \bowtie \cdots \bowtie (\pi_{Tk}r) \]
+    Quindi dalla definizione di giunzione naturale scaturisce questo teorema:
+    \begin{itemize}
+        \item \textbf{Teorema}: Se $\rho = \{ R_1(T_1), \cdots, R_k(T_k) \}$ è una decomposizione di $R(T)$, allora per ogni istanza $r$ di $R$ vale che $r \subseteq (\pi_{T1}r) \bowtie (\pi_{T2}r) \bowtie \cdots \bowtie (\pi_{Tk}r)$.
+    \end{itemize}
+    Quindi il vincolo $=$ della definizione non lascia spazio ad altre n-uple, che sono invece potenzialmente presenti nel teorema che si basa sul operatore $\subseteq$. Quindi se la decomposizione avviene senza perdite di dati allora questo vuol dire che non verrà generata alcuna n-upla spuria.
+    \newpage
+    \paragraph{Teorema Informale Decomposizione Senza Perdite} Se l'insieme di attributi comuni alle due relazioni $X_{1} \cap X_{2}$ \textbf{è chiave} per \textbf{almeno una delle due relazioni} decomposte allora la \textbf{decomposizione} è \textbf{senza perdite}. Nel caso binario questo diventa:
+    \begin{itemize}
+        \item Sia $R(T,F)$ uno schema di relazione, la decomposizione $\rho = \{ R_{1}(T_1), R_{2}(T_2) \}$ preserva i dati se e solo se $T_1 \cap T_2 \to T_1 \in F^+$ oppure $T_1 \cap T_2 \to T_2 \in F^+$.
+    \end{itemize}
+    \item \textbf{Preservazione di Dipendenze}: Dato lo schema $R(T,F)$, e $T_1 \subseteq T$, la proiezione di $F$ su $T_1$ è definita come:
+    \[ \pi_{T1}(F) = \{ X \to Y \in F^+ \: | \: XY \subseteq T_1 \} \]
+    Informalmente stiamo quindi dicendo che una decomposizione preserva le \textbf{dipendenze} se \textbf{ciascuna} di queste dello schema originario coinvolge attributi che compaiono \textbf{tutti insieme in uno degli schemi decomposti}.
+\end{itemize}
+
+\vspace*{10px}
+
+\subsection{Forme Normali}
+
+Una forma normale è una proprietà di una base di dati relazionale che ne garantisce la qualità, solitamente quando una relazione non è normalizzata presenta ridondanze o si presta a comportamenti poco desiderabili durante gli aggiornamenti.
+
+\paragraph{Tipi di Forme Normali} Ogni tipo di forma normale definisce specifici vincoli:
+
+\begin{itemize}
+    \item \textbf{1FN (Prima Forma Normale)}: Impone una restrizione sul tipo di una relazione: ogni attributo ha un tipo elementare.
+    \item \textbf{2FN, 3FN e BCNF}: Impongono restrizioni sulle dipendenze e la Boyce-Codd BCNF è la più naturale e restrittiva.
+\end{itemize}
+
+\vspace*{10px}
+
+\subsubsection{BCNF - Forma Normale di Boyce-Codd}
+
+Una relazione $r$ si dice in BCNF se \textbf{per ogni dipendenza funzionale} non banale del tipo $X \to Y$ definita su essa, $X$ contiene una chiave $K$ di $r$, ovvero \textbf{$X$ è superchiave}.
+
+\paragraph{Definizione Formale} $R(T,F)$ è in BCNF $\Leftrightarrow$ per ogni $X \to A \in F^+$ non banale, ossia vale che $A \notin X$ quindi $X$ è una superchiave.
+
+\paragraph{Teorema} $R(T,F)$ è in BCNF $\Leftrightarrow$ per ogni $X \to A \in F$ non banale vale che $X$ è superchiave.
+
+\paragraph{Corollario} $R(T,F)$ con $F$ in copertura canonica è in BCNF $\Leftrightarrow$ per ogni $DF$ atomica non banale $X \to A \in F$ vale che $X$ è una superchiave.
+
+\newpage
+
+\subsubsection{Algoritmo di Analisi}
+
+Questo algoritmo prende in input una relazione $R(T,F)$ con $F$ copertura canonica e produce in output un $\rho = \{ R_1, R_2, R_m \}$ decomposizione in BCNF che preserva i dati. Possiamo definirne uno pseudocodice:
+
+\begin{Verbatim}[commandchars=\\\{\}]
+while esiste in \(\rho\) una \(Ri(Ti, Fi)\) non in BCNF per la DF \( X \to A \)
+    //incrememta contatore relazioni
+    n=n+1
+    //chiusura di X
+    Ta = X+
+    //proiezione DF rispetto a Ta
+    Fa = \(\pi\) Ta(Fi)
+    //rimozione da attrivuti non in X ma nella sua chiusura
+    //riaggiunta X alla fine
+    Tb = Ti - X+ + X
+    //rimuove R non BCNF per \( X \to A \) e inserisce quelle corrette
+    \( \rho \) = \(\rho - Ri + {Ri <Ta,Fa>, Rn<Tb,Fb>} \)
+\end{Verbatim}
+
+Questo algoritmo \textbf{preserva i dati ma non necessariamente le dipendenze}.
+
+In alcune occasioni bisogna ricorrere a forme di normalizzazione indebolita. Mostriamo ad esempio la 3FN che consente di ottenere decomposizioni senza perdite e che preservano tutte le dipendenze.
+
+\subsubsection{3FN - Terza Forma Normale}
+
+Rilassiamo il vincolo della definizione precedente mettendo il vincolo della BCNF in $XOR$ con la possibilità di $A$ di essere \textbf{attributo primo}.
+
+\paragraph{Definizione} $R(T,F)$ è in 3FN se per ogni $X \to A \in F^{+}$, con $A \notin X$ vale che $X$ è una \textbf{superchiave} \textbf{oppure} $X$ è \textbf{attributo primo}.
+
+\paragraph{Teorema} $R(T,F)$ è in 3FN se per ogni $X \to A \in F$ non banale vale che $X$ è una superchiave oppure A è primo, ossia è contenuto in almeno una chiave.
+
+\paragraph{Esistenza 3FN e Caratteristiche} Elenchiamo alcune caratteristiche della 3FN:
+\begin{itemize}
+    \item \textbf{Esistenze e Proprietà Garantite}: Ogni schema del tipo $R(T,F)$ \textbf{ammette sempre} una decomposizione che \textbf{preserva dati}, \textbf{dipendenze ed è in 3FN}.
+    \item \textbf{Tempo Ottenimento 3FN}: La decomposizione 3FN può essere ottenuta in tempo polinomiale.
+    \item \textbf{Meno Restrizione}: Essendo meno restrittiva, la 3FN accetta anche schemi che presentano anomalie, in particolare la 3FN \textbf{tollera le ridondanze sui dati}.
+\end{itemize}
+
+\newpage
+
+\subsubsection{Algoritmo di Sintesi}
+
+L'interesse per la 3FN è derivato dal fatto che ci permette di \textbf{decomporre qualsiasi schema} in un \textbf{insieme di relazioni in 3FN} tramite un algoritmo semplice e \textbf{preservando dati e dipendenze}.
+
+\vspace*{10px}
+
+In maniera approssimata potremmo quindi dire che l'idea dell'algoritmo sia quella di partizionare una copertura canonica $G$ data in gruppi $G_{i}$ tali che tutte le dipendenze in ogni $G_{i}$ abbiano la stessa parte sinistra. Quindi da ogni $G_{i}$ si definisce uno schema di relazione composto da tutti gli attributi che vi appaiono, la cui chiave, detta chiave sintetizzata, è la parte sinistra comune.
+
+\paragraph{Formalizzazione Algoritmo di Sintesi in Versione Base} Definiamo l'effettivo algoritmo, descrivendolo a passi:
+
+\begin{itemize}
+    \item \textbf{Input}: Insieme $R$ di attributi ed un insieme $F$ di dipendenze su $R$.
+    \item \textbf{Output}: Decomposizione $\rho = \{ S_{i} \}_{i=1 \cdots n}$ di $R$ tale che
+    \item \textbf{Fasi}: L'algoritmo è caratterizzato da queste fasi:
+    \begin{enumerate}
+        \item Trova una copertura canonica $G$ di $F$ e poni $\rho = \{ \: \}$.
+        \item Sostituisce in $G$ ogni insieme $X \to A_1, \cdots, X \to A_{h}$ di dipendenze con lo stesso determinante, con la dipendenza $X \to A_1 \cdots A_h$.
+        \item Per ogni dipendenza $X \to Y$ in $G$, metti uno schema con attributi $XY$ in $\rho$.
+        \item Elimina ogni schema di $\rho$ contenuto in un altro schema di $\rho$.
+        \item Se la decomposizione \textbf{non} contiene alcuno schema i cui attributi costituiscano una superchiave per $R$, aggiungi ad essa lo schema con attributi $W$, con $W$ una chiave di $R$.
+    \end{enumerate}
+\end{itemize}
 
 \newpage
 

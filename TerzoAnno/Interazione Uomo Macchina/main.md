@@ -252,7 +252,9 @@ Suddivisi in due macroclassi: **slips** e **mistakes**:
     - **Rule Based**
     - **Memory Lapse**: Dimenticanza, come se fosse un lapsus di memoria nello stato di transizione tra i golfi, che causa un interruzione nelle fasi di pianificazione.
 
+<div style="text-align: center;">
 <img src="img/slipsAndMistakes1.png" width="450">
+</div>
 
 ## Feedback e Utenti Esperti
 
@@ -692,9 +694,12 @@ E non sono mutualmente esclusivi, quindi possono essere usati in combinazione.
 
 - **Tiny Tweaks**:
     - Layout che resta simile tra tutti gli schermi
-    - Magari abbiamo progettato un interfaccia per mobile, ma si adatta involontariamente bene al fisso, quindi sistemo solo qualcosa, in maniera ridotta.
-    <img src="img/pattern1.png" width="450">
+<div style="text-align: center;">
+    - Magari abbiamo progettato un interfaccia per mobile, ma si adatta 
+    involontariamente bene al fisso, quindi sistemo solo qualcosa, in maniera ridotta.
+<img src="img/pattern1.png" width="450">
 
+</div>
 - **Column Drop**:
     - Si inizia con una sola colonna per mobile e aggiungendo larghezza allora si aggiungono colonne e gli elementi scivolano alla riga precedente affiancandosi alla colonna.
     - Viene utilizzato in contesti content-heavy, diventa multicolonna solo in contesti più larghi.
@@ -1007,7 +1012,9 @@ Per costruire adeguata reliance andrebbero seguiti questi passi:
 2. **Transparency**: Cercare di essere trasparenti con l'utente sulle percentuali di successo in specifici contesti, magari avvisando quando si sta lavorando fuori dal dominio su cui il modello è stato allenato.
 3. **Control**: Automazione e controllo sono pesantemente correlati, ma non in maniera monodimensionale, il livello di controllo ed automazione dipende quindi dal contesto e dai tipi di task.
 
+<div style="text-align: center;">
 <img src="img/control_in_AI.png" width="450">
+</div>
 
 ## Feedback & Learning
 
@@ -1034,7 +1041,9 @@ Il feedback andrebbe **acquisito nella maniera più facile possibile**, cercando
 
 È fondamentale capire anche la precisione e la possibilità di errore in relazione a falsi positivi e falsi negativi.
 
+<div style="text-align: center;">
 <img src="img/errors_in_AII.png" width="450">
+</div>
 
 I problemi sono quindi casi di falsi negativi e falsi positivi.
 
@@ -1049,3 +1058,152 @@ I problemi sono quindi casi di falsi negativi e falsi positivi.
 
 - **Testing AI Systems**: Capire tramite test se realmente necessario l'utilizzo di AI.
 
+# Lezione 17 - Interfacce Utente - 20/11/2025
+
+`Basato sui PDF 17,18`
+
+Un **interfaccia** è il **punto di contatto** tra **due entità**, quindi in questo caso dove l'utente entra in contatto con lo strumento, cosa lo rende usabile.
+
+Quindi attraverso affordances e significanti, le interfacce adattano uno strumento ad uno specifico utente.
+
+L'interfaccia utente ha quindi come scopo la semplificazione dell'utilizzo del prodotto, semplificando il modello concettuale inizale per facilitare lo sviluppo di un modello mentale adeguato. Quindi l'idea è quella di spostare l'attenzione umana dalla gestione a basso livello del prodotto alla pianificazione delle sue azioni.
+
+Quindi un interfaccia ben progettata richiede all'utente uno sforzo fisico e cognitivo minimo per interagirvi.
+
+## HMI - Human Machine Interface
+
+Un device che ci permette di interagire con una macchina è detta **HMI**, come i mouse, la tastiera, o dei gamepad, che ci abilitano un interazione con una macchina.
+
+Questo spesso viene messo in correlazione ai **sensi umani**, quindi vengono definiti **tipi diversi di categoria**:
+
+- Tactile UI
+- Visual UI
+- Auditory UI
+- Olfactory UI
+- Gustatory UI
+- Equilibrial U
+
+Non sono però **singlesense** attualmente, ma **multisense**, come uno schermo touch che mentre mostra permette anche di toccare (esempio con due sensi). Queste sono dette **CUI**, ossia Composite User Interface.
+
+- La **più comune** delle **CUI** è la **GUI Grafical User Interface**, ma è improprio, perchè andrebbe incluso anche l'audio, rendendola una **MUI Multimedial User Interface**.
+- Non sempre l'utilizzo del multisense è una cosa corretta, bisogna sempre partire da una e poi aumentare solo se necessario.
+
+### Tipologie di User Interface (UI)
+
+- **Standard**: Usa interazioni tramite HMI.
+- **Virtuale**: La CUI è completamente virtuale, quindi l'interfaccia non dipende dall'ambiente fisico in cui la si sta utilizzando.
+- **Aumentata**: La CUI è virtuale, ma è influenzata dall'ambiente fisico in cui la si sta utilizzando.
+
+## Human Interface Devices e HID Protocol
+
+Device pensati e progettati per essere utilizzati da umani.
+
+Microsoft sviluppò l'**HID protocol** per consentire ai dispositivi di annunciarsi e **descriversi in maniera semplice** senza richiedere potenza computazionale e renderla compatibile in maniera "automatica" tramite lo standard.
+- Quindi questo **mappava** i dispositivi come **configurazioni di byte** secondo lo standard dato, questo non richiedeva quindi calcolo lato device ma **solo calcolo lato host**.
+- Quando nemmeno questo riusciva a coprire i casi di interpretazione di dispositivi più specifici, allora si richiedeva una creazione di popup che avvisasse l'utente della mancanza di driver.
+- Questo **protocollo quindi era anche componibile** e nasceva per una porta seriale, e successivamente è stato migrato ad un **USB e Bluetooth**, ma anch'essi utilizzano lo **stesso funzionamento delle porte seriali**.
+
+### Periferiche HID
+
+- **Sensore (Input Device)**: Acquisisce una variabile esterna e la converte in segnale elettrico.
+- **Attuatore (Output Device)**: Da un segnale elettrico si produce una variabile esterna.
+
+Esistono anche delle **classificazioni di queste periferiche**, come :
+- Texts and chars
+- Positions
+- Sound
+- Images
+- Environmental parameters
+- Position
+- Health/bio/physiological parameters
+
+### Esempi di Periferiche HID
+
+- **Dispositivi Input**:
+    - **Tastiera**: Hanno diversi tipi di layout:
+        - **Layout Fisico**: Disposizione tasti.
+        - **Layout Visuale**: Layout ad esempio delle lingue.
+            - QWERTY è un esempio comune di questo tipo di layout, è nato da uno studio statistico delle lettere più utilizzate di lingue latine.
+        - **Layout Funzionale**: Layout che magari è specifico per un software.
+    - **Barcode Readers**: Trasferisce testo tramite stringa che viene letta in blocco e trasferita, proprio come una tastiera, generando involontariamente un supporto nativo. Un **QR Code** è come un **barcode bidimensionale**, ma anche esso **produce una stringa**.
+    - **RFID**: Piccoli radio transponder che a basso consumo, se gli viene sparato un segnale radio questo risponde con un segnale, interpretabile come una stringa.
+    - **NFC**: Protocollo di comunicazione bidirezionale, entrambi sono alimentati in maniera indipendente (esempio pagamento con Google Wallet). Invece in caso di utilizzo NFC di tag nelle carte, il tag viene caricato dal dispositivo alimentato (POS), e quindi il tag sarà in grado di rilasciare i token per l'autenticazione.
+    - **Sensore Mouse**: Segue il principio della Fitts's Law, ossia $MT = a + b \: log_2 (\frac{2D}{w}) $ dove
+        - $a$: Tempo di start/stop in secondi
+        - $b$: Velocità del device
+        - $D$: Distanza dal punto iniziale al centro del target.
+        - $W$: Larghezza del target.
+
+        **Differenze tra dispositivi di puntamento**: questa può essere **diretta** (stylus) oppure **indiretta** (mouse, trackpad). Va mantenuta anche una scala, quindi tutti i dispositivi diretti sarannò diretti (senza scalare), mentre magari $1 cm$ sul trackpad saranno $4cm$ sullo schermo
+
+    - **Dispositivi di Puntamento Generici**:
+        - **Diretta/Indiretta**: Rispettivamente stylus e mouse o trackpad.
+        - **Assoluta/Relativa**: La distanza coperta è rispettivamente la stessa oppure scalata con un coefficiente.
+        - **Isotonica/Elastica/Isometrica**:
+            - Isotonica: Dispositivo che può muoversi
+            - Isometrica: Dispositivo che genera spostamento in base alla forza applicata.
+            - Elastica: Versione di una isometrica che applica anche resistenza grazie alla sua molla.
+        - **Posizione/Rate Control**: Rispettivamente un mouse che riporta la distanza (che sia scalata o meno), ed uno stick che genera spostamento in base ad una velocità stabilita dall'angolo dello stick stesso.
+    - **Eye Tracking**: Tracker che permettono di generare ad esempio heatmap di attenzione, questi analizzano il movimento degli occhi dell'utente.
+        - **Metodi di Eye Tracking**: Esistono varie tipologie:
+            - Attiva: Eroghiamo energia per acquisire informazioni
+            - Passiva: È sufficiente l'energia dell'ambiente
+
+            Un metodo comune di tracking è il **Bright Pupil**, che emettendo un fascio di infrarossi perpendicolare alla retina per provocare un completo riflesso come se fosse un punto. Alternativamente esiste un **Dark Pupil** che al contrario utilizza fasci infrarossi paralleli che generano la sagoma della parte interna.
+    - **Array di Microfoni**: Ogni microfono acquisisce una frequenza, quindi stiamo assumendo una matrice/array ed ognuno di questi acquisisce una frequenza. Dato che però l'aria genera attrito nella sua interazione con l'aria, possiamo dedurre la sorgente dell'audio in termini di posizione ed angolo di ampiezza. Grazie a meccanismi simili vengono implementati anche gli algoritmi di reiezione del rumore.
+    
+        Attualmente tutti gli array di microfoni si interfacciano al pc come singolo microfono virtuale.
+
+        Le interfacce macchina/uomo audio sono poco costose in termini di interazione dal lato dell'utente, ma la banda della trasmissione è molto inferiore ad un interfaccia testuale/grafica. Quindi esistono specifiche limitazioni e problemi:
+        - Banda ridotta
+        - Natura dell'utilizzo del linguaggio umano non formale
+        - Parsing del linguaggio naturale richiede grande costo computazionale.
+
+        Esistono quindi contesti in cui queste interfacce hanno preso piede, magari in cui il contesto è così specifico che risulta semplice parsare e tokenizzare delle informazioni generate a voce da un utente umano.
+
+        Quindi long story short, interfaccia audio buona ma in contesti straspecifici, non in general purpose.
+    - **Image Based Input Interfaces**: Esempio comune di questo tipo di input è lo **scanner** di **qualcosa di 3D** per una **ricostruzione 2D**. Ne esistono di due tipi:
+        - **3D Scanning Passivo Fotometrico**: Basato su sistemi stereoscopici, come i nostri occhi, ciascuno dei quali funziona come camera stereoscopica, e l'esistenza di queste due permette la definizione di una dimensione di profondità, anche se l'input di entrambe era bidimensionale.
+        
+            Un altro tipo di scanning passivo è quello **fotometrico**, che permette la definizione della terza dimensione grazie allo studio delle ombre generato da vari scatti da vari punti di vista. Questo è utilizzato su oggetti piccoli ad alto dettaglio.
+        <div style="text-align: center;">
+        <img src="img/scanningFotometrico.png" width="280">
+        </div>
+
+        Esiste anche la **tecnica della silouhette**, basata su tante catture di immagini con forte contrasto con lo sfondo, utilizzato per oggetti grandi a dettaglio minore.
+
+        <div style="text-align: center;">
+        <img src="img/silohuetteScanning.png" width="280">
+        </div>
+
+        - **3D Scanning Attivo**: Ne esistono di vari tipi:
+            - **Time Of Flight**: Un fascio laser ad infrarossi che ci restituisce la distanza della profondità, ma perdendo informazione su colore o precisione sul punto di caduta del fascio laser. I time of flights vengono anche messi in matrice, quindi attualmente molto utilizzati in contesti di riprese senza violazione della privacy degli utenti sorvegliati.
+            - Triangolazione: Vedi slide
+            - **Structured Light**: Proietta una matrice con un pattern regolare, che verrà deformata dalla profondità dell'oggetto (solo la profondità, si perdono le altre informazioni), la tecnologia su cui è basata la **Microsoft Kinect**. Solitamente messo in combinazione con un altra telecamera per recuperare anche informazioni sui colori, quindi ad esempio nella Kinect venivano prodotte due immagini, una per la `depth` e una per `rgb`.
+    - **IMU - Inertial Measurement Unit**: Utilizzando solo un acceleratore dovremmo ottenere lo spazio integrando due volte l'accelerazione acquisita, ed in questo modo si produrrebbero due costanti, dette **drift**. Quindi non si usa solo un accelerometro, ma anche un magnetometro ed un giroscopio, ciascuno da tre dimensioni, e si compensano a vicenda sulla perdita di informazione di uno.
+    - **Heart Rate Wearable Monitor**: Quali sono le differenze tra battito cardiaco misurato da uno smartwatch o un reale elettrocardiogramma?
+        - **ECG (Elettrocardiografia)**: Si misura l'attività elettrica effettiva generata dall'attività cardiaca. Misura il vettore elettrico del cuore, quindi si posiziona un set di sensori, per generare uno spettro ed analizzarne il suo movimento, e non solo la frequenza cardiaca.
+        - **PPG**: Misura "le conseguenze" dell'attività cardiaca, questo perchè il passaggio di sangue può essere letto "tramite la lettura con luce verde" che subisce poco la variazione di movimento ma non riesce a recuperare informazioni ottimali sulla saturazione. Tramite la lettura con luce rossa invece subisce molto il movimento ma riesce ad acquisire anche informazioni sulla saturazione. ()
+    
+
+# Lezione 18 - Interfacce Utente II - 20/11/2025
+
+`Basato sul PDF 19`
+
+## Natural User Interface NUI
+
+Interazione basata su azioni (**gesture**) che avremmo eseguito naturalmente anche in altri contesti, come ad esempio lo **scroll** oppure il **pinch per lo zoom**. Questa è caratterizzata da una curva d'apprendimento particolare, proprio perchè l'utente diventa rapidamente esperto, ma altre gesture più specifiche sono difficilmente acquisibili.
+
+Quindi è molto utile per un rapido onboarding, ma non è sempre abbastanza.
+
+Possiamo definirla come evoluzione di CLI e GUI.
+
+Le **NUI** non sono oggettive, ma **dipendono** da un **background culturale**, l'etichetta Natural quindi è molto influenzato dal contesto di utilizzo dell'interfaccia stessa.
+
+L'aggiunta di un interfaccia vocale **non rende** una generica interfaccia in una **NUI**.
+
+Con **Naturale** si intende un tipo di **gesture che non va insegnata**, ma in qualche modo sono gesti che derivano dalla vita quotidiana.
+
+### Definizione di NUI
+
+Interfaccia che risulti naturale da utilizzare in maniera tale da **fittare le skill** ed il contesto dell'utente. In questo modo però gli **utenti** saranno **meno avvezzi all'insegnamento**, dato che hanno applicato **zero effort** per utilizzare il **primo set di feature base**.
