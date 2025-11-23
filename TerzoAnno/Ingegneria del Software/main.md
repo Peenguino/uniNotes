@@ -934,7 +934,7 @@ In ogni caso vado a infrangere principi di buona progettazione.
 
 Il singleton permette di passare un riferimento ad una classe, invece una classe non posso riferirla direttamente. Quindi è proprio un problema concettuale, non ha senso generare più sottoclassi di una classe di un oggetto caratterizzato dall'essere uno solo.
 
-# Lezione 16 - Design Pattern Strutturali (Decorator e )
+# Lezione 16 - Design Pattern Strutturali (Decorator, Proxy, Facade e Adapter)
 
 ## 05 - Design Pattern - Decorator
 
@@ -999,3 +999,62 @@ Si nota infatti che entrambe le classi `Proxy` e `OriginalService` sono dello st
 - **Cache Proxy**: Mantiene coppie di richieste-risposta.
 - **Synchronization Proxy**: Gestisce accessi concorrenti ad un servizio.
 - **Virtual Proxy**: Permette di interfacciarsi al servizio prima che il servizio sia realmente in funzione.
+
+# Lezione 17 - Esercitazione Design Pattern
+
+## Esercizio 1 - Utilizzo pattern Singleton per gestire la creazione e l'accesso ad un oggetto CalendarioTurni
+
+** Vedi slide **
+
+## Esercizio 2 - Utilizzo pattern Strategy per la gestione di implementazioni diverse ad un metodo di cui è data la segnatura
+
+** Vedi slide **
+
+## Esercizio 3 - Utilizzo pattern Adapter per un metodo dato da una nuova classe rispettando l'Open Closed
+
+** Vedi soluzioni slide, molto utile e chiaro per definizione di adapter **
+
+## Esercizio 4 - Utilizzo pattern Factory Method
+
+- Fondamentali le operazioni in comune all'inizio che portano alla scelta di questo pattern, perchè le assegnazioni iniziali saranno in comune a tutti i tipi di turni che genererà la Factory.
+
+## Esercizio 5 - Utilizzo pattern Abstract Factory
+
+** Vedi Slide **
+
+## Esercizio 6 - Utilizzo pattern Proxy
+
+** Vedi Slide **
+
+### Esercizio 6.1 - Combo Proxy/Adapter
+
+** Vedi Slide **
+
+### Esercizio 6.2 - Combo Proxy/Strategy
+
+** Vedi Slide **
+
+## Lezione 18 - Verifica e Validazione
+
+È **indecidibile** testare tramite un algoritmo se un altro algoritmo dato in input **sia o meno corretto**, dato che già è indecidibile capire se termini o meno.
+
+Le tecniche di testing sono dette **stime ottimistiche**, dato che non potrò mai con il testing dimostrare formalmente che il programma sia corretto.
+
+Esistono anche tipologie alternative come **stime pessimistiche** e per **proprietà semplici**, quali ad esempio correttezze statiche, triple di Hoare.
+
+- Anche verificare se le triple di Hoare siano corrette o meno tramite un algoritmo è non decidibile.
+
+### V&V (vedi slide)
+
+### Fasi di Testing 
+
+- (vedi slide)
+- (vedi slide)
+- Valutazione in **alpha/beta** test.
+- Controllo delle release successive: Test e analisi del nuovo codice, ripetizione dei test, test di regressione, distinzione delle versioni.
+- Miglioramento del processo
+
+### Validazione VS Verifica
+
+- Convalida: Risponde alla domanda: "Stiamo costruendo il sistema che **serve all'utente**?".
+- Verifica: Risponde alla domanda: Stiamo costruendo un sistema che **rispetta le specifiche**?".
