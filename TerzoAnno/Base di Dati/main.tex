@@ -1429,7 +1429,7 @@ In alcune occasioni bisogna ricorrere a forme di normalizzazione indebolita. Mos
 
 Rilassiamo il vincolo della definizione precedente mettendo il vincolo della BCNF in $XOR$ con la possibilità di $A$ di essere \textbf{attributo primo}.
 
-\paragraph{Definizione} $R(T,F)$ è in 3FN se per ogni $X \to A \in F^{+}$, con $A \notin X$ vale che $X$ è una \textbf{superchiave} \textbf{oppure} $X$ è \textbf{attributo primo}.
+\paragraph{Definizione} $R(T,F)$ è in 3FN se per ogni $X \to A \in F^{+}$, con $A \notin X$ vale che $X$ è una \textbf{superchiave} \textbf{oppure} $A$ è \textbf{attributo primo}.
 
 \paragraph{Teorema} $R(T,F)$ è in 3FN se per ogni $X \to A \in F$ non banale vale che $X$ è una superchiave oppure A è primo, ossia è contenuto in almeno una chiave.
 
@@ -1454,7 +1454,7 @@ In maniera approssimata potremmo quindi dire che l'idea dell'algoritmo sia quell
 
 \begin{itemize}
     \item \textbf{Input}: Insieme $R$ di attributi ed un insieme $F$ di dipendenze su $R$.
-    \item \textbf{Output}: Decomposizione $\rho = \{ S_{i} \}_{i=1 \cdots n}$ di $R$ tale che
+    \item \textbf{Output}: Decomposizione $\rho = \{ S_{i} \}_{i=1 \cdots n}$ di $R$ tale che \textbf{preservi dati e dipendenze} ed ogni $S_{i}$ sia in 3FN rispetto alle proiezioni di $F$ su $S_{i}$.
     \item \textbf{Fasi}: L'algoritmo è caratterizzato da queste fasi:
     \begin{enumerate}
         \item Trova una copertura canonica $G$ di $F$ e poni $\rho = \{ \: \}$.
