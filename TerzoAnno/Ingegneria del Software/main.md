@@ -1002,39 +1002,129 @@ Si nota infatti che entrambe le classi `Proxy` e `OriginalService` sono dello st
 
 # Lezione 17 - Esercitazione Design Pattern
 
-## Esercizio 1 - Utilizzo pattern Singleton per gestire la creazione e l'accesso ad un oggetto CalendarioTurni
+# Esercizio 1 - Singleton
 
-** Vedi slide **
+```JAVA
+class CalendarioTurni{
+    private static final Calendario instance = new CalendarioTurni();
+    private String[] turni;
 
-## Esercizio 2 - Utilizzo pattern Strategy per la gestione di implementazioni diverse ad un metodo di cui è data la segnatura
+    //Costruttore privato, non ne abbiamo bisogno dato che non creeremo più istanze di questa classe
+    private CalendarioTurni(){
+        turni = new String[0];
+    }
 
-** Vedi slide **
+    //Getter che permette l'accesso all'istanza unica
+    public static CalendarioTurni getInstance() {
+        return instance;
+    }
 
-## Esercizio 3 - Utilizzo pattern Adapter per un metodo dato da una nuova classe rispettando l'Open Closed
+    //Setter del campo del Singleton che abbiamo assunto di avere all'inizio
+    public void modificaCalendario(String[] nuoviTurni){
+        turni = nuoviTurni;
+    }
+}
+```
 
-** Vedi soluzioni slide, molto utile e chiaro per definizione di adapter **
+# Esercizio 2 - Strategy
 
-## Esercizio 4 - Utilizzo pattern Factory Method
+Dato il metodo
 
-- Fondamentali le operazioni in comune all'inizio che portano alla scelta di questo pattern, perchè le assegnazioni iniziali saranno in comune a tutti i tipi di turni che genererà la Factory.
+```JAVA
+public void finePasto(String[] commensali, String[] lavapiatti, StatoPunti statoPunti) {
+    //
+}
+```
 
-## Esercizio 5 - Utilizzo pattern Abstract Factory
+che aggiorna lo stato dei punti togliendo un punto a ogni commensale e assegnandone 2 a chi ha lavato i piatti.
 
-** Vedi Slide **
+Si sceglie però di dare diverse implementazioni e lasciare ai coinquilini decidere quale usare.
 
-## Esercizio 6 - Utilizzo pattern Proxy
+<div style="text-align: center;">
+    <img src="img/esercitazione_es2.png" width="650">
+</div>
 
-** Vedi Slide **
+# Esercizio 3 - Adapter
 
-### Esercizio 6.1 - Combo Proxy/Adapter
+<div style="text-align: center;">
+    <img src="img/esercitazione_es3.png" width="650">
+</div>
 
-** Vedi Slide **
+# Esercizio 4 - Factory Method
 
-### Esercizio 6.2 - Combo Proxy/Strategy
+Si vuole automatizzare la gestione dei turni di pulizia e di spesa settimanali (i turni dello stesso tipo devono essere distanziati di almeno 7 giorni). 
 
-** Vedi Slide **
+Ogni turno è associato a un inquilino e a una data. L’assegnazione deve seguire un criterio di turnazione ciclica tra gli inquilini. Dopo la creazione, inviare a ciascun inquilino un riepilogo dei turni assegnati.
 
-## Lezione 18 - Verifica e Validazione
+Ogni tipo di turno deve poter definire in modo indipendente la propria modalità di creazione o rappresentazione. La parte comune della pianificazione (calcolo delle date, assegnazione ciclica, invio dei riepiloghi) deve essere riutilizzabile da tutti i tipi di turno.
+
+Dati di ingresso (a titolo di esempio)
+- elenco degli inquilini `List<String>`;
+- numero di turni da assegnare per ciascun inquilino (int n);
+- data di inizio della pianificazione (LocalDate start)
+
+<div style="text-align: center;">
+    <img src="img/esercitazione_es4.png" width="700">
+</div>
+
+## Analisi soluzione proposta
+
+La classe `PianificatoreTurni` ha un metodo che si occupa **di operazioni comuni** tra le classi effettive, quindi la **parte in comune** si tiene come **metodo** nella **classe astratta** `PianificatoreTurni`.
+
+Le classi `PianificatorePulizie` e `PianificatoreSpesa` sono invece le classi **reali istanziabili** e forniscono metodi che differenziano la gestione dei due **tipi di pianificatori**.
+
+Il pattern di Factory Method si basa quindi su una struttura simile a questa, il resto come `Notificatore` o `ListaSpesa` era parte del caso specifico descritto dalla traccia.
+
+Quindi Factory Method si basa sul **riutilizzo di logica comune** e le classi istanziabili **generano un singolo tipo di prodotto**.
+
+# Esercizio 5 - Abstract Factory
+
+<div style="text-align: center;">
+    <img src="img/esercitazione_es5.png" width="700">
+</div>
+
+Come possiamo notare **non si riutilizza alcuna logica in comune** ed oltre a questo la factory istanziata in questo caso **si occupa di generare un insieme di prodotti** e non un prodotto singolo.
+
+<div style="text-align: center;">
+    <img src="img/differenze_method_vs_abstract_factory.png" width="700">
+</div>
+
+# Esercizio 6 - Proxy e Strategy
+
+Quando un coinquilino si reca a fare la spesa, deve consultare il sistema per ottenere la lista degli
+articoli da acquistare. Questa operazione potrebbe essere ripetuta più volte in un breve intervallo di
+tempo, ad esempio per verificare aggiornamenti o dimenticanze. Tuttavia, richieste frequenti possono
+risultare onerose sia in termini di accesso al database che di utilizzo della rete, oltre a diventare
+problematiche in luoghi con connessione limitata, come i supermercati.
+Per affrontare questo problema, si propone l'uso del pattern Proxy per implementare una cache locale
+della lista della spesa. Il Proxy gestirà le richieste seguendo le seguenti regole:
+1.Recupero della lista dalla cache: Se la lista della spesa è già stata caricata e la copia cache risale
+a meno di due ore, il sistema restituirà i dati memorizzati localmente, evitando di interrogare il
+database.
+2.Recupero dal database: Se la cache non è valida (ad esempio, se è stata creata più di due ore fa),
+la lista sarà recuperata dal database o da una sorgente remota e aggiornata nella cache per utilizzi
+futuri.
+3.Utilizzo del pattern Strategy per diversi tipi di Proxy: Si implementeranno due varianti di Proxy:
+1. Proxy standard (esercizio precedente): Basato sul controllo della validità della cache in base
+al tempo di creazione.
+2. Proxy con gestione delle modifiche: Ogni modifica alla lista della spesa (aggiunta o rimozione
+di articoli) invalida immediatamente la cache. Prima di restituire i dati, il Proxy verifica se la copia
+in cache è aggiornata confrontando il timestamp della cache con quello dell’ultima versione
+disponibile nel database.
+
+## Quesito 6.1 - Utilizzo Proxy
+
+<div style="text-align: center;">
+    <img src="img/esercitazione_6.1.png" width="700">
+</div>
+
+## Quesito 6.1 - Utilizzo Proxy e Strategy
+
+<div style="text-align: center;">
+    <img src="img/esercitazione_6.2.png" width="700">
+</div>
+
+# Lezione 18 - Verifica, Validazione, ed Analisi Statica
 
 È **indecidibile** testare tramite un algoritmo se un altro algoritmo dato in input **sia o meno corretto**, dato che già è indecidibile capire se termini o meno.
 
@@ -1044,17 +1134,251 @@ Esistono anche tipologie alternative come **stime pessimistiche** e per **propri
 
 - Anche verificare se le triple di Hoare siano corrette o meno tramite un algoritmo è non decidibile.
 
-### V&V (vedi slide)
+## V&V - Verifica e Validazione
 
-### Fasi di Testing 
+Parte integrante del processo software, da svolgere in ogni fase. Per confermare che **processo e prodotto** rispettino **requisiti di qualità**.
 
-- (vedi slide)
-- (vedi slide)
-- Valutazione in **alpha/beta** test.
-- Controllo delle release successive: Test e analisi del nuovo codice, ripetizione dei test, test di regressione, distinzione delle versioni.
-- Miglioramento del processo
+<div style="text-align: center;">
+    <img src="img/verifica_e_validazione.png" width="450">
+</div>
 
-### Validazione VS Verifica
+I requisiti di qualità sono diversi tra loro, un prodotto software è in costante evoluzione.
 
-- Convalida: Risponde alla domanda: "Stiamo costruendo il sistema che **serve all'utente**?".
-- Verifica: Risponde alla domanda: Stiamo costruendo un sistema che **rispetta le specifiche**?".
+I guasti hanno una distribuzione irregolare.
+
+## Cinque Domande Guida per il Testing 
+
+- **Quando iniziano V&V?**:
+    - Continuano anche dopo il rilascio, comprendendo attività di manutenzione. Iniziano dalla creazione di un prodotto software e continuano dopo la sua consegna.
+- **Quali tecniche applicare?**
+    - Andrebbero applicate più tecniche del T&T.
+- **Come valutare se un prodotto sia o meno pronto al rilascio?**
+    - Vanno misurate le qualità del software di interesse, definendo **set di test** come gli **alpha test** o i **beta test**.
+- **Come controllare release successive?**
+    - Test e analisi del nuovo codice, ripetizione dei test, test di regressione, distinzione delle versioni.
+- **Come migliorare il processo?**
+    - Vanno identificati e rimossi i punti deboli nel processo di sviluppo e nei test e nell'analisi.
+
+## Validazione VS Verifica
+
+- **Convalida**: Risponde alla domanda: "Stiamo costruendo il sistema che **serve all'utente**?".
+- **Verifica**: Risponde alla domanda: Stiamo costruendo un sistema che **rispetta le specifiche**?".
+
+## Malfunzionamento vs Difetto vs Errore
+
+- **Malfunzionamento**: A runtime il sistema non si comporta secondo le specifiche, ha una natura dinamica.
+- **Difetto**: Fault del codice, quindi ha una natura statica.
+- **Errore**: Lo sviluppatore ha commesso un errore, che può essere di logica o di cattiva comprensione della specifica.
+
+## Limiti del Testing
+
+Il **testing** è definito come **approccio ottimistico**, concetto ben definito dalla Tesi di Dijkstra:
+
+- **Tesi di Dijkstra**: Il testing può affermare che si siano bug, ma non può affermarne l'assenza.
+
+## Tecniche di Verifica Statica
+
+Verifiche che **non prevede l'esecuzione del programma**.
+
+- **Metodi Manuali**: Basati sulla lettura del codice.
+- **Metodi Formali**: Analisi statica supportata da specifici strumenti come model checking, theorem proving, interpretazione astratta...
+
+### Deskcheck mediante Inspection
+
+Basato sulla lettura del codice, si basa su **quattro specifiche fasi**:
+
+- **Pianificazione**
+- **Definizione della checklist**
+- **Lettura del codice**
+- **Correzione del codice**
+
+Queste fasi vengono eseguite da **ispettori** che hanno come **obiettivo** la **rilevazione di difetti**, orientando la loro ricerca difetti **tramite difetti noti**.
+
+<div style="text-align: center;">
+    <img src="img/difettiNoti.png" width="500">
+</div>
+
+### Deskcheck mediante Walkthrough
+
+Basato sulla simulazione della semantica operazionale del programma, mantenendo ambiente e memoria della simulazione del programma. Simile alla Deskcheck precedente, ma basata sulla **simulazione di esecuzione**, basata in tre fasi:
+
+- **Pianificazione**
+- **Lettura del codice**
+- **Correzione dei difetti**
+
+### Metodi Formali
+
+Tecniche basate sulla **dimostrazione formale** di **correttezza** di un **modello** finito e **istanziazione del modello**.
+
+- **Triple di Hoare**: Basata su tre condizioni:
+    - Precondizioni: Condizione che deve essere valida prima dell'esecuzione.
+    - Invariante: Condizione valida per ogni iterazione o durante l'esecuzione.
+    - Postcondizioni: Condizione che deve essere valida dopo l'esecuzione.
+- **B Method**: L'applicazione più nota del B method è la metropolitana
+automatica METEOR, linea 14 di Parigi.
+- **Model Checker**: Permette di **esplorare un automa a stati finiti** con **condizioni** che possono essere validate **in base allo scorrere del tempo**. E' sufficiente che esista un modello a stati finiti per eseguire il model checker, che è un programma a se stante. **Permette di verificare** anche **stati intermedi** poco espliciti grazie all'**esplorazione di tutti i possibili interleaving**, verificandone la correttezza. Definiamo quindi un insieme di proprietà $G(prop_1, \cdots, prop_n)$ che vogliamo che siano garantite durante tutti i possibili attraversamenti del modello a stati finiti nel tempo.
+
+# Lezione 19 - Testing I: Verifica Dinamica
+
+Si compone di più fasi:
+
+1. **Progettazione**: input, output atteso, ambiente di esecuzione dei test.
+2. **Esecuzione del Codice**. 
+3. **Analisi dei Risultati**: Output ottenuto vs Output atteso.
+4. **Debugging**.
+
+## Progettazione di Casi di Test
+
+Bisogna poter ripetere una sessione di test in condizioni immutate in un **ambiente definito**, con **casi di prova definiti** e **procedure definite.**
+
+Quindi formalmente un caso di test è una tripla $(input, output\_atteso, ambiente)$.
+
+- **Test Obligation**: Specifica di requisiti per quei casi di test, ad esempio: $$\text{"un input composto da almeno 2/3 parole"}$$
+
+- **Criterio di Adeguatezza**: Insieme di test obligation, un insieme di test soddisfa un criterio di adeguatezza se:
+    - Tutti i test hanno successo.
+    - Ogni test obligation è soddisfatta da almeno un caso di test.
+
+### Come Definire Test Obligation
+
+Si può fare in vari modi:
+
+- **Partendo dalle funzionalità** della specifica del software, dalle funzionalità che implementa.
+- **Partendo dalla struttura** del software, partendo quindi dal codice.
+- **Partendo dal modello del programma**, riferendo quindi a modelli utilizzati nella specifica o nella progettazione.
+
+### Metodi Black Box vs White Box
+
+Questo tipo di criteri si utilizzano solo per i casi di input, mai infatti vedremo il codice per verificare i casi di output.
+
+- **Black Box**: Si basano solo sulla specifica del metodo che stiamo testando. In ogni caso l'implementazione deve esistere, ma il test si modella solo sull'interfaccia del metodo. 
+
+- **White Box**: Si basano sul codice che implementa il metodo.
+
+### Batterie, Procedure di Prova e Scaffolding
+
+- **Batterie di Prove (Test Suite)**: Insieme o sequenza di casi di prova.
+- **Procedura di Prova**: Procedure per eseguire, registrare, analizzare e valutare i risultati di una batteria di prove.
+
+- **Scaffolding**: Per l'esecuzione di un test serve codice aggiuntivo, ossia il test scaffolding, letteralmente "impalcatura" di un test, questo può contenere:
+
+    - **Driver Di Test**: Si simula un chiamante, un client che invoca il metodo che stiamo cercando di testare.
+    - **Stub/Mock**: Si simula l'esistenza di metodi chiamati, su cui il corrente metodo ha delle dipendenze.
+    - **Test Harness**: Si simulano parti dell'ambiente di produzione. Quindi stub di programmi che non stiamo sviluppando noi, appartenenti all'ambiente potenziale di produzione.
+
+## Sviluppo di Test Black Box
+
+Mostriamo la selezione di valori conoscendo solo le interfacce dei metodi, appunto black box. Quindi **generazioni di valori di input basata solo sulle specifiche**.
+
+### Selezione Valori con Metodi Diversi
+
+- **Selezione Statistica**:
+
+    - Casi di test selezionati in base alla distribuzione di probabilità degli input del programma, quindi gli **input a regime più probabili**.
+
+    - In questo caso quindi non è semplice calcolare il risultato atteso.
+
+- **Selezione Partizione in Categorie**:
+
+    - Il **dominio degli input** si suddivide in **classi di equivalenza** che in base ai requisiti, dovrebbero produrre lo stesso comportamento del programma.
+    - Ogni **classe di equivalenza** ha quindi un proprio **tipo di test**.
+    - L'esempio nelle slide dell'aliquota non è discontinua ma non derivabile nei punti di frontiera degli intervalli.
+
+- **Selezione Frontiera**:
+
+    - Metodo basato sull'individuazione di valori limite/estremi, significativo quando il **punto di frontiera** è un **punto di discontinuità**.
+    - L'esempio nelle slide degli sconti applicati in base alla quantità, quella è esattamente discontinua.
+
+- **Selezione Random**:
+
+    - Generazione a basso prezzo e poco ripetibile.
+
+- **Selezione Catalogo**:
+
+    - Selezione di valori guidata da conoscenze note.
+
+
+### Testing Combinatorio
+
+Al crescere dei potenziali argomenti passati ad un metodo dovrei calcolare tutte le possibili combinazioni generate da quei parametri. Esistono quindi degli approcci per evitare l'esplosione combinatoria.
+
+- **Testing Combinatorio - Vincoli**: Questo tipo di riduzione viene fatta se ha senso rispetto al dominio reale in cui si sta operando:
+    - **Vincoli d'Errore**: Un solo caso di errore, ossia input non valido per ogni posizione degli argomenti. Questo rende meno "solido" il test fatto, ma l'obiettivo è tagliare senza pesare troppo sulla bontà del test fatto.
+    - **Vincoli di Proprietà**: Definizione di proprietà comuni per classi di equivalenza diverse, per poi guidare una combinazione di parametri. Si basano quindi su assunzioni per cui specifiche combinazioni di parametri non potranno mai essere fatte a causa delle loro classi.
+    - **Singoletti**: data una funzione del tipo `foo(a,b,c,d,e)` scelgo un valore specifico per uno dei parametri.
+- **Test Combinatorio - Pairwise Testing**: Si prendono tutte le possibili coppie di parametri, questo perchè spesso un errore è causato da una combinazione a coppie, dell'interazione tra coppie di parametri. Quindi va fatto un calcolo dei casi possibili su $primo * secondo, primo * terzo, primo * quarto, secondo * terzo, secondo * quarto \cdots$
+
+# Lezione 20 - Testing II
+
+## Flusso di Controllo
+
+Definizione di **criteri strutturali** di progettazione di casi di test, per verificare che i test **esercitino tutti gli elementi del programma**.
+
+Se alcuni elementi del nostro programma non vengono esercitati dai test allora il test non è abbastanza accurato, di conseguenza si preferisce che **tutti gli elementi siano esercitati**.
+
+Tutte le tecniche che vediamo **testano** delle **funzionalità del sistema**.
+
+### Criterio Copertura di Comandi
+
+L'obiettivo è quello di **minimizzare** i **casi di test** a **parità di copertura**.
+
+<div style="text-align: center;">
+    <img src="img/coverageTest1.png" width="500">
+</div>
+
+### Criterio Copertura di Condizioni
+
+Vanno valutati anche i casi in cui si utilizzano condizioni definite come composizione di espressioni booleane con $AND$, $OR$ e $NOT$.
+
+<div style="text-align: center;">
+    <img src="img/condizioniComposte.png" width="500">
+</div>
+
+### Criterio Copertura dei Cammini
+
+Si identificano valori di input per esercitare **tutti i cammini possibili**, cresce in **modo esponenziale** con il **numero di decisioni**.
+
+### Fault Based Testing e Test Mutazionale
+
+Ipotizzo dei difetti del codice, e creo una test suite sulla base della capacità di rilevare i difetti ipotizzati (e magari errori più comuni).
+
+Si **iniettano** quindi dei **difetti nel codice** per provarlo.
+
+- **Test Mutazionale**: Metodo si test strutturale per valutare l'adeguatezza delle suite di test e stimare il numero di difetti nei sistemi sotto test.
+
+    Si vuole quindi dare una misura di qualità alla batteria di test. Quindi **si iniettano bachi per vedere se i test se ne accorgono**.
+
+    Le mutazioni solitamente sono sempre abbastanza piccoli, per vedere se passano o meno i test. Un programma a cui abbiamo applicato delle mutazioni è detto **mutante**. E' detto **valido** se è **sintatticamente corretto** e **utile** se **non è facile distinguerlo dal programma originale**.
+
+    - **Uccisione/Sopravvivenza Mutante**: La batteria di test $T$ uccide il mutante $P_i$ se nota il baco aggiunto e non lo lascia passare, mentre il mutante $P_i$ sopravvive se la batteria lo lascia passare.
+
+    - **Efficacia di Test Mutazionale**: L'efficacia è misurata in $$ \frac{\text{numero mutanti uccisi}}{\text{numero mutanti totali}}$$. Questa **efficacia** in realtà misura la **bontà della batteria di test**.
+
+    - **Numero Bachi del Sistema**: Possiamo stimare la quantità di difetti iniettandogli degli altri e facendo una proporzione del tipo $$ n : tot = n' : m $$. Quindi iniettando un difetto, a volte ne troviamo altri.
+
+### Oracolo
+
+L'oracolo è uno **strumento** o metodologia in **grado di generare i risultati attesi di un test case**. 
+
+Esistono **vari modi** per trovare un risultato atteso:
+
+- Risultati ricavati da specifiche formali o eseguibili.
+- **Inversione di funzioni**: quindi ad esempio se sto implementando un metodo di sorting, allora eseguo dello shuffle su un array e successivamente uso il suo stato originale come output atteso.
+- **Versioni precedenti** dello **stesso codice** che sappiamo sia **funzionante**.
+- Versioni multiple indipendenti, quindi ad esempio un altro SW già funzionante per generare dell'output atteso.
+- **Semplificazione dei dati di input**, provare quindi le funzionalità su dati semplici **con risultati noti o calcolabili**.
+- **Semplificazione dei risultati**, accontentandosi di **risultati vicini** a quello atteso realmente, tramite invarianti.
+
+## Test di Sistema
+
+Test più globali, non solo funzionali, ma anche di requisiti non funzionali.
+
+- **Facility Test**: Test delle funzionalità, si controlla che quelle stabilite nei requisiti siano state correttamente realizzate.
+- **Security Test**: Test dell'efficacia dei meccanismi di sicurezza del sistema.
+- **Usability Test**: Test di usabilità.
+- **Performance Test**: Test dell'efficienza dei sistemi rispetto a tempi di elaborazione e di risposta.
+- **Load Test**: Test con carico di lavoro massimo previsto dai requisiti.
+- **Stress Test**: Test con superamento esplicito dei limiti operativi.
+- **Storage Use Test**: Si testa l'utilizzo della memoria persistente.
+- **Configuration Test**: Si testa che il sistema funzioni nelle configurazioni HW, o in termini di sistema operativo host.
+- **Compatibility Test**: Controlla la compatibilità del sistema con altri sistemi software.

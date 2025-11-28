@@ -1207,3 +1207,7 @@ Con **Naturale** si intende un tipo di **gesture che non va insegnata**, ma in q
 ### Definizione di NUI
 
 Interfaccia che risulti naturale da utilizzare in maniera tale da **fittare le skill** ed il contesto dell'utente. In questo modo però gli **utenti** saranno **meno avvezzi all'insegnamento**, dato che hanno applicato **zero effort** per utilizzare il **primo set di feature base**.
+
+# Lezione 19 - DA RIPRENDERE - 27/11/2025
+
+# Lezione 20 - - 28/11/2025

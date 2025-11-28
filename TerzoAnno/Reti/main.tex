@@ -2387,6 +2387,167 @@ Analizziamo alcune caratteristiche mettendo a confronto i due algoritmi:
 
 \newpage
 
+\subsection{Sistemi Autonomi AS ed Instradamento Gerarchico}
+
+Sarebbe irrealistico immaginare un routing basato sulla visualizzazione di tutti i miliardi di hosts che compongono Internet. Tutta la rete è composta da sistemi autonomi \textbf{AS}, ossia un \textbf{gruppo
+di router} sotto lo \textbf{stesso controllo amministrativo}.
+
+\paragraph{Tipi di AS} Elenchiamo i vari tipi di sistemi autonomi:
+
+\begin{itemize}
+    \item \textbf{AS Stub}: Collegato solo ad un altro stub, trasporta solo traffico di cui è origine o destinazione.
+    \item \textbf{AS Multihomed}: Collegato a più di un altro AS.
+    \item \textbf{AS di Transito}.
+\end{itemize}
+
+\subsubsection{Intra/Inter-AS}
+
+Si differenzia il tipo di routing in base a se sorgente e destinazione facciano o meno parte dello stesso AS:
+
+\begin{itemize}
+    \item \textbf{Intra Domain Routing}: Routing all'interno dello stesso AS, tutti i router al suo interno utilizzano lo stesso protocollo intra-domain. Un \textbf{gateway router} si trova al confine del suo AS ed ha i link con i router di altri AS.
+    \item \textbf{Inter Domain Routing}: I gateway router si occupano dell'instradamento inter-domain, quindi tra AS diversi.
+\end{itemize}
+
+\vspace*{10px}
+
+\subsection{Protocolli Reali per Intra-AS}
+
+Elenchiamo alcuni protocolli reali di routing interno ad un sistema autonomo.
+
+\vspace*{10px}
+
+\subsubsection{RIP - Routing Information Protocol}
+
+Protocollo di routing intra-dominio con le seguenti caratteristiche:
+
+\begin{itemize}
+    \item Basato su Distance Vector con Poisoned Reverse.
+    \item Gestione del \textbf{costo} basata sul \textbf{numero di hop} effettuati tra sottoreti per raggiungere la destinzazione.
+    \item Basato su richieste/risposte.
+    \item Utilizza un processo demone che comunica tramite protocollo UDP con porta standard $520$.
+    \item Non viene inviata solo la distance vector ma tutta la tabella di routing.
+\end{itemize}
+
+\newpage
+
+\paragraph{Algoritmo del RIP} Un nodo invia la tabella di inoltro ai propri vicini in maniera periodica, solitamente 30 secondi. Si definisce quindi il costo di hop tra $R$ ed $Y$ con:
+
+\[ D_{R}[Y] = 1 + D_{V}[Y] \]
+
+dove
+
+\begin{itemize}
+    \item $D_{R}[Y]$: Corrisponde alla nuova distanza tra $R$ sorgente ed $Y$ destinazione.
+    \item $D_{V}[Y]$: Corrisponde alla distanza che il nodo $V$ afferma di avere per raggiungere la destinazione $Y$.
+    \item $+1$: Costo causato dal collegamento tra i due nodi vicini, ossia $R$ e $V$.
+\end{itemize}
+
+Quindi il nuovo percorso da $R$ ad $Y$ viene inserito in tabella se è un percorso non presente, ha un costo inferiore rispetto a quello del vecchio percorso o se $V$ è nextHop del vecchi e nuovo percorso, ma con costo aggiornato.
+
+\paragraph{Prestazioni RIP} Così come per l'algoritmo DV abbiamo una potenziale convergenza lenta delle tabelle di inoltro, specialmente in domini ampi. Allo stesso tempo però si garantisce robustezza in caso di guasto di un router a causa della sua logica distribuita.
+
+\paragraph{Protocollo RIP e Utilizzo UDP} Nella precedente pagina abbiamo definito come questo protocollo a livello di rete si basi sull'utilizzo dell'UDP, che è un protocollo di trasporto. Non stiamo però nell'ambito del data plane ma del control plane, quindi non siamo limitati solo all'utilizzo del livello di rete, ma possiamo anche arrivare fino al livello applicazione. Quindi non si è limitati solo al livello di rete nei router per il Control Plane, proprio perchè il compito è la comunicazione per la creazione delle regole, e non per l'inoltro effettivo.
+
+\subsubsection{OSPF - Open Shortest Path First}
+
+Basato sul Link State, in maniera periodica viene effettuata una operazione di \textbf{flooding} che permette la propagazione dello stato globale della rete.
+
+\paragraph{Caratteristiche OSPF} Elenchiamo alcune caratteristiche di questo protocollo:
+
+\begin{itemize}
+    \item Il payload OSPF viene incapsulato in datagrammi IP.
+    \item Questo protocollo è utilizzato soprattutto in reti grandi, per evitare quindi di inondare tutta la rete di messaggi si effettua l'invio in maniera globale ma relativamente ad un area/dorsale della rete totale.
+\end{itemize}
+
+\paragraph{Prestazioni OSPF} Definiamo le prestazioni di questo protocollo:
+
+\begin{itemize}
+    \item Il formato dei payload e il metodo di trasmissione a flooding potrebbero generare molto traffico e sprecare banda.
+    \item La convergenza delle tabelle di inoltro è molto più rapida del RIP.
+    \item La robustezza è garantita dall'indipendenza ci ciascun router.
+\end{itemize}
+
+\newpage
+
+\subsection{Protocolli Reali per Inter-AS}
+
+Elenchiamo alcuni protocolli reali di routing tra sistemi autonomi diversi.
+
+\subsubsection{BGP - Border Gateway Protocol}
+
+Permette ai Gateway di diversi AS di interfacciarsi secondo un protocollo comune, dando la possibilità a ciascuna AS di pubblicizzare la propria esistenza.
+
+\vspace*{10px}
+
+In generale le operazioni permesse da BGP sono ad esempio comunicare la propria esistenza, ottenere informazioni riguardanti le reti raggiungibili di AS vicini, determinare percorsi verso altre reti basandosi su politiche di raggiungibilità, propagare alle reti vicine informazioni di raggiungibilità.
+
+\vspace*{10px}
+
+Oltre a questo gestisce in maniera aggregata gli indirizzi e distribuisce \textbf{informazioni di raggiungibilità} in due modi:
+
+\begin{itemize}
+    \item \textbf{eBGP - external BGP}: Gestione dello scambio di informazioni di routing tra AS diversi, tramite comunicazione dei router Gateway con altri router Gateway di AS esterni.
+    \item \textbf{iBGP - internal BGP}: Gestione della distribuzione interna delle informazioni sulle rotte apprese dall'esterno dal Gateway del AS locale.
+\end{itemize}
+
+\paragraph{Messaggi BGP}
+
+Due router BGP, detti peer, si scambiano messaggi BGP su una connessione TCP semi-permanente, ciascun nodo mantiene quindi informazioni sul percorso completo verso una destinazione, non solo sulla distanza o sulla prossima tappa. Esistono vari tipi di messaggi BGP, ad esempio \texttt{OPEN}, \texttt{UPDATE}, \texttt{KEEP ALIVE}, \texttt{NOTIFICATION}.
+
+\paragraph{Annunci ed Attributi BGP} Definiamo elementi principali di questo meccanismo:
+
+\begin{itemize}
+    \item \textbf{Annuncio BGP}: Messaggio centrale che un router BGP invia ai vicini per comunicare una rotta verso una o più destinazioni.
+    \item \textbf{Prefisso CIDR}\footnote{Classless Inter Domain Routing}: Identifica la destinazione raggiungibile come blocco di indirizzi IP rappresentato in notazione CIDR.
+    \item \textbf{Attributo AS-PATH}: Lista logica ordinata degli AS attraversati per raggiungere il corrente router.
+    \item \textbf{Attributo NEXT-HOP}: Indirizzo IP del prossimo router fisico che il pacchetto deve raggiungere.
+\end{itemize}
+
+\paragraph{Selezione Rotta con BGP} Un router potrebbe \textbf{conoscere più di un percorso} verso l'\textbf{AS destinazione}, quindi questo viene selezionato in base a vari elementi come una \textbf{preferenza locale} assegnata alle rotte, l'\textbf{AS-PATH più breve}, il \textbf{NEXT-HOP più vicino} oppure \textbf{altri criteri aggiuntivi}.
+
+\newpage
+
+\paragraph{Policy Based Routing} Il gateway che riceve l'annuncio di una rotta usa una import policy per accettare/rifiutare un percorso. Le policy vengono utilizzate anche per pubblicizzare o meno un percorso ad altri AS vicini.
+
+\paragraph{Riassunto Caratteristiche Protocolli Inter/Intra AS} Elenchiamo le caratteristiche mostrate negli ultimi due capitoli:
+
+\begin{itemize}
+    \item \textbf{Politiche}:
+    \begin{itemize}
+        \item \textbf{Inter-AS}: Si vuole che l'amministratore abbia controllo su come viene instradato il suo traffico.
+        \item \textbf{Intra-AS}: Singolo amministratore, la gestione della politica è meno problematica.
+    \end{itemize}
+    \item \textbf{Scalabilità}: L'instradamento gerarchico consente di ridurre le dimensioni delle tabelle e del traffico di aggiornamento.
+    \item \textbf{Performance}:
+    \begin{itemize}
+        \item \textbf{Inter-AS}: Si tiene conto delle performance.
+        \item \textbf{Intra-AS}: Le politiche hanno maggiore importanza delle performance.
+    \end{itemize}
+\end{itemize}
+
+\subsection{Protocollo IPv6}
+
+Nato per soddisfare la potenziale mancanza di indirizzi generati da IPv4, a causa di un forte utilizzo del Natting non è stato utilizzato in larga scala come ci si aspettava.
+
+\paragraph{Caratteristiche} Questo protocollo si basa su queste caratteristiche:
+
+\begin{itemize}
+    \item Indirizzi a 128 bit.
+    \item Lunghezza dell'header fissa a 40 byte.
+    \item Eliminazione della checksum.
+    \item Nessuna frammentazione.
+\end{itemize}
+
+\paragraph{Tunneling} Dato che non è possibile switchare da IPv4 ad IPv6 si definisce un meccanismo di "convivenza" tra i due protocolli, grazie al quale si wrappa tutto il datagramma IPv6 nel payload del datagramma IPv4 in modo tale che questo possa essere trasmesso in una regione IPv4.
+
+\begin{figure}[htbp]
+    \center
+    \includegraphics[scale=0.575]{img/tunnelingIPv6.png}
+\end{figure}
+
+\newpage
+
 %\begin{figure}[htbp]
     %\center
     %\includegraphics[scale=0.4]{img/classiComplessita2.png}

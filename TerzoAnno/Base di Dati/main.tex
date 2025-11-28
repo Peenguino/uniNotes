@@ -1467,10 +1467,295 @@ In maniera approssimata potremmo quindi dire che l'idea dell'algoritmo sia quell
 
 \newpage
 
+\section{Realizzazione di un DBMS}
+
+\subsection{Architettura dei DBMS e Gestione della Memoria}
+
+Lo studio della realizzazione dei DBMS è indispensabile per utilizzare tali sistemi in modo efficace. È necessario conoscere l'architettura dei DBMS relazionali centralizzati e le tecniche utilizzate per implementare le funzionalità essenziali, come la gestione dei dati, delle interrogazioni, della concorrenza e dell'affidabilità.
+
+\subsubsection{Gerarchia delle Memorie e Implicazioni per i DBMS}
+
+La memoria di un sistema di calcolo è organizzata in una gerarchia. Ai livelli più alti si trovano memorie di piccola dimensione, molto veloci e costose; scendendo lungo la gerarchia, la dimensione aumenta mentre velocità e costo diminuiscono.
+
+Le prestazioni di una memoria sono misurate in termini di tempo di accesso, dato dalla somma della latenza (tempo per accedere al primo byte) e del tempo di trasferimento dei dati:
+$$
+\text{Tempo di accesso} = \text{latenza} + \frac{\text{dimensione dati da trasferire}}{\text{velocità di trasferimento}}
+$$
+A causa delle loro grandi dimensioni, i database (DB) risiedono normalmente su dischi o altri tipi di dispositivi. I dati devono essere trasferiti in memoria centrale per l'elaborazione da parte del DBMS.
+
+\paragraph{Trasferimento Dati e Ottimizzazione}
+Il trasferimento dei dati non avviene a livello di singole tuple, ma in termini di \textbf{blocchi} (o \textbf{pagine}, quando sono in memoria centrale).
+Poiché le operazioni di I/O (Input/Output) spesso costituiscono il \textbf{collo di bottiglia} del sistema, è cruciale ottimizzare l'implementazione fisica del DB attraverso:
+\begin{itemize}
+    \item Organizzazione efficiente delle tuple su disco.
+    \item Strutture di accesso efficienti.
+    \item Gestione efficiente dei buffer in memoria.
+    \item Strategie di esecuzione efficienti per le query.
+\end{itemize}
+
+\paragraph{Struttura degli Hard Disk}
+Un hard disk (HD) è un dispositivo elettro-meccanico che conserva informazioni magnetiche su un supporto rotante (piatto). I dischi metallici ruotano a velocità costante e le testine di lettura si muovono radialmente. Una traccia è suddivisa in settori di dimensione fissa, raggruppati logicamente in \textbf{blocchi}, che sono l'unità di trasferimento.
+Trasferire un blocco richiede un tempo di posizionamento delle testine (seek time), un tempo di latenza rotazionale e il tempo di trasferimento vero e proprio (che è spesso trascurabile).
+
+\paragraph{Pagine e Località}
+Un blocco (o pagina) è una sequenza contigua di settori su una traccia, ed è l'unità di I/O utilizzata dal DBMS. La dimensione tipica di una pagina varia da 4 a 64 KB.
+\begin{itemize}
+    \item Pagine piccole comportano un maggior numero di operazioni di I/O.
+\newpage
+    \item Pagine grandi aumentano la frammentazione interna (pagine parzialmente riempite).
+\end{itemize}
+\paragraph{Importanza Località} L'importanza della località è critica, leggere un file memorizzato in settori consecutivi è estremamente più veloce rispetto a leggerlo da blocchi distribuiti a caso.
+
+\subsubsection{Gestore della Memoria Permanente e del Buffer}
+
+\paragraph{Gestore Memoria Permanente}
+Fornisce un'astrazione della memoria permanente in termini di file logici di pagine fisiche (blocchi), nascondendo i dettagli dei dischi e del sistema operativo.
+
+\paragraph{Gestore del Buffer}
+Si occupa del trasferimento delle pagine tra la memoria temporanea (\textbf{Buffer Pool}) e la memoria permanente. Offre agli altri livelli del DBMS una visione della memoria permanente come un insieme di pagine utilizzabili nel buffer, astraendo da quando esse vengono trasferite.
+
+Nel Buffer Pool, ogni pagina ha informazioni associate:
+\begin{itemize}
+    \item \textbf{NumeroSpilli (Pin count)}: Contatore incrementato quando una pagina viene richiesta dal DBMS (\texttt{getAndPinPage}) e decrementato quando viene rilasciata (\texttt{unPinPage}). Fino a quando il pin count è maggiore di zero, la pagina non può essere rimpiazzata.
+    \item \textbf{SeModificata (dirty/non dirty)}: Indica se la pagina è stata modificata (\textit{dirty} o "sporca"). Se una pagina è \textit{dirty}, deve essere riscritta su disco (\texttt{flushPage}) prima di essere rimpiazzata.
+\end{itemize}
+
+\paragraph{Politiche di Rimpiazzamento}
+La politica comune nei sistemi operativi è \textbf{LRU} (Least Recently Used). Tuttavia, nei DBMS, LRU non è sempre la scelta migliore perché il "pattern di accesso" ai dati è spesso noto. Ad esempio, per alcuni algoritmi di \textit{join}, la politica migliore può essere \textbf{MRU} (Most Recently Used), che rimpiazza la pagina utilizzata più di recente.
+La bontà di una politica è misurata dall'\textbf{hit ratio}, ovvero la frazione di richieste che non provocano un'operazione di I/O.
+
+\subsubsection{Strutture e Organizzazioni di Memorizzazione}
+
+\paragraph{Struttura Logica di Una Pagina}
+Una pagina ha una struttura logica che include \textbf{informazioni di servizio} e un'area contenente le stringhe che rappresentano i record. Il problema del riferimento ai record è risolto tramite l'identificatore \textbf{RID}: una coppia \texttt{(PID della pagina, Slot)}. L'organizzazione a slot permette la riallocazione interna del record senza modificarne il RID.
+
+\paragraph{Tipi di Organizzazioni}
+Le organizzazioni sono caratterizzate da occupazione di memoria e costo delle operazioni (ricerca, modifica, inserzione).
+
+\begin{itemize}
+    \item \textbf{Organizzazione Seriale (Heap file)}: I dati sono memorizzati in modo disordinato (nell'ordine di inserzione). È semplice e a basso costo di memoria, ma poco efficiente per grandi quantità di dati. È l'organizzazione standard di ogni DBMS.
+\newpage
+    \item \textbf{Organizzazione Sequenziale}: I dati sono ordinati sul valore di uno o più attributi. Questo facilita le operazioni SQL di ordinamento, raggruppamento e ricerca (\texttt{ORDER BY, GROUP BY, WHERE}) sugli attributi ordinati.
+    Tuttavia, è più complessa da gestire in caso di aggiornamento/cancellazione/inserimento, richiedendo periodiche riorganizzazioni.
+    In un file sequenziale ordinato, la ricerca binaria di un record richiede circa $\lceil \log_2 b \rceil + 1$ accessi a blocco/pagina, dove $b$ è il numero di blocchi.
+    \item \textbf{Organizzazioni per Chiave}: L'obiettivo è trovare un record, nota la chiave, con il minor numero possibile di accessi a disco (idealmente 1 accesso) [19]. Le alternative sono il metodo \textbf{procedurale (hash)} o il metodo \textbf{tabellare (indice)}.
+\end{itemize}
+
+
+\paragraph{Hash File (Metodo Procedurale Statico)}
+I record vengono allocati in una pagina il cui indirizzo è determinato dal valore della chiave tramite una funzione hash $H(\text{key}) \rightarrow \text{page address}$. Le collisioni (overflow) sono gestite di solito con liste collegate (\textit{linked lists}).
+\begin{itemize}
+    \item È l'organizzazione più efficiente per l'accesso diretto (puntuale) basato su valori della chiave.
+    \item Non è efficiente per ricerche basate su intervalli di valori (\textit{range queries}).
+    \item Funziona bene solo con file la cui dimensione non varia molto nel tempo (procedurale statico).
+\end{itemize}
+
+\subsubsection{Indici: Metodo Tabellare, B-tree e B+-tree}
+
+\paragraph{Metodo Tabellare (Indice)}
+Per le ricerche per chiave e per intervallo è preferibile il metodo tabellare, che utilizza un \textbf{indice}: un insieme ordinato di coppie $(k, r(k))$, dove $k$ è il valore della chiave e $r(k)$ è il riferimento al record.
+L'indice è una struttura che contiene informazioni sulla posizione di memorizzazione delle tuple in base al valore del campo chiave. La realizzazione degli indici avviene tipicamente attraverso strutture ad albero multi-livello.
+
+\paragraph{B-tree e B+-tree}
+La struttura più usata e ottimizzata dai DBMS per la gestione degli indici è il \textbf{B+-albero}.
+
+\subparagraph{Albero di Ricerca di Ordine P}
+Un albero di ricerca di ordine $P$ è un albero i cui nodi contengono al più $P-1$ valori di ricerca (search value) e $P$ puntatori. Tali alberi possono essere memorizzati su disco, con ogni nodo assegnato a una pagina. Gli algoritmi di inserimento e cancellazione devono garantire il mantenimento dei vincoli, sebbene non garantiscano sempre che l'albero sia bilanciato (nodi foglia allo stesso livello).
+
+\subparagraph{B-tree}
+Un B-tree è una soluzione per mantenere l'albero bilanciato. Un nodo interno di un B-tree contiene tree pointer ($P_i$), chiavi di ricerca ($K_i$) e data pointer ($Pr_i$) che puntano al record o alla pagina che lo contiene. Tutti i nodi foglia sono posti allo stesso livello.
+
+\subparagraph{B+-tree}
+Un B+-tree è una variazione del B-tree in cui i \textbf{data pointer sono memorizzati solo nei nodi foglia}. I nodi foglia sono generalmente collegati tra loro (relazionati) per facilitare le \textit{range query}. I nodi interni hanno la funzione esclusiva di guidare la ricerca.
+\begin{itemize}
+    \item \textbf{Nodi Interni}: Hanno la forma $\langle P_1, K_1, P_2, K_2, \ldots, P_{q-1}, K_{q-1}, P_q \rangle$, dove $P_i$ sono solo \textit{tree pointer}.
+    \item \textbf{Nodi Foglia}: Hanno la forma $\langle \langle K_1, Pr_1 \rangle, \ldots, \langle K_q, Pr_q \rangle, P_{\text{next}} \rangle$, dove $Pr_i$ sono i \textit{data pointer} e $P_{\text{next}}$ punta al nodo foglia successivo.
+\end{itemize}
+
+\paragraph{Tipologie di Indici}
+\begin{itemize}
+    \item \textbf{Indice Primario}: La \textbf{chiave di ordinamento} del file sequenziale \textbf{coincide} con la \textbf{chiave di ricerca} dell'indice. Esiste un record nell'indice per ogni blocco nel file di dati.
+    \item \textbf{Indice Secondario}: La \textbf{chiave di ordinamento} e la \textbf{chiave di ricerca} \textbf{sono diverse}. Può essere definito su un campo non chiave (anche con valori duplicati). In questo caso quindi il \textbf{primo indice} è utilizzato per \textbf{mantenere l'ordine}, mentre il \textbf{secondo indice} è un \textbf{effettivo puntatore} al blocco o al record (RID).
+\end{itemize}
+
+\subsubsection{Tecniche di Ordinamento (Sort)}
+L'ordinamento di archivi è fondamentale per rispondere a interrogazioni con \texttt{ORDER BY}, e per eseguire operazioni relazionali come \texttt{JOIN}, \texttt{SELECT DISTINCT}, e \texttt{GROUP BY}.
+
+L'algoritmo più comune utilizzato dai DBMS è lo \textbf{Z-way Sort-Merge}. L'algoritmo opera in due fasi, supponendo di dover ordinare un file di $N_P$ pagine con a disposizione $N_B < N_P$ buffer in memoria centrale:
+\begin{enumerate}
+    \item \textbf{Sort Interno}: Le pagine vengono lette e i record di ogni pagina vengono ordinati (es. Quicksort), creando delle "run" che vengono scritte su disco in un file temporaneo. Avendo $N_B$ buffer, si possono ordinare $N_B$ pagine alla volta.
+    \item \textbf{Merge} (\textbf{Fusione}): Le run vengono fuse in uno o più passi fino a ottenere un unico file ordinato.
+\end{enumerate}
+
+Miglioramenti sostanziali si ottengono fondendo $N_B - 1$ run alla volta (riservando 1 buffer per l'output). Il costo complessivo delle operazioni di I/O (leggere e riscrivere le pagine) è dato da:
+$$
+\text{Costo I/O} = 2 \times N_P \times \left( \lceil \log_{N_B-1} (N_P/N_B) \rceil + 1 \right)
+$$
+Un tempo di ordinamento può essere notevolmente ridotto aumentando il numero di buffer utilizzati per la fusione.
+
+\newpage
+
+\subsection{Realizzazione Operatori Relazionali}
+
+La realizzazione efficiente di un DBMS richiede che gli operatori relazionali logici (come Proiezione, Selezione, Raggruppamento e Join) siano tradotti in \textbf{operatori fisici} realizzati tramite algoritmi specifici. Un operatore logico può essere implementato con diversi algoritmi, ciascuno codificato in un appropriato operatore fisico.
+
+\subsubsection{Operatori Fisici e Interfaccia a Iteratore}
+
+Gli algoritmi per implementare gli operatori relazionali sono codificati in specifici \textbf{operatori fisici}.
+I DBMS definiscono questi operatori mediante un’interfaccia a \textbf{iteratore}. Un iteratore è un oggetto che fornisce i seguenti metodi principali:
+
+\begin{itemize}
+    \item \texttt{open}: Inizializza lo stato dell’operatore, alloca i buffer per l’input e l’output e richiama ricorsivamente \texttt{open} sugli operatori figli. Viene anche utilizzato per passare argomenti, come la condizione che un operatore \texttt{Filter} deve applicare.
+    \item \texttt{next}: Richiede la successiva tupla del risultato dell’operatore. L'implementazione di questo metodo include l'invocazione di \texttt{next} sugli operatori figli e l'esecuzione di codice specifico dell'operatore, e in genere ritorna un record.
+    \item \texttt{isDone}: Indica se ci sono ancora valori da leggere (generalmente booleano).
+    \item \texttt{close}: Termina l’esecuzione dell’operatore, rilasciando le risorse allocate.
+\end{itemize}
+
+Esempi di operatori fisici includono \texttt{TableScan(R)} per la scansione completa di una relazione $R$, e \texttt{IndexScan(R, Idx)} per la scansione basata su un indice $Idx$.
+
+\subsubsection{Realizzazione degli Operatori Fondamentali}
+
+\paragraph{Proiezione (\(\Pi\))}
+Se la proiezione include la clausola \texttt{DISTINCT} (eliminazione dei duplicati), un approccio comune è basato sull'ordinamento: si legge la relazione $R$, si scrive una relazione temporanea $T$ contenente solo gli attributi della \texttt{SELECT}, si ordina $T$ su tutti gli attributi, e infine si eliminano i duplicati.
+Gli operatori fisici per la proiezione logica $\pi_b \{A_i\}$ (con duplicati) e $\pi \{A_i\}$ (senza duplicati) sono:
+\begin{itemize}
+    \item $Project(O, \{Ai\})$: Esegue la proiezione senza eliminazione dei duplicati.
+    \item $Distinct(O)$: Elimina i duplicati dai record, assumendo che l'input $O$ sia ordinato.
+\end{itemize}
+
+\paragraph{Selezione/Restrizione (\(\sigma\))}
+L'efficienza della selezione dipende dalla presenza o meno di indici.
+\begin{itemize}
+    \item \textbf{Senza indice e dati disordinati}: Il costo è $N_{pag}(R)$, ovvero il numero di pagine della relazione $R$. L'operatore fisico corrispondente è \texttt{Filter (O, $\psi$)}.
+    \item \textbf{Con indice (es. B+-albero)}: Il costo si riduce a $CI + CD$, dove $CI$ è il costo di accesso all'indice e $CD$ è il costo di accesso ai dati. L'operatore fisico corrispondente è \texttt{IndexFilter (R, Idx, $\psi$)}, che esegue la restrizione utilizzando l'indice $Idx$.
+\end{itemize}
+
+\newpage
+
+\paragraph{Raggruppamento e Aggregazione ($\Gamma$)}
+Per le operazioni di aggregazione senza 
+
+\texttt{GROUP BY} (es. \texttt{SELECT COUNT(*)}) si visitano i dati e si calcolano le funzioni di aggregazione.
+Nel caso in cui sia presente la clausola \texttt{GROUP BY}, si utilizza tipicamente un approccio basato sull'ordinamento: i dati vengono ordinati sugli attributi del \texttt{GROUP BY}, poi visitati per calcolare le funzioni di aggregazione per ogni gruppo.
+L'operatore fisico è $GroupBy(O, \{Ai\}, \{fi\})$, che raggruppa i record di $O$ sugli attributi $\{A_i\}$ e utilizza le funzioni di aggregazione $\{f_i\}$ (presenti nella \texttt{SELECT} e nella \texttt{HAVING}).
+L'operatore restituisce record con gli attributi $\{A_i\}$ e le funzioni $\{f_i\}$, assumendo che i record di $O$ siano ordinati sugli $\{A_i\}$.
+
+\subsubsection{Algoritmi di Giunzione (Join)}
+
+L'esecuzione di una giunzione (Join) è cruciale; l'approccio di calcolare il Prodotto Cartesiano ($R \times S$) seguito da una restrizione è inefficiente a causa della potenziale dimensione di $R \times S$. Sebbene il Join sia logicamente commutativo, dal punto di vista fisico esiste una chiara distinzione tra l'operando sinistro (esterno o "outer") e l'operando destro (interno o "inner"), che influenza le prestazioni.
+
+\paragraph{Nested Loops Join (Cicli Nidificati)}
+L'algoritmo di base \texttt{Nested Loops} consiste nel visitare l'intera relazione interna $S$ per ogni record $r$ della relazione esterna $R$:
+$$
+\text{foreach record } r \text{ in } R \text{ do}
+\begin{cases}
+    \text{foreach record } s \text{ in } S \text{ do} \\
+    \quad \text{if } r_i = s_j \text{ then aggiungi } \langle r, s \rangle \text{ al risultato}
+\end{cases}
+$$
+Nel caso base (1 buffer per $R$ e 1 per $S$), il costo totale è:
+$$
+\text{Costo I/O} = N_{pag}(R) + N_{rec}(R) \times N_{pag}(S)
+$$
+Conviene scegliere come \textbf{relazione esterna} quella con un minor numero di tuple o, in generale, quella che soddisfa la condizione $N_{rec}(R) \times N_{pag}(S) < N_{rec}(S) \times N_{pag}(R)$, che corrisponde alla relazione con i record più grandi/lunghi.
+L'ordine delle tuple nel risultato finale coincide con l'ordine eventualmente presente nella relazione esterna $R$.
+
+\paragraph{Nested Loop A Pagine (\texttt{PageNestedLoop})}
+Molti DBMS utilizzano la variante \texttt{Nested Loop a Pagine} (Page Nested Loop), che è più efficiente perché rinuncia a preservare l'ordine della relazione esterna ed esegue il join di tutte le tuple in memoria prima di richiedere nuove pagine della relazione interna $S$.
+Logica: Per ogni pagina $p_R$ di $R$, si visitano tutte le pagine $p_S$ di $S$ ed si esegue il join di tutte le tuple in $p_R$ e $p_S$. La strategia si estende anche assegnando più buffer a $R$.
+
+\newpage
+
+\paragraph{Nested Loop con Indice (\texttt{IndexNestedLoop})}
+Questa variante sostituisce la scansione completa della relazione interna $S$ con una scansione basata su un indice $I_{S_j}$ costruito sugli attributi di join di $S$. Questo accesso mediante indice riduce notevolmente i costi di esecuzione del Nested Loops Join.
+$$
+\text{foreach record } r \text{ in } R \text{ do}
+\begin{cases}
+    \text{foreach record } s \text{ in } \texttt{get-through-index}(I_{S_j}=r_i) \text{ do} \\
+    \quad \text{aggiungi } \langle r, s \rangle \text{ al risultato}
+\end{cases}
+$$
+L'operatore fisico è \texttt{IndexNestedLoop (OE, OI, $\psi_J$)}. L'operando interno $OI$ è spesso un \texttt{IndexFilter} sulla relazione interna.
+
+\paragraph{Sort-Merge Join (\texttt{SortMerge})}
+Questo algoritmo è applicabile quando entrambe le relazioni in input ($R$ e $S$) sono \textbf{ordinate sugli attributi di join}. L'ordinamento può essere raggiunto se la relazione è fisicamente ordinata o se esiste un indice sugli attributi di join.
+L'algoritmo sfrutta l'ordinamento per evitare confronti inutili. Il numero di letture (senza contare il tempo di sort) è dell'ordine di $N_{pag}(R) + N_{pag}(S)$ se si accede sequenzialmente.
+L'operatore fisico è \texttt{SortMerge (OE, OI, $\psi_J$)}.
+
+\vspace*{10px}
+
+\begin{figure}[htbp]
+    \center
+    \includegraphics[scale=0.625]{img/tipiImplementazioniJoin.png}
+\end{figure}
+
+\newpage
+
+\subsection{Piani d'Accesso}
+
+I piani d'accesso sono \textbf{espressioni algebriche} in cui gli \textbf{operatori logici} vengono \textbf{sostituiti} da \textbf{operatori fisici}.
+
+\vspace*{10px}
+
+In questa fase si applicano quindi le ottimizzazioni sulle interrogazioni, si sceglie quindi il piano di costo minimo tra quelli selezionabili.
+
+\paragraph{Fasi del Processo di Ottimizzazione} Le fasi attraversate sono le seguenti:
+
+\begin{itemize}
+    \item \textbf{Analisi e Semplificazione}: Verifica la correttezza del comando, normalizzazione e semplificazione della condizione.
+    \item \textbf{Trasformazione}: Trasformazione dell'albero con regole di equivalenza.
+    \item \textbf{Ottimizzazione Fisica}: Definizione del piano di accesso, quindi scelta dell'algoritmo per eseguiro ogni operatore, l'ideale sarebbe trovare i migliori piani d'accesso ma l'obiettivo reale e quello di evitare i peggiori.
+    \item \textbf{Esecuzione}: Viene eseguito il piano d'accesso.
+\end{itemize}
+
+\begin{figure}[htbp]
+    \center
+    \includegraphics[scale=0.45]{img/esempioToPianoAccesso.png}
+\end{figure}
+
+\subsection{Gestione Transazioni}
+
+Una transazione è un programma sequenziale costituito da operazioni che il sistema deve eseguire garantendo atomicità, serializzabilità e persistenza.
+
+\vspace*{15px}
+
+Il DBMS deve quindi \textbf{gestire} i \textbf{dati in memoria permanente}, il \textbf{buffer} a disposizione per il trasferimento da memoria centrale a memoria di massa e delle \textbf{ottimizzazioni} delle \textbf{interrogazioni}.
+
+\newpage
+
+\paragraph{Proprietà ACID} Elenchiamo le proprietà ACID delle transazioni:
+
+\begin{itemize}
+    \item \textbf{Atomicity}: Le transazioni devono essere eseguite con la regola del tutto o niente.
+    \item \textbf{Consistency}: La transazione deve lasciare il DB in uno stato constente, non violando eventuali vincoli di integrità
+    \item \textbf{Isolation}: L'esecuzione di una transazione deve essere indipendente dalle altre.
+    \item \textbf{Durabilty}: L'effetto di una transazione conclusa con un \texttt{commit} non deve essere perso.
+\end{itemize}
+
+\paragraph{Transazione per il DBMS}
+
+Anche se una transazione può eseguire molte operazioni, al DBMS interessano solo quelle di lettura/scrittura che definiremo così:
+
+\begin{itemize}
+    \item $r_i[x]$: Operazione che comporta la \textbf{lettura di una pagina nel buffer}, se non già presente.
+    \item $w_i[x]$: Operazione che comporta un \textbf{eventuale lettura nel buffer} di una pagina e la sua \textbf{modifica nel buffer}, ma \textbf{non necessariamente} la sua \textbf{scrittura} in \textbf{memoria permanente}.
+\end{itemize}
+
+\paragraph{Tipi di Malfunzionamento}
+
+Esistono tre tipi di malfunzionamento:
+
+\begin{itemize}
+    \item \textbf{Fallimenti di Transazioni}: Non comportano la perdita di dati in memoria temporanea ne persistente.
+    \item \textbf{Fallimenti di Sistema}: Comportano perdite di dati in memoria temporanea ma non in memoria persistente.
+    \item \textbf{Disastri}: Comportano perdite di dati in memoria permanente.
+\end{itemize}
+
+\newpage
+
 %\begin{figure}[htbp]
     %\center
     %\includegraphics[scale=0.4]{img/classiComplessita2.png}
 %\end{figure}
-
 
 \end{document}
