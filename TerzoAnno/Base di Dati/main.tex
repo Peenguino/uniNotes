@@ -586,7 +586,6 @@ Insieme di operatori su relazioni che restituiscono altre relazioni. La forza di
     \[ R \: \cap \: S = R - (R - S) \]
     \item \textbf{Giunzione (Join)}: L'operazione $R \bowtie_{R.A = S.B} S$ combina le righe (tuple) di $R$ ed $S$ \textbf{solo quando} un attibuto A di R \textbf{è uguale} ad un attributo B di S. Questa operazione è derivata da:
     \[ R \bowtie_{R.A = S.B} S = \rho_{R.A = S.B} (R \times S) \]
-    \newpage
     \item \textbf{Giunzione Naturale}: L'operazione $R \:v\: S$ è una giunzione automatica su tutti gli attributi che hanno lo stesso nome in entrambe le relazioni, quindi non sono specificate condizioni.
 \end{enumerate}
 
@@ -1677,12 +1676,14 @@ $$
 $$
 L'operatore fisico è \texttt{IndexNestedLoop (OE, OI, $\psi_J$)}. L'operando interno $OI$ è spesso un \texttt{IndexFilter} sulla relazione interna.
 
+\vspace*{15px}
+
 \paragraph{Sort-Merge Join (\texttt{SortMerge})}
 Questo algoritmo è applicabile quando entrambe le relazioni in input ($R$ e $S$) sono \textbf{ordinate sugli attributi di join}. L'ordinamento può essere raggiunto se la relazione è fisicamente ordinata o se esiste un indice sugli attributi di join.
 L'algoritmo sfrutta l'ordinamento per evitare confronti inutili. Il numero di letture (senza contare il tempo di sort) è dell'ordine di $N_{pag}(R) + N_{pag}(S)$ se si accede sequenzialmente.
 L'operatore fisico è \texttt{SortMerge (OE, OI, $\psi_J$)}.
 
-\vspace*{10px}
+\vspace*{25px}
 
 \begin{figure}[htbp]
     \center
@@ -1749,6 +1750,215 @@ Esistono tre tipi di malfunzionamento:
     \item \textbf{Fallimenti di Transazioni}: Non comportano la perdita di dati in memoria temporanea ne persistente.
     \item \textbf{Fallimenti di Sistema}: Comportano perdite di dati in memoria temporanea ma non in memoria persistente.
     \item \textbf{Disastri}: Comportano perdite di dati in memoria permanente.
+\end{itemize}
+
+\subsection{Gestione Affidabilità}
+
+Verifica che siano garantite le \textbf{proprietà} di \textbf{atomicità} e \textbf{persistenza} delle transazioni. Quindi questa fase è responsabile dei comandi \texttt{begin transaction}, \texttt{commit} e \texttt{rollback}.
+
+\vspace*{10px}
+
+\subsubsection{Ripresa a Caldo/Freddo}
+
+Esistono due tipi di ripristino del sistema:
+
+\begin{itemize}
+    \item \textbf{Ripresa a Caldo}: Ripristino del sistema dopo un malfunzionamento software.
+    \item \textbf{Ripresa a Freddo}: Ripristino del sistema dopo un malfunzionamento hardware.
+\end{itemize}
+
+\newpage
+
+\subsubsection{File di LOG e Primitive Undo/Redo}
+
+Tutte le operazioni svolte dal DBMS vengono riportate in un file di LOG:
+
+\begin{figure}[htbp]
+    \center
+    \includegraphics[scale=0.4]{img/fileDiLog.png}
+\end{figure}
+
+Ogni transazione $T$ vengono indicate le operazioni di \texttt{begin}, \texttt{commit} e \texttt{abort} di $T$ con $B(T), C(T), A(T)$.
+
+\vspace*{10px}
+
+Indichiamo invece con $D(T, O, BS)$, $I(T, O, AS)$ e $U(T, O, BS, AS)$ rispettivamente le operazioni di \texttt{delete}, \texttt{insert} e \texttt{update}.
+
+\paragraph{Primitive Undo/Redo} I record dei log associati ad una transazione consentono di \textbf{disfare (undo)} o \textbf{rifare (redo)} le corrispondenti azioni su una base di dati. Un log contiene \textbf{due tipi diversi} di \textbf{record}:
+
+\begin{itemize}
+    \item \textbf{Record di Transazione}: Tengono traccia di ogni tipo operazione relativa ad una transazione, quindi per ciascuna di esse si mantengono record di \texttt{begin}, \texttt{insert}, \texttt{delete}, \texttt{update}, \texttt{commit} e \texttt{abort}.
+    \item \textbf{Record di Sistema}: Tengono traccia delle operazioni di sistema, quindi di elementi quali \texttt{dump} che permette la copia completa in backup della base di dati e \texttt{checkpoint} per contrassegnare periodicamente il file di LOG.
+\end{itemize}
+
+\paragraph{Regole di Scrittura dei LOG} Esistono diversi approcci:
+
+\begin{itemize}
+    \item \textbf{Regola Write Ahead Log (WAL)}: La parte \textbf{BS (Before State)} di ciascun record di log deve essere \textbf{scritta prima} che la corrispondente \textbf{operazione venga effettuata} nella base di dati.
+    \item \textbf{Regola Commit Precedence}: La parte \textbf{AS (After State)} di ogni record di log deve essere scritta nel log \textbf{prima} di \textbf{effettuare il commit della transazione}.
+\end{itemize}
+
+\paragraph{Undo/Redo} Mostriamo quali politiche si seguono per disfare/rifare specifiche transazioni sulla base di dati:
+
+\begin{itemize}
+    \item \textbf{Undo}: Si segue la \textbf{politica della modifica libera}, ossia le modifiche possono essere portate nella base di dati stabile prima che la transizione termini. La \textbf{regola} per poter \textbf{disfare} invece è quelle del \textbf{Write Ahead Log}.
+    \newpage
+    \item \textbf{Redo}: Secondo il commit libero una transazione può essere considerata terminata normalmente prima che utte le modifiche bengano riportate nella base di dati stabile. La regola per poter rifare una transazione è quindi quella della commit rule, riportando le modifiche di una transizione nel log prima che questa raggiunga il commit.
+\end{itemize}
+
+\paragraph{Checkpoint} Si scrive sul LOG un mark che riporta l'elenco delle transazioni attive a tempo di checkpoint $BeginCheckpoint, \{ T_1, \cdots, T_n \}$. In parallelo alle normali operazioni delle transazioni, il gestore del buffer riporta sul disco tutte le pagine modificate. Successivamente si scrive sul giornale $EndCheckpoint$, in questo modo si certifica che tutte le scritture avvenute prima del $BeginCheckpoint$ siano state riportate su disco.
+
+\vspace*{10px}
+
+Attenzione, non abbiamo alcuna garanzia di aver riportato su disco le scritture avvenute tra $BeginCheckpoint$ ed $EndCheckpoint$.
+
+\vspace*{10px}
+
+\paragraph{Ripresa di Malfunzionamenti in base alla Tipologia} Applichiamo \textbf{undo/redo} in base al tipo di malfunzionamento.
+
+\begin{itemize}
+    \item \textbf{Fallimenti di Transazioni}: Si scrive nel LOG $(T, abort)$ e si applica il \texttt{redo}.
+    \item \textbf{Fallimenti di Sistema}: La base di dati viene ripristinata con il comando restart, \textbf{partendo} quindi dallo \textbf{stato} dell'\textbf{ultimo checkpoint}.
+    \begin{itemize}
+        \item Le transazioni \textbf{non terminate} devono essere approcciate in \texttt{undo}.
+        \item Le transazioni \textbf{terminate} devono essere approcciate in \texttt{redo}.
+    \end{itemize}
+    \item \textbf{Disastri}: Si riporta in linea la copia più recente della base di dati dal \textbf{dump di backup}, secondo il meccanismo della \textbf{ripartenza a freddo}.
+\end{itemize}
+
+\vspace*{10px}
+
+\subsubsection{Procedure della Ripresa a Caldo}
+
+Si seguono questi passi:
+
+\begin{itemize}
+    \item Trovare l'\textbf{ultimo checkpoint} percorrendo i \textbf{LOG a ritroso}.
+    \item Costruire gli insiemi \texttt{undo} e \texttt{redo}.
+    \item Ripercorrere \textbf{nuovamente a ritroso} i LOG, fino all'\textbf{azione più vecchia} nel insieme \texttt{undo} costruito prima.
+    \item Percorrere il LOG \textbf{in avanti}, eseguendo tutte le azioni contenute nell'insieme \texttt{redo}.
+\end{itemize}
+
+\newpage
+
+\subsection{Gestione della Concorrenza}
+
+Il DBMS deve garantire sia \textbf{esecuzione concorrente} di transazioni sia \textbf{accesso concorrente} agli stessi \textbf{dati}.
+
+\paragraph{Seriale e Serializzabile} Definiamo la differenza tra queste due proprietà:
+
+\begin{itemize}
+    \item \textbf{Seriale}: Un esecuzione di un insieme di transazioni $\{ T_1, \cdots, T_n \}$ si dice seriale se, per ogni coppia di transazioni $T_i, T_j$ tutte le operazioni di $T_i$ vengono eseguite prima di quelle di $T_j$.
+    \begin{itemize}
+        \item Uno schedule $S = \{ T_1, T_2, \cdots, T_n \}$ si dice \textbf{seriale} se appaiono consecutivamente, senza essere \textbf{inframezzate} da \textbf{azioni di altre transazioni}.
+    \end{itemize}
+
+    \item \textbf{Serializzabile}: Un insieme di transizioni si dice serializzabile se produce lo stesso effetto sulla base di dati di quello ottenibile eseguendo in serie, in qualche ordine, le sole transizioni normalmente.    
+\end{itemize}
+
+\subsubsection{Problematiche Gestione di Transazioni}
+
+In un sistema reale le transazioni vengono eseguite in concorrenza, questo porta alla gestione di un insieme di problematiche note:
+
+\vspace*{10px}
+
+Mostriamo degli esempi, categorizzando queste casistiche di race condition:
+
+\begin{itemize}
+    \item \textbf{Perdita d'Aggiornamento}:
+    \begin{figure}[htbp]
+        \center
+        \includegraphics[scale=0.4]{img/perditaAggiornamento.png}
+    \end{figure}    
+    \item \textbf{Lettura Sporca o Impropria}:
+    \begin{figure}[htbp]
+        \center
+        \includegraphics[scale=0.4]{img/letturaSporca.png}
+    \end{figure}
+    \newpage
+    \item \textbf{Letture Inconsistenti o Non Riproducibili}:
+    \begin{figure}[htbp]
+        \center
+        \includegraphics[scale=0.4]{img/letturaInconsistente.png}
+    \end{figure}
+\end{itemize}
+
+\paragraph{Controllo Concorrenza} I DBMS implementano \textbf{due classi} di \textbf{tecniche di controllo} di conocrrenza che grantiscono direttamente la \textbf{serializzabilità delle transazioni concorrenti}:
+
+\begin{itemize}
+    \item \textbf{Protocolli Pessimistici}: Tendono a ritardare l'esecuzione di transazioni che potrebbero generare conflitti, cercando di prevenire.
+    \begin{itemize}
+        \item Basato su fasi di lettura, validazione e scrittura.
+    \end{itemize}
+    \item \textbf{Protocolli Ottimistici}: Permettono l'esecuzione sovrapposta e non sincronizzata di transazioni ed effettuano controlli sui conflitti solo a fine commit.
+    \begin{itemize}
+        \item Metodi basati su lock e timestamps.
+    \end{itemize}
+\end{itemize}
+
+\subsection{Gestione delle Transazioni}
+
+\paragraph{Meccanismo dei Lock} Il meccanismo che blocca l'accesso ai dati ai quali una transazione accede ad altre transazioni:
+
+\begin{itemize}
+    \item Lock multi granularità.
+    \item Lock in operazioni di scrittura/lettura.
+\end{itemize}
+
+Quando una risorsa è bloccata, le transazioni che ne richiedono l'accesso vengono messe in coda. Si definiscono due operazioni sui lock, ossia \textbf{lock/unlock}.
+
+\paragraph{Serializzatore 2PL Stretto} Il serializzatore (\textbf{gestore della concorrenza}) ha il compito di \textbf{stabilire l'ordine} secondo il quale vanno eseguite le \textbf{singole operazioni} per rendere \textbf{serializzabile l'esecuzione} di un insieme di \textbf{transazioni}.
+
+\paragraph{Strict Two Phase Locking} Protocollo che segue queste regole:
+
+\begin{itemize}
+    \item Ogni transazione, prima di effettuare un operazione, acquisisce il blocco corrispondente \textbf{chiedendo il lock}.
+    \item Transazioni diverse non ottengono lock in conflitto.
+    \item I lock si rilasciano alla terminazione della transazione, precisamente a tempo di commit.
+\end{itemize}
+
+La gestione a lock può però causare delle attese circolari infinite, dette \textbf{deadlocks}.
+
+\newpage
+
+\paragraph{Risoluzione di Deadlocks} Possiamo risolvere il problema dei deadlocks in diversi modi:
+
+\begin{itemize}
+    \item \textbf{Timeout}: Ogni operazione di una transazione ha un timeout, entro il quale deve essere completata, altrimenti va in abort.
+    \item \textbf{Deadlock Avoidance}: Basata su \textbf{acquisizione di tutte le risorse necessarie} oppure \textbf{classi di priorità} tra transazioni.
+    \item \textbf{Deadlock Detection}: Utilizzare algoritmi e/o grafi per identificare la presenza di cicli nella richiesta di risorse.    
+\end{itemize}
+
+\paragraph{Timestamp delle Transazioni} Metodo che associa un \textbf{timestamp} che rappresenta il momento di inizio della transazione, e si seguono due criteri:
+
+\begin{itemize}
+    \item Ogni transizione \textbf{non può leggere o scrivere} un \textbf{dato scritto} da una \textbf{transazione} con \textbf{timestamp maggiore}.
+    \item Ogni transizione \textbf{non può scrivere} su un dato \textbf{già letto} da una \textbf{transazione} con \textbf{timestamp maggiore}.
+\end{itemize}
+
+\paragraph{Livelli di Isolamento e Consistenza} Esistono diversi livelli di garanzia di proprietà:
+
+\begin{itemize}
+    \item \textbf{Serializable}:
+    \begin{itemize}
+        \item La transazione leggerà solo cambiamenti fatti da transazioni concluse.
+        \item Nessun valore letto o scritto da T verrà cambiato da altre transazioni fino alla sua conclusione.
+        \item Se T legge un insieme di valori acceduti in ricerca, allora l'insieme non viene modificato da altre transazioni fino alla sua conclusione.
+    \end{itemize}
+    \item \textbf{Repeatable Read}:
+    \begin{itemize}
+        \item La transazione legge solo cambiamenti fatti da transazioni concluse.
+        \item Nessun valore letto o scritto dalla transazione verrà camiato da altre transazioni fino alla sua conclusione.
+    \end{itemize}
+    \item \textbf{Read Committed}:
+    \begin{itemize}
+        \item La transazione legge solo cambiamenti fatti da transazioni concluse.
+        \item La transazione non vede nessun cambiamento effettuato da transazioni concorrenti non concluse.
+    \end{itemize}
+    \item \textbf{Read Uncommitted}:
+    \begin{itemize}
+        \item La transazione è soggetta ad effetti fantasma, dato che può leggere modifiche fatte ad un oggetto da un altra transazione in esecuzione.
+    \end{itemize}
 \end{itemize}
 
 \newpage

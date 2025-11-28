@@ -1208,6 +1208,175 @@ Con **Naturale** si intende un tipo di **gesture che non va insegnata**, ma in q
 
 Interfaccia che risulti naturale da utilizzare in maniera tale da **fittare le skill** ed il contesto dell'utente. In questo modo però gli **utenti** saranno **meno avvezzi all'insegnamento**, dato che hanno applicato **zero effort** per utilizzare il **primo set di feature base**.
 
-# Lezione 19 - DA RIPRENDERE - 27/11/2025
+# Lezione 19 - Qualitative Research Methods in HCI - DA RIPRENDERE - 27/11/2025
 
-# Lezione 20 - - 28/11/2025
+# Lezione 20 - Quantitative Research Methods in HCI - 28/11/2025
+
+## Understanding Qunatitative Research
+
+La ricerca quantitativa si occupa di collezionare ed analizzare dati numerici per misurare variabili, testare ipotesi, identificare pattern, fare predizioni e generalizzare scoperte.
+
+A differenza dell'approccio qualitativo, si definisce in **maniera molto più strutturata**.
+
+Anche essendo qualcosa di **oggettivo**, **non esiste sempre** un test "migliore" da scegliere, ma **sicuramente ne esiste uno "peggiore"**.
+
+- **Caratteristiche fondamentali**: Dataset su cui si basano sono standardizzati, grandi dataset per definire delle statistiche oggettive.
+
+- **Quando utilizzare la Quantitative Research?** Questo tipo di ricerca è fondamentale in questi casi:
+    - Testare ipotesi
+    - Comparare performance
+    - Identificare pattern
+    - Stabilire causalità negli esperimenti
+    - Comparare alternative
+    - Quando bisogna rispondere a domande come `quanti?`.
+
+- **Metodi Quantitativi Principali**:
+    - **Surveys**: Definiti da domande e pattern già ben definiti:
+        - **Pro**: Può raggiungere tante persone, si producono dati standardizzati.
+        - **Contro**: Soffrono di self-report bias, non riescono a stabilire causalità.
+    - **Experiments**: Provano a misurare outcomes date variabili diverse ad utenti diverse:
+        - **Pro**: Si ha molto controllo sulle variabili, possono determinare causalità, sono fine-grained rispetto ai dati.
+        - **Contro**: Ambiente costruito in maniera artificiale, è molto time-intensive e si effettuano su sample piccoli.
+
+
+## Survey Research
+
+Esistono due tipi di survey:
+
+- **Descrittivi**: Per capire quanto sia comune un fenomeno e la sua distribuzione.
+- **Analitici**: Cercare relazioni tra fenomeni, ma non si riesce a stabilirne in maniera formale causalità tra essi.
+
+### Pianificazione di un Survey
+
+Si seguono queste fasi:
+
+- **Definire il Focus della ricerca**: Cosa dobbiamo misurare di un costrutto scelto, ad esempio valutandone l'usabilità, la trust, l'usabilità...
+- **Scelta di Questionario**: Va utilizzato un preset di questionario, raramente si definiscono nuovi questionari.
+- **Pianificazione del Sample**: A chi stiamo mandando questo questionario? Come li raggiungiamo?
+- **Pilot Test**: Si testa il survey prima su piccoli gruppi, per definire i timing, la comprensione e la chiarezza del survey.
+- **Collect and Analyze**: Fase di collezione, pulizia ed analisi dei risultati ottenuti dai survey.
+
+### Progettazione di Domande di un Survey
+
+Le domande dovrebbero essere chiare e non ambigue, gestendo un idea a domanda, utilizzando un vocabolario appropriato, neutrali e rispondibili.
+
+- **Tipi di Domande**:
+    - **Domande Chiuse**
+    - **Domande Aperte**
+
+### Sample dei Survey
+
+Segue **terminologia** del contesto:
+
+- **Population**: Tutti i potenziali utenti.
+- **Sample Frame**: Tutti gli utenti raggiungibili.
+- **Sample**: Chi invitiamo al survey.
+- **Respondends**: Chi effettivamente completa il survey.
+
+Seguono **strategie** di survey:
+
+- **Random**: Tutti i membri hanno la stessa chance.
+- **Stratified**: Definire dei sottogruppi.
+- **Convenience**: Utilizzare le persone disponibili, problematico ma approccio comune.
+- **Snowball**: Lasciare che i partecipanti possano invitarne di altri.
+
+### Response Rates and Bias of Surveys
+
+- I response rates sono spesso molto bassi, di persona più alti, online tipicamente sono tra $10\% - 30\% $.
+- **Non Response Bias**: CHi non risponde potrebbe essere differente da chi risponde.
+- Esistono **strategie per favorire la terminazione del survey**, mantenendolo ad esempio brebe, spiegare perchè sia utile, ricompensando l'utente...
+
+## Experimental Design
+
+Gli **esperimenti** sono più **rappresentativi** del **metodo scientifico**, quindi permette di stabilire causalità tra feneomeni, fare preise misurazioni, capire i meccanismi di interazione tra fenomeni.
+
+- Vengono **utilizzati per**:
+    - Testare ipotesi specifiche
+    - Comparare interfacce
+    - Misurare performance
+
+### Variabili di Esperimenti - IV vs DV
+
+Esistono due tipi di variabili:
+
+- **Variabili Indipendenti (IV)**: Cosa puoi manipolare, quindi è sotto il tuo controllo, la causa nel processo che stiamo impostando.
+- **Variabili Dipendenti (DV)**: L'effetto, l'outcome del processo, quindi qualcosa di generato dal processo stesso, ad esempio l'error rate, il task completion time o numero di click per completamento di task.
+
+Quindi un ipotesi sarà impostata in un modo simile a $$ IV \: \text{affects} \:  DV $$
+
+### Tipi di Experimental Design: Between vs Within Subject
+
+- **Between Subject**: Ogni **partecipante** prova **una sola condizione**, quindi definisco gruppi per ongi condizione.
+    - **Vantaggi**: Analisi più semplice, non c'è affaticamento causato da ripetizione dello stesso task sotto diverse condizioni
+    - **Svantaggi**: Servono più partecipanti, meno espressivo da un punto di vista statistico
+
+    Un esempio potrebbe essere definire un gruppo A di utenti che utilizzano il trackpad ed un gruppo B di utenti che utilizzano il mouse durante l'esperimento.
+
+- **Within Subject**: Ogni **partecipante** prova **tutte le condizioni**, quindi stesse persone e molteplici condizioni.
+    - **Vantaggi**: Più partecipanti richiesti, più espressivo da un punto di vista statistico.
+    - **Svantaggi**: Analisi più complessa, c'è affaticamento causato da ripetizione dello stesso task sotto diverse condizioni.
+
+    Un esempio potrebbe essere definire un gruppo unico di utenti che utilizzano sia trackpad che il mouse durante l'esperimento.
+
+Si utilizza solitamente il Within Subject a causa della sua espressività statistica.
+
+### Confounds and Controls
+
+- **Confounding Variable**: Qualcosa che influenza una DV ma non è una IV esplicita.
+
+Questi vanno controllati tramite randomizzazione, bilanciando le condizioni rispetto a queste variabili, standardizzando, bloccando specifiche cose a specifici gruppi e controllando statisticamente cosa sta accadendo.
+
+### Formulazione di Ipotesi
+
+**Ipotesi**: Predizioni testabili riguardo relazioni tra variabili
+
+- **Due tipi**:
+    - **Ipotesi Nulla $H_0$**: No effetti, no differenze.
+    - **Ipotesi Alternativa $H_1$**: Esiste un effetto
+
+L'idea è quella di voler rigettare la $H_0$ per dimostrare che esiste una relazione tra le variabili secondo l'ipotesi fatta.
+
+### Power e Dimensione del Sample
+
+- **Power Analysis**: Aiuta a determinare la dimensione del sample in base ad elementi come potenza statistica attesa, livello di significatività, tipo di studio (quindi se between o within) e dimensione attesa del effetto.
+
+Solitamente, per un effetto medio e $80\%$ power sono richiesti almeno $64$ partecipanti.
+
+## Statistical Analysis
+
+Esistono **due tipi** di statistica:
+
+- **Statistica Descrittiva**: Permette la descrizione di dati. Si basano su misure come:
+    - **Indici di Centralità**: Media, mediana, moda.
+    - **Indici di Deviazione**: Deviazione standard, range, quantili.
+    - **Visualizzazione**: Rappresentazioni grafiche, boxplots.
+    
+- **Statistica Inferenziale**: Permette di trarre conclusioni sulla popolazione dati dei campioni.
+
+### Testing di Ipotesi: La logica
+
+Segue queste fasi:
+
+- Si assume che l'ipotesi nulla $H_0$ sia vera.
+- Si calcola quanto probabilmente questi risultati sono estremi se $H_0$ è vera.
+    - Se è **molto probabile** $(p < 0.05)$ allora si **rigetta** $H_0$.
+    - Se **non è molto probabile** $(p < 0.05)$ allora **non si rigetta** $H_0$.
+
+La $p$ ossia il `p-value` è la probabilità di ottenere risultati così estremi data $H_0$ vera.
+
+$\alpha$ indica invece la **significance**.
+
+### Test Comune: T-Test
+
+Compara due gruppi, si effettua in **due modi**:
+- **Sample Indipendenti T-Test**: Se Between Subject.
+- **Sample Dipendenti T-Test**: Se Within Subject.
+
+## Quality & Ethics
+
+### Validità di Esperimenti
+
+Due tipi di validità:
+
+- **Internal Validity**: Risponde alla domanda: "Davvero IV causa DV?"
+- **External Validity**: Risponde alla domanda: "Davvero i risultati generalizzano"
