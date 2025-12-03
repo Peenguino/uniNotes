@@ -1694,7 +1694,7 @@ Prima della descrizione effettiva delle fasi è utile definire la \texttt{cwnd} 
     \end{itemize}
     \item \textbf{Eventi di Perdita}: Esistono varie condizioni:
     \begin{itemize}
-        \item \textbf{Timeout}: Si setta \texttt{soglia = cwnd} e \texttt{cwnd = 1 MSS} in \textbf{Slow Start}.
+        \item \textbf{Timeout}: Si setta \texttt{soglia = 1/2cwnd} e \texttt{cwnd = 1 MSS} in \textbf{Slow Start}.
         \item \textbf{3 ACK Duplicati}: \texttt{soglia = 1/2cwnd} e \texttt{cwnd = soglia + 3MSS} in \textbf{Fast Recovery}. In particolare in questa fase possono anche accadere altri eventi:
         \begin{itemize}
             \item Se avviene un \textbf{timeout} si va in \textbf{Slow Start}.
