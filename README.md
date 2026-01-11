@@ -32,12 +32,12 @@ Gli appunti presenti in questa repo sono:
 ### Terzo Anno
 
 - **Base di Dati**:
-    - Appunti in LaTeX (in corso).
+    - Appunti in LaTeX.
 - **Reti**:
-    - Appunti in LaTeX (in corso).
+    - Appunti in LaTeX (mancante la parte sul Livello Link).
 - **Ingegneria del Software**:
-    - Appunti in Markdown (in corso).
+    - Appunti in Markdown.
 - **Interazione Uomo Macchina**:
-    - Appunti in Markdown (in corso).
+    - Appunti in Markdown.
 
     

@@ -105,10 +105,10 @@ All'utente solitamente risulta pesante ogni cambiamento effettuato al prodotto. 
 
 Noi capiamo come agire spesso in risposta a vincoli. Sviluppo quindi un modello concettuale in base a questi vincoli, che sono di 4 tipi:
 
-1. Fisico
-2. Culturale
-3. Semantico: I cartelli semafori sono il più semplice esempio di vincolo semantico. Viene assegnato arbitrariamente un significato a dei segni.
-4. Logico: Si evince un vincolo logico "intuendo".
+1. **Fisico**
+2. **Culturale**
+3. **Semantico**: I cartelli semafori sono il più semplice esempio di vincolo semantico. Viene assegnato arbitrariamente un significato a dei segni.
+4. **Logico**: Si evince un vincolo logico "intuendo".
 
 **Esempio del Lego**: il fitting tra Conceptual Model e nostro Mental Model è completamente composto dai vincoli, che ci permettono di montare il lego senza istruzioni.
 
@@ -118,7 +118,7 @@ Noi capiamo come agire spesso in risposta a vincoli. Sviluppo quindi un modello 
 2. **Lock-in**: Il lock-in mantiene un operazione attiva, **evitando** che **l'utente possa terminarla prematuramente**. Un classico esempio è il pop up che si apre in chiusura di un editor di file, previene la chiusura involontaria.
 3. **Lock-out**: Il lock-out previene che un operazione in ingresso venga effettuata involontariamente, è necessario che l'utente riconfermi la propria operazione. Un classico esempio è il pop up che chiede di essere maggiorenni per poter accedere.
 
-# Lezione 5 - Golfi di Esecuzione e Valutazione - 02/10/2025
+# Lezione 5,6 - Golfi di Esecuzione e Valutazione - 02/10/2025
 
 ## User Goals and Interaction
 
@@ -183,18 +183,18 @@ Il principio di **interazione** si basa su elementi di **sfida** in modo tale da
 
 ### Funzionamento Feed Forward e Feed Back
 
-- **Feed Forward**: si basa sull'utilizzo appropriato di signifiers, vincoli e ???
-- **Feed Back**: ???
+- **Feed Forward**: Permette di capire domande sull'esecuzione.
+- **Feed Back**: Permette di capire cosa sia successo.
 
 ### I 7 Principi Fondamentali del Design - Ulteriore Presentazione
 
-- Discoverability: Determinare il corrente stato del sistema.
-- Feedback: Avere un esito da un azione eseguita per definire lo stato del sistema.
-- Modello Concettuale: Proiezione del sistema che porta ad una convinzione ed un buon feeling sulla comprensione del sistema.
-- Affordances: Rende possibili le azioni che l'user vuole eseguire.
-- Signifiers: Migliora la discoverability per rendere migliore la comunicazione tra sistema ed utente.
-- Mappings: Link tra funzionalità e layout presentato all'utente.
-- ?:?
+- **Discoverability**: Determinare il corrente stato del sistema.
+- **Feedback**: Avere un esito da un azione eseguita per definire lo stato del sistema.
+- **Modello** Concettuale: Proiezione del sistema che porta ad una convinzione ed un buon feeling sulla comprensione del sistema.
+- **Affordances**: Rende possibili le azioni che l'user vuole eseguire.
+- **Signifiers**: Migliora la discoverability per rendere migliore la comunicazione tra sistema ed utente.
+- **Mappings**: Link tra funzionalità e layout presentato all'utente.
+- **Constraints**: Vincoli fisici, culturali, semantici e logici che guidano azioni tramite interpretazioni più semplici.
 
 ### Opportunistic vs Planned Actions
 
@@ -209,11 +209,117 @@ Vengono effettuati quindi processi di pattern matching del pensiero del subconsc
 - **Livello Viscerale**: Ci permette di rispondere velocemente, senza controllo o awareness dell'azione che stiamo compiendo. Le risposte viscerali sono rapide ed automatiche e si basano sui concetti di buono, cattivo, pericoloso...
 Da un **punto di vista di design**, molta risposta alla presentazione di un prodotto è viscerale, bravi designer utilizzano questi design estetici che tranquillizzino gli utenti in maniera primordiale. E' il livello più a contatto con il mondo.
 - **Livello Comportamentale**: Si basa sulle skill acquisite e triggerate da situazioni che matchano il pattern. Le azioni di questo livello sono largamente appartenenti al subconscio, anche essendo consapevoli della situazione, non siamo coscienti del processo nello specifico. Il feedback è parte critica di questa fase sulla gestione delle aspettative, il tutto si basa su un feedback loop in relazione alle aspettative. Esiste un processo di nudging, guidando l'utente alla formazione di un modello mentale aderente al modello concettuale del sistema.
-- **Livello Riflessivo**: Livello di analisi, conscio decision-making, ragionamento profondo. Solitamente la fase riflessiva è lenta, profonda e cognitiva. I livelli di emozioni più alti vengono dal livello riflessivo, qui assegno e peso tutti i feedback ottenuti essendo che sto anche pagando di più da un punto di vista di risorse mentali. Da un **punto di vista di design**, sappiamo che le scelte effettuate in questo livello sono quelle più durature, formano la memoria dell'utente sugli eventi accaduti. L'appeal di questo livello causa ad esempio una review positiva/negativa. ?MAPPING PRESENTE NELLE SLIDE (INSERISCI L'IMMAGINE)?
+- **Livello Riflessivo**: Livello di analisi, conscio decision-making, ragionamento profondo. Solitamente la fase riflessiva è lenta, profonda e cognitiva. I livelli di emozioni più alti vengono dal livello riflessivo, qui assegno e peso tutti i feedback ottenuti essendo che sto anche pagando di più da un punto di vista di risorse mentali. Da un **punto di vista di design**, sappiamo che le scelte effettuate in questo livello sono quelle più durature, formano la memoria dell'utente sugli eventi accaduti. L'appeal di questo livello causa ad esempio una review positiva/negativa.
 
-# Lezione 6
+<div style="text-align: center;">
+<img src="img/reflectiveBehaviouralVisceral.png" width="250">
+</div>
 
-# Lezione 7 - - 16/10/2025
+# Lezione 7 - Personas, Requirements and User Stories - 16/10/2025
+
+## Personas
+
+Una **Personas**, o **User Personas** rappresenta un potenziale utente del nostro prodotto.
+
+Questo permette quindi di **identificare meglio il target** del prodotto.
+
+Si definiscono sulla base di obiettivi e difficoltà degli utenti, raccogliendo questi dati e organizzandoli rispetto ad un contesto dato.
+
+Permette quindi di **indirizzare il design del prodotto** cercando di capire il comportamento degli utenti che lo utilizzeranno.
+
+### Tecniche di Definizione di Personas
+
+Esistono vari modi per definire queste personas, ad esempio:
+
+- **Analisi dei Task**: Click testing, analisi di utilizzo dell'app...
+- **Feedback**: Interview dirette agli utenti.
+- **Prototyping**: Sperimentare le funzionalità prima di implementarle realmente.
+
+### Tipi di Personas
+
+- **Proto Personas**: Prima forma abbozzata di personas.
+- **Personas Qualitative**: Definita da studi qualitativi, come delle interview, su segmenti di 5-30 persone.
+- **Personas Statistiche**: Definita da raccolta dati su larghi sample, per la definizione di cluster di segmenti di utenti.
+
+### Quantità e Tipi di Informazioni delle Personas
+
+- **Quantità**: La quantità di Personas da definire segue il **principio di Pareto**, secondo il quale si dice che il $20\%$ dell'utenza definirà l'$80\%$ della revenue del prodotto.
+- **Tipo di Informazioni**: Ce ne sono di diverso tipo:
+    - **Dettagli Demografici**
+    - **Dettagli Personali**
+    - **Dettagli Cognitivi**
+    - **Motivazioni ed Obiettivi**
+    - **Dettagli Comportamentali**
+
+### Personas vs Archetipi
+
+Sono entrambi rappresentazioni di un segmento di utenza, ma la differenza principale è che una **personas è qualcosa di esistente**, mentre un **archetipo è astratto**.
+
+## Requisiti
+
+Funzioni, servizi o feature di cui necessita l'utente.
+
+### Suddivisione dei Requisiti
+
+- **Business Requirements**: Punto di vista aziendale, obiettivi del business.
+- **User Requirements**: Punto di vista di input ed output per l'utente, parte fondamentale per questo corso.
+- **System Requirements**: Requisiti funzionali/non funzionali. Questi sono indipendenti dal modo in cui verranno implementati. Solitamente un requisito funzionale rappresenta una funzionalità da coprire, mentre un requisito non funzionale rappresenta caratteristiche tecniche richieste.
+
+La raccolta requisiti non può essere fatta a monte, ma va gestita durante lo sviluppo del progetto, dato che una gestione troppo monolitica porterebbe a tanti svantaggi.
+
+## User Stories
+
+Una **user story** è un **requisito espresso** dalla **prospettiva di un obiettivo di un utente**.
+
+Solitamente viene espresso con questa forma $$\text{As a ROLE, I want a FEATURE because REASON}$$
+
+Questo quindi riesce a focalizzare l'attenzione sugli utenti durante la definizione dei requisiti.
+
+- **Epic User Story**: Una user story molto ad alto livello, che in un contesto Agile non è realizzabile in uno sprint, ma che permette di definire le necessità di specifici utenti.
+    - Grandi user stories come questa vanno **splittate in user stories più** piccole per essere realmente utilizzate, oppure vanno **limitate tramite specifiche condizioni**.
+
+## Scenarios
+
+Gli scenarios sono **situazioni di cattura** di come gli utenti compiono specifici **task sull'applicazione**. Quindi permettono di descrivere la motivazione per cui gli utenti sono sull'applicazione.
+
+**Permette** quindi lo **sviluppo** di **specifiche user stories**.
+
+Gli scenarios essere splittati in casi d'uso per descrivere il flow dei task.
+
+Quindi gli **scenarios** permettono la **definizione chiara di un contesto** alla **user experience attesa**.
+
+### Scrivere uno Scenarios
+
+Uno scenarios scritto bene è breve e risponde alle **seguenti domande**:
+
+- **Chi è l'utente?**
+- **Perchè l'utente visita il sito?**
+- **Che obiettivi ha l'utente?**
+- (Opzionale) **Come l'utente raggiungerà l'obiettivo?**
+
+La scrittura di uno scenarios **parte** dallo **scenario mapping**, in cui, grazie alle personas già definite si riesce a definire un **task main** che l'**utente spera di ottenere**. Quindi il focus principale sarà sempre l'**obiettivo atteso dall'utente**.
+
+Quindi gli scenarios vengono scritti sulle User Stories, estendendo queste ultime e aggiungendo l'interazione tra il prodotto e l'utente.
+
+## Use Cases
+
+Rappresenta una **descrizione testuale** di come un utente eseguirà un **task sull'applicazione**, quindi permette di **analizzare il comportamento di risposta** del sistema **ad una richiesta**.
+
+### Use Case vs Scenarios
+
+Gli use cases si focalizzano sul singolo attore che svolge un task, invece gli scenarios descrivono una situazione più ampia, quindi la differenza principale tra i due è la prospettiva.
+
+Gli use cases permettono quindi di definire una lista di obiettivi degli utenti, e questa può essere utilizzata per stabilire costi e complessità del sistema.
+
+### Elementi di uno Use Case
+
+- **Attore**: Chiunque utilizzi il sistema.
+- **Stakeholder**: Chiunque abbia un interesse nei confronti del comportamento del sistema.
+- **Attore Primario**: Chi inizia l'interazione con il sistema.
+- **Precondizioni**: Cosa deve essere valido prima dell'esecuzione dell'azione del sistema.
+- **Triggers**: Cosa causa l'inizio dell'azione.
+- **Basic Flow**: Caso d'uso in cui tutto va secondo il comportamento atteso.
+- **Alternative Flow**: Variazione in caso di eccezioni durante l'esecuzione.
 
 # Lezione 8 - Human Errors and Mitigation Strategies - 17/10/2025
 
@@ -263,18 +369,19 @@ Abbiamo già detto come il feedback sia utile ad un utente, ma diventa inutile p
 ## Error Prevention
 
 - Capire le cause degli errori per minimizzarle.
-- Fare sensibility check, solitamente magari non viene mai fatta un azione e quindi viene effettuato un secondo check prima di effettuare l'operazione. Esempio: "Solitamente la media del bonifico è 2000$, ne viene effettuato uno da $20000 allora si chiede una conferma esplicita."
+- Fare sensibility check, solitamente magari non viene mai fatta un azione e quindi viene effettuato un secondo check prima di effettuare l'operazione. 
+    - Esempio: "Solitamente la media del bonifico è 2000$, ne viene effettuato uno da $20000 allora si chiede una conferma esplicita."
 - Possibilità dell'azione di undo.
 - Rendere semplice per l'utente capire quale sia l'errore.
 - Non bisogna trattare azioni distanti da quelle attese come errori.
 
 ### Constraint to Block Errors
 
-Vedi Slide
+Quando possibile si pongono vincoli su comportamenti errati prevedibili, tramite **controlli segregati**, in maniera tale da mantenere distanziati i controlli, oppure **moduli di controllo** separati in base al tipo di operazione che si sta eseguendo, rendendo più complesse operazioni comuni ma rendendo più difficile commettere errori. 
 
 ### Conferme e Messaggi d'Errore
 
-Vedi Slide
+Spesso vengono utilizzati messaggi di conferma o errore prima dell'esecuzione di un azione importante, sono più efficaci però i messaggi di conferma che non quelli di errore.
 
 ### Minimizzazione Slips
 
@@ -283,7 +390,7 @@ Difficile pensare di diminuire gli slips degli utenti, quindi gli slips devono e
 ### Key Principles
 
 - Bisogna mettere l'utente nella posizione di sapere tutto il necessario per operare con la nostra teconologia.
-- Vedi slide
+- Bisogna utilizzare la forza espressiva dei vincoli per guidare l'utilizzo dell'applicazione tramite forcing functions e mapping naturalmente esistenti.
 - Bisogna progettare per colmare la distanza tra due golfi
 
 # Lezione 9 - Information Architecture - 23/10/2025
@@ -294,8 +401,8 @@ Difficile pensare di diminuire gli slips degli utenti, quindi gli slips devono e
 
 - Questo design quindi si basa su una rappresentazione a strati, ossia:
     1. **Data and Content**: Information Architecture
-    2. **Functionality, Inputs and Outputs**: ...
-    3. **Presentation Layer**: ...
+    2. **Functionality, Inputs and Outputs**: Interaction Design, UI Patterns
+    3. **Presentation Layer**: UI Design, Editorial, Specific Components
 
 - Focus di questa lezione è il **layer di Data and Content**, che ha anche maggiore priorità rispetto agli altri layer dato che definirà dei constraint per i livelli successivi.
 
@@ -338,8 +445,8 @@ Difficile pensare di diminuire gli slips degli utenti, quindi gli slips devono e
 
 - Organizing content
 - Structuring navigation
-- vedi slide
-- vedi slide
+- Labeling clearly for a safe exploration
+- Creating flexible structures where users can change direction
 
 ## Information Architecture
 
@@ -383,10 +490,9 @@ Un interfaccia deve essere **findable**, al sapere di che informazione sto cerca
 
 Si utilizzano elementi standard che siano familiari con gli utenti:
 
-- **Input Controls**: vedi slide
+- **Input Controls**: checkboxes, radio buttons, lists...
 - **Navigational Components**: slider, paginazione, tags, icone
 - **Informational Components**: modali, messages boxes, icone
-- **Containers**: vedi slide
 
 # Lezione 10 - Innovation Methods - 24/10/2025
 
@@ -498,7 +604,9 @@ Il **ruolo del contesto è fondamentale**, quindi la struttura dell'**interfacci
 
 ### Adaptability
 
-No ---- VEDI SLIDE
+Bisogna sempre ricordare di non star progettando per se stessi, di conseguenza ciascun utente avrà tipi diversi di necessità, dato che ciascun utente ragionerà in maniera diversa ed avrà possibilità di eseguire azioni in maniera propria.
+
+Quindi con **adaptability** si intende la **capacità del prodotto di adattarsi** alle **necessità degli utenti**.
 
 ## User Flows
 
@@ -556,7 +664,7 @@ Quindi bisogna definire un pretotipo che ci permette di identificare una primiss
 - **Mechanical Turk**: Si finge l'esistenza di un prodotto, magari non implementando un prodotto ma fingendo la sua funzionalità, magari con delle persone dietro che simulino le funzionalità.
 - **Impersonator**: Un esempio è utilizzare un nuovo front-end su un API già esistente, per raccogliere le analytics riguardo il nostro front-end.
 - **Pinocchio**: Un dummy non funzionante del prodotto che abbiamo in mente. Ad esempio un cellulare finto che renda l'idea di cosa voglia dire andare in giro con un cellulare.
-- **One Night Stand**: ??? vedi slide ???
+- **One Night Stand**: Completo servizio breve offerto ad un segmento di utenti "favorevoli". Nell'ottica del failing fast, se questo non dovesse funzionare all'inizio allora non funzionerà nemmeno dopo il completo sviluppo.
 - **Facade**: Noleggio di prodotti ed equipaggiamenti, per simulare un prodotto offerto da noi.
 
 ### Minimum Viable Product
@@ -608,11 +716,13 @@ La fedeltà del prototipo è quanto questo si avvicina al prodotto finale, non s
 
 ## Wireframe vs Mockup vs Prototypes
 
-- Wireframe: Non si testano, danno solo un idea grafica e la struttura del layout.
-- Mockup: Composizione di Wireframe per simulare l'esperienza. Solitamente ha anche immagini, colori, testi...
-- Prototipo: Interattivo e potenzialmente anche funzionale.
+- **Wireframe**: Non si testano, danno solo un idea grafica e la struttura del layout.
+- **Mockup**: Composizione di Wireframe per simulare l'esperienza. Solitamente ha anche immagini, colori, testi...
+- **Prototipo**: Interattivo e potenzialmente anche funzionale.
 
-    ??? IMMAGINE NELLE SLIDE CHE DEFINISCE BENE LE DIFFERENZE TRA QUESTI TRE ???
+<div style="text-align: center;">
+    <img src="img/mockups_pre_prototypes.png" width="600">
+</div>
 
 # Lezione 13 - Design for Everyone and Everywhere - 06/11/2025
 
@@ -694,12 +804,11 @@ E non sono mutualmente esclusivi, quindi possono essere usati in combinazione.
 
 - **Tiny Tweaks**:
     - Layout che resta simile tra tutti gli schermi
-<div style="text-align: center;">
     - Magari abbiamo progettato un interfaccia per mobile, ma si adatta 
     involontariamente bene al fisso, quindi sistemo solo qualcosa, in maniera ridotta.
-<img src="img/pattern1.png" width="450">
-
-</div>
+    <div style="text-align: center;">
+        <img src="img/pattern1.png" width="450">
+    </div>
 - **Column Drop**:
     - Si inizia con una sola colonna per mobile e aggiungendo larghezza allora si aggiungono colonne e gli elementi scivolano alla riga precedente affiancandosi alla colonna.
     - Viene utilizzato in contesti content-heavy, diventa multicolonna solo in contesti più larghi.
@@ -792,17 +901,17 @@ Non dipendono dalla piattaforma, e da questi possono essere esportati i formati 
 
 Documentazione per applicazioni web, per pattern visivi, tramite codice per implementazioni reali.
 
-# Lezione 14 - Usability ...  - 07/11/2025
+# Lezione 14 - Usability and Evaluation Techniques - 07/11/2025
 
 ## Definizione di Usability di Nielsen
 
 Questa definizione potrebbe essere utile da un punto di vista formativo per il progetto.
 
-- Learnability: Quanto è facile capire come si utilizza un interfaccia la prima volta
-- Efficiency: Quanto velocemente, una volta capito il design dell'interfaccia, l'utente può concludere un task in quanto tempo?
-- Memorability: Passato un po' di tempo, quanto è facile per l'utente ricordarsi come utilizzare il sistema.
-- Errors: Quanto l'interfaccia evita all'utente di fare errori.
-- Satisfaction: Quanto è piacevole l'utilizzo di quell'interfaccia.
+- **Learnability**: Quanto è facile capire come si utilizza un interfaccia la prima volta
+- **Efficiency**: Quanto velocemente, una volta capito il design dell'interfaccia, l'utente può concludere un task in quanto tempo?
+- **Memorability**: Passato un po' di tempo, quanto è facile per l'utente ricordarsi come utilizzare il sistema.
+- **Errors**: Quanto l'interfaccia evita all'utente di fare errori.
+- **Satisfaction**: Quanto è piacevole l'utilizzo di quell'interfaccia.
 
 ## Definizione di Usability secondo la ISO9241-11
 
@@ -1049,8 +1158,8 @@ I problemi sono quindi casi di falsi negativi e falsi positivi.
 
 È quindi capire se siamo in Precision oppure Recall.
 
-- Precision: Se la cosa peggiore è un falso allarme (falso positivo), come nel caso dello spam detection, anche se dovesse capitare un falso positivo non sarebbe un problema.
-- Recall: Contesto in cui la cosa peggiore è missare una detection, quindi i falsi negativi, come nei casi di medical screening.
+- **Precision**: Se la cosa peggiore è un falso allarme (falso positivo), come nel caso dello spam detection, anche se dovesse capitare un falso positivo non sarebbe un problema.
+- **Recall**: Contesto in cui la cosa peggiore è missare una detection, quindi i falsi negativi, come nei casi di medical screening.
 
 ## Design Process
 
@@ -1140,14 +1249,14 @@ Esistono anche delle **classificazioni di queste periferiche**, come :
         - **Diretta/Indiretta**: Rispettivamente stylus e mouse o trackpad.
         - **Assoluta/Relativa**: La distanza coperta è rispettivamente la stessa oppure scalata con un coefficiente.
         - **Isotonica/Elastica/Isometrica**:
-            - Isotonica: Dispositivo che può muoversi
-            - Isometrica: Dispositivo che genera spostamento in base alla forza applicata.
-            - Elastica: Versione di una isometrica che applica anche resistenza grazie alla sua molla.
+            - **Isotonica**: Dispositivo che può muoversi
+            - **Isometrica**: Dispositivo che genera spostamento in base alla forza applicata.
+            - **Elastica**: Versione di una isometrica che applica anche resistenza grazie alla sua molla.
         - **Posizione/Rate Control**: Rispettivamente un mouse che riporta la distanza (che sia scalata o meno), ed uno stick che genera spostamento in base ad una velocità stabilita dall'angolo dello stick stesso.
     - **Eye Tracking**: Tracker che permettono di generare ad esempio heatmap di attenzione, questi analizzano il movimento degli occhi dell'utente.
         - **Metodi di Eye Tracking**: Esistono varie tipologie:
-            - Attiva: Eroghiamo energia per acquisire informazioni
-            - Passiva: È sufficiente l'energia dell'ambiente
+            - **Attiva**: Eroghiamo energia per acquisire informazioni
+            - **Passiva**: È sufficiente l'energia dell'ambiente
 
             Un metodo comune di tracking è il **Bright Pupil**, che emettendo un fascio di infrarossi perpendicolare alla retina per provocare un completo riflesso come se fosse un punto. Alternativamente esiste un **Dark Pupil** che al contrario utilizza fasci infrarossi paralleli che generano la sagoma della parte interna.
     - **Array di Microfoni**: Ogni microfono acquisisce una frequenza, quindi stiamo assumendo una matrice/array ed ognuno di questi acquisisce una frequenza. Dato che però l'aria genera attrito nella sua interazione con l'aria, possiamo dedurre la sorgente dell'audio in termini di posizione ed angolo di ampiezza. Grazie a meccanismi simili vengono implementati anche gli algoritmi di reiezione del rumore.
@@ -1178,12 +1287,12 @@ Esistono anche delle **classificazioni di queste periferiche**, come :
 
         - **3D Scanning Attivo**: Ne esistono di vari tipi:
             - **Time Of Flight**: Un fascio laser ad infrarossi che ci restituisce la distanza della profondità, ma perdendo informazione su colore o precisione sul punto di caduta del fascio laser. I time of flights vengono anche messi in matrice, quindi attualmente molto utilizzati in contesti di riprese senza violazione della privacy degli utenti sorvegliati.
-            - Triangolazione: Vedi slide
+            - **Triangolazione**: Basato sull'utilizzo di scanner laser 3D attivi, viene proiettato questo laser sull'oggetto ed una lente acquisisce il raggio riflesso dall'oggetto.
             - **Structured Light**: Proietta una matrice con un pattern regolare, che verrà deformata dalla profondità dell'oggetto (solo la profondità, si perdono le altre informazioni), la tecnologia su cui è basata la **Microsoft Kinect**. Solitamente messo in combinazione con un altra telecamera per recuperare anche informazioni sui colori, quindi ad esempio nella Kinect venivano prodotte due immagini, una per la `depth` e una per `rgb`.
     - **IMU - Inertial Measurement Unit**: Utilizzando solo un acceleratore dovremmo ottenere lo spazio integrando due volte l'accelerazione acquisita, ed in questo modo si produrrebbero due costanti, dette **drift**. Quindi non si usa solo un accelerometro, ma anche un magnetometro ed un giroscopio, ciascuno da tre dimensioni, e si compensano a vicenda sulla perdita di informazione di uno.
     - **Heart Rate Wearable Monitor**: Quali sono le differenze tra battito cardiaco misurato da uno smartwatch o un reale elettrocardiogramma?
         - **ECG (Elettrocardiografia)**: Si misura l'attività elettrica effettiva generata dall'attività cardiaca. Misura il vettore elettrico del cuore, quindi si posiziona un set di sensori, per generare uno spettro ed analizzarne il suo movimento, e non solo la frequenza cardiaca.
-        - **PPG**: Misura "le conseguenze" dell'attività cardiaca, questo perchè il passaggio di sangue può essere letto "tramite la lettura con luce verde" che subisce poco la variazione di movimento ma non riesce a recuperare informazioni ottimali sulla saturazione. Tramite la lettura con luce rossa invece subisce molto il movimento ma riesce ad acquisire anche informazioni sulla saturazione. ()
+        - **PPG**: Misura "le conseguenze" dell'attività cardiaca, questo perchè il passaggio di sangue può essere letto "tramite la lettura con luce verde" che subisce poco la variazione di movimento ma non riesce a recuperare informazioni ottimali sulla saturazione. Tramite la lettura con luce rossa invece subisce molto il movimento ma riesce ad acquisire anche informazioni sulla saturazione.
     
 
 # Lezione 18 - Interfacce Utente II - 20/11/2025
@@ -1208,11 +1317,116 @@ Con **Naturale** si intende un tipo di **gesture che non va insegnata**, ma in q
 
 Interfaccia che risulti naturale da utilizzare in maniera tale da **fittare le skill** ed il contesto dell'utente. In questo modo però gli **utenti** saranno **meno avvezzi all'insegnamento**, dato che hanno applicato **zero effort** per utilizzare il **primo set di feature base**.
 
-# Lezione 19 - Qualitative Research Methods in HCI - DA RIPRENDERE - 27/11/2025
+# Lezione 19 - Qualitative Research Methods in HCI - 27/11/2025
+
+## Understanding Qualitative Research
+
+Bisogna capire quando sia necessario utilizzare questo tipo di ricerca, nello specifico la si utilizza quando bisogna capire il perchè delle **azioni** e dei **comportamenti degli utenti**.
+
+Viene quindi utilizzato nel caso in cui si vuole **andare in verticale** sull'analisi di qualcosa, **non soffermandosi solo su dati analitici**.
+
+Esistono delle caratteristiche core a riguardo:
+
+- **Naturalistic Inquiry**: Studiare gli utenti in un contesto reale
+- **Holistic Perspective**: Capire l'intera situazione
+- **Participants Viewpoint**: Vedere il mondo dal punto di vista dell'utente
+- **Flexibility**: Adattamento e analisi del cambiamento
+- **Rich Description**: Descrizione dettagliata delle esperienze utente e del contesto
+- **Iterative Process**: L'analisi inizia già dalla raccolta dei dati
+
+## Interviews
+
+Adatte alla raccolta di informazioni soggettive, permettono l'identificazione del **come** e del **perchè**, non adatte ad analisi oggettive e statistiche.
+
+### Tipi di Interviews
+
+- **Interview Strutturate**: Stesse domande per ogni utente, in un ordine prefissato, possono essere domande qualitative e quantitative. Sono semplici da comparare ma poco flessibili. Da utilizzare nel caso in cui si sappia precisamente cosa chiedere.
+- **Interview Semi Strutturate**: Struttura non fissa, con domande flessibili e con ordine non prestabilito. Si cerca un compromesso tra forma e flessibilità, ma risulta difficile trovare l'equilibrio.
+- **Interview Non Strutturate**: Massima flessiblità, la conversazione avanza naturalmente, non si mantiene quindi alcuna struttura prefissata.
+
+### Planning an Interview
+
+- **Definisci le domande**: Cosa vogliamo capire? Perchè le interview dovrebbero essere un buon modo per capirlo?
+- **Identifica i Partecipanti**: Chi può rispondere alle domande? Come verrà effettuata la fase di recruiting?
+- **Sviluppa una Guida della Interview**: Definire quale sia il topic principale.
+- **Pilot della Interview**: Prima di essere realmente avviata, andrebbe testata.
+
+## Observations
+
+Spesso gli utenti non dichiarano esplicitamente cosa vogliono, di conseguenza vanno osservati per poter ottenere le informazioni che non ci vengono direttamente fornite, esistono quindi diversi **modi di osservazione**:
+- **Direct Observation**: Ricercatore osserva l'utente direttamente.
+- **Video Recording**: Ricercatore analizza registrazioni dell'utente.
+- **Diary Studies**: Ricercatore analizza un self report dell'utente.
+- **Ethnography**: Immersione da parte del ricercatore nel contesto dell'utente.
+    - Si divide in **fasi diverse**:
+        - Accesso al contesto dell'utente.
+        - Sviluppo di una familiarità con il contesto utente.
+        - Raccolta dati
+        - Analisi dei dati
+
+## Analisi di Dati Qualitativi
+
+L'analisi di dati qualitativi comprende **fasi** di **espansione** e **compressione**.
+
+I due approcci tra loro alternativi sono:
+- **Induttivo**: I temi emergono dai dati, in bottom-up.
+- **Deduttivo**: Si applicano framework preesistenti, in top-down.
+
+### Metodi di Analisi Dati Qualitativi
+
+- **Affinity Diagramming**: Costruzione di una collezione di dati in maniera collaborativa e bottom up, basata su quattro fasi:
+    - Creazione di note, dividendo tutti i dati in piccole parti
+    - Suddivisione in cluster dei dati
+    - Review dei cluster ed attenta organizzazione
+    - Trasferimento in digitale dei cluster di dati
+
+    Molto utile nei casi in cui bisogna effettuare analisi in team.
+
+- **Thematic Analysis**: Identificazione sistematica in temi, secondo sei steps:
+    - Familiarizzazione con il contesto
+    - Generazione di *codici*, assegnando ai dati label utili
+    - Ricerca per temi, raggruppando i *codici*
+    - Revisione dei temi, garantendo che siano consistenti rispetto ai dati raggruppati rispetto ad essi
+    - Scrittura dei temi in una narrativa
+
+    Il focus di questo tipo di analisi è quindi il tema, bisogna chiedersi quali di questi siano importanti e rilevanti per la ricerca che si sta effettuando, e che sia internamente consistente rispetto ai dati che cerca di raggruppare.
+
+### Qualità di Dati Qualitativi (Validità, Reliability e Trasparenza)
+
+Bisogna analizzare la **validità** dei dati raccolti, verificandola tramite specifiche tecniche come:
+- **Triangolazione**: Confronto di stessi dati presi da fonti diverse
+- **Member Checking**: Validazione dei partecipanti
+- **Peer Debriefing**: Analisi con colleghi
+- **Analisi di Casi Negativi**: Bisogna analizzare eventuali evidenze negative
+- **Ricche Descrizioni**
+
+Anche la **reliability** è un fattore fondamentale, bisogna chiedersi se anche altri ricercatori sarebbero arrivati alle stesse conclusioni, bisogna quindi astrarre il più possibile da framework "soggettivi", attenendosi a protocolli chiari e procedure prestabilite e discusse in team.
+
+La **trasparenza** invece permette di tener traccia delle tecniche utilizzate, mantenendo "aperta" la scienza tramite la quale si è arrivati a determinate conclusioni. Questo facilita il supporto esterno e l'eventuale estensione della ricerca.
+
+### Considerazioni Etiche e Punti da Evitare
+
+Vanno fatte alcune **considerazioni** etiche:
+- Ogni ricerca andrebbe sostenuta da un consenso informato
+- Va mantenuta la privacy degli utenti
+- Vanno tenute in conto dinamiche come la compensazione ed eventuale utenza vulnerabile
+- Andrebbe evitato l'uso di stereotipi
+
+I punti da evitare sono invece:
+- **Bias di Conferma**: Vedere solo cosa ci si aspetta di vedere
+- **Perdita di Prospettiva Critica**
+- **Analisi Superficiale**
+- **Frasi schierate a favore della tesi della ricerca**
+- **Over Generalizzazione**
+- **Evidenze Inadeguate**
+- **Ignorare i Casi Negativi**
+- **Metodi Poco Chiari**
+
+Quindi risulta fondamentale **documentare** il processo di ricerca passo passo, cercando di mixare **analisi qualitativa** e **quantitativa**.
 
 # Lezione 20 - Quantitative Research Methods in HCI - 28/11/2025
 
-## Understanding Qunatitative Research
+## Understanding Quantitative Research
 
 La ricerca quantitativa si occupa di collezionare ed analizzare dati numerici per misurare variabili, testare ipotesi, identificare pattern, fare predizioni e generalizzare scoperte.
 
@@ -1288,7 +1502,7 @@ Seguono **strategie** di survey:
 
 ## Experimental Design
 
-Gli **esperimenti** sono più **rappresentativi** del **metodo scientifico**, quindi permette di stabilire causalità tra feneomeni, fare preise misurazioni, capire i meccanismi di interazione tra fenomeni.
+Gli **esperimenti** sono più **rappresentativi** del **metodo scientifico**, quindi permette di stabilire causalità tra fenomeni, fare precise misurazioni, capire i meccanismi di interazione tra fenomeni.
 
 - Vengono **utilizzati per**:
     - Testare ipotesi specifiche
@@ -1380,3 +1594,67 @@ Due tipi di validità:
 
 - **Internal Validity**: Risponde alla domanda: "Davvero IV causa DV?"
 - **External Validity**: Risponde alla domanda: "Davvero i risultati generalizzano"
+
+# Lezione 21 - Human Factors & Measurement
+
+## Human Factors
+
+Bisogna progettare sistemi rispetto ai limiti e le facoltà umane (sociali, fisiche e cognitive), mantenendo sempre il focus nell'HCI su come le persone percepiscono e pensano durante l'interazione con il sistema.
+
+Questi tipi di dati possono essere raccolti tramite misurazioni, per poter **analizzare** **performance**, **esperienza** e **safety** dell'interazione con il sistema.
+
+**Fondamentale** risulta anche il **mapping** tra gli **indicatori** e i **costrutti**, infatti non misuriamo direttamente costrutti ma i loro indicatori, o almeno qualcosa che ci aspettiamo che sia mappabile sui costrutti.
+
+## Fundamentals of Psychometrics
+
+La **psicometria** è la **scienza dell'interpretazione** di **misure psicologiche**. Gli obiettivi di questa scienza sono quelli di creare **strumenti affidabili**, **garantire che siano validi** e **permettere la stima dell'errore**.
+
+### Validity vs Reliability
+
+- **Validity**: Stiamo realmente misurando cosa crediamo di star misurando? Va quindi misurata la validità del contenuto e la validità dei costrutti utilizzati, basandosi su specifici criteri.
+- **Reliability**: Quanto del segnale raccolto è rumore e quanto invece è reale? Esistono tre tipi di reliability:
+    - **Internal Reliability**: Oggetti che dovrebbero misurare la stessa cosa sono realmente correlati?
+    - **Test-retest Reliability**: Se il costrutto non cambia nel tempo, i punteggi restano gli stessi?
+    - **Inter-rater Reliability**: Quando umani devono valutare il comportamento del sistema, sono tra loro d'accordo?
+
+### Scale di Misurazione e Likert
+
+- **Scale di Misurazione**: Ne esistono di diversi tipi:
+    - **Nominale**: Categorie non ordinate.
+    - **Ordinale**: Ordinate ma senza alcuna dimensione agli intervalli.
+    - **Intervallo**: Tutti gli elementi a distanza uguale tra loro, ma con uno zero che non ha alcuna semantica.
+    - **Ratio**: Distanza uguale, zero con una semantica.
+- **Likert**: Strettamente ordinati, trattati spesso come un intervallo approssimato. Si accumulano quindi risultati su una somma o un punteggio. Molto importante quando bisogna scegliere quale tesi vada testata.
+
+## Usability Scales
+
+Esistono diverse tipologie di scale di usabilità:
+
+- **System Usability Scale (SUS)**: Basato su 10 punti, con valori da 1 a 5, le domande dispari sono positive e quelle pari sono negative. Alla fine viene sintetizzato tutto in uno score da $1-100$. Ha dei punti di forza, dato che è molto versatile e funziona in diversi contesti. Non può però essere usata sempre, dato che mixa dati oggettivi a interpretazioni personali. Va usata se cerchiamo uno score comparabile e semplice da ottenere.
+- **UMUX e UMUX Lite**: Rispettivamente 4 e 2 domande basate su concetti di usabilità definita dalla ISO. Correla molto bene con la SUS, ma le poche domande potrebbero portare a tanto rumore sul risultato finale. Va utilizzato quindi in contesti in cui sappiamo di non avere molta attenzione da parte dell'utente, come in contesti mobile.
+- **BUS-11**: Utilizzata per i chatbot, 11 domande e 5 punti likert. Ha vari punti di forza, come l'essere specifica per i chatbot e la sua convergenza di validità con la scala UMUX-Lite.
+
+## Mental Workload
+
+Definisce quante risorse mentali sono richieste all'utente per eseguire una specifica azione. Non deve essere ne troppo alto ne troppo basso.
+
+La relazione tra **mental workload** e **performance utente** non è scontata, e viene analizzata dalla **legge di Yerkes-Dodson**:
+
+<div style="text-align: center;">
+    <img src="img/leggeYerkesDodson.png" width="650">
+</div>
+
+Il mental workload può essere anche misurato tramite indicatori fisici come il battito cardiaco, la dilatazione della pupilla, movimento dell'occhio. Chiaramente la raccolta di questo tipo di dati può risultare invasivo per l'utente.
+
+## Data Quality
+
+Dati inconsistenti portano a **cattive misurazioni**, quindi andrebbe ridotto al minimo il **rumore prodotto** sui **dati raccolti**, evitando al massimo errori tecnici o perdita d'attenzione dell'utente durante la raccolta dati. I **dati inconsistenti** possono portare a **falsi negativi** o **falsi positivi**.
+
+Quindi la progettazione della raccolta dati dovrebbe seguire questi principi:
+- Struttura chiara con istruzioni coincise
+- Limiti di tempo
+- Compenso corretto rispetto all'effort dell'utente
+- Vanno utilizzati strumenti come questionari pilota
+- Vanno evitate domande che coprono più argomenti
+- Andrebbero effettuati dei check dell'attenzione e di comprensione dell'utente durante il task
+- Filtri per bot e cheaters.
