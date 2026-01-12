@@ -154,15 +154,14 @@ Il principio di **interazione** si basa su elementi di **sfida** in modo tale da
 - Descrizione degli Stati:
     - **Golfo d'Esecuzione**:
 
-        1. **Specificare** il Goal
-        2. **Pianificare** il Goal
-        3. **Specificare** il Goal
-        4. **Eseguire**
+        1. **Pianificare** il Goal
+        2. **Specificare** il Goal
+        3. **Eseguire**
     - **Golfo di Valutazione**:
 
-        5. **Percepire** l'Esito
-        6. **Interpretare** l'Esito
-        7. **Comparare** l'Esito 
+        4. **Percepire** l'Esito
+        5. **Interpretare** l'Esito
+        6. **Comparare** l'Esito 
 
 - Spesso queste **fasi** sono **iterate** oppure basate su **feedback loop**, ossia che si interrompono su una specifica fase per testarla.
 
@@ -339,7 +338,7 @@ Gli incidenti avvengono a causa di insiemi di sorgenti. Quindi vanno seguiti dei
 - Identificare la causa e non curare solo i sintomi.
 - Rendere oggettivo il mondo, per rendere evidente tramite dati delle scelte
 - Migliorare problemi sul prodotto per il bene generato.
-- Ricercare miglioramente e accettare il cambiamento.
+- Ricercare miglioramento e accettare il cambiamento.
 - Embrace della cultura del progresso.
 
 ## Classificazione di Errori
@@ -421,7 +420,7 @@ Difficile pensare di diminuire gli slips degli utenti, quindi gli slips devono e
     - Successivamente può diventare difficili, ma l'ingresso confident dell'utente può spingerlo a continuare.
     - Da evitare lunghe istruzioni, tempi di caricamenti lunghi o pubblicità vanno contro questo pattern.
 3. **Satisficing**: Buono abbastanza, meglio qualcosa che funziona adesso che qualcosa che funzionerà meglio dopo.
-    - Satisficing: Satisftying + Sufficing.
+    - Satisficing: Satisfying + Sufficing.
     - Bene abbastanza è meglio di ottimo in relazione all'investimento di tempo e impegno.
     - Scelta delle etichette che non generi confusione tra i significati nell'interfaccia.
     - Cambiare qualcosa dell'interfaccia, anche se dovesse velocizzare i processi dell'utente, questo probabilmente troverà comodo non cambiare e restare nella routine di cui è abituato, diventa quasi una sorta di debito nei confronti del design, dato che durante la progettazione bisogna trovare un compromesso con questo effetto.
@@ -441,12 +440,10 @@ Difficile pensare di diminuire gli slips degli utenti, quindi gli slips devono e
 
 ### Systematic Ways to Support Patterns
 
-**vedi dettagli slide**
-
-- Organizing content
-- Structuring navigation
-- Labeling clearly for a safe exploration
-- Creating flexible structures where users can change direction
+- Dare una struttura fissa al contenuto
+- Strutturare la navigazione
+- Utilizzo di labels chiare per una navigazione sicura
+- Mantenere flessibilità durante la navigazione, in modo tale da lasciare la possibilità all'utente di cambiare direzione.
 
 ## Information Architecture
 
@@ -466,7 +463,7 @@ Come viene categorizzato il contenuto della nostra interfaccia? Questo può esse
 
 2. **Subjective Organization Schemes**: Non sono oggettivi ma dipendono dagli utenti. Difficili da modellare perchè devono essere aderenti al modello mentale dell'utente. Degli esempi potrebbero essere:
     - **Topic Schema**: Ad esempio le sezioni di Netflix in apertura.
-    - Task Schema: Schema che cercano di guidare l'utente nei task che deve effettuare.
+    - **Task Schema**: Schema che cercano di guidare l'utente nei task che deve effettuare.
     - **Audience Schema**: Clusterizzare in base al segmento utente (bambini, adulti...)
     - **Metaphor Schema**: Usare metafore per clusterizzare funzionalità (come il cestino come astrazione sopra fs di un sistema).
 
