@@ -31,7 +31,7 @@ Gli appunti presenti in questa repo sono:
 
 ### Terzo Anno
 
-- **Base di Dati**:
+- **Basi di Dati**:
     - Appunti in LaTeX.
 - **Reti**:
     - Appunti in LaTeX (mancante la parte sul Livello Link).
@@ -39,5 +39,12 @@ Gli appunti presenti in questa repo sono:
     - Appunti in Markdown.
 - **Interazione Uomo Macchina**:
     - Appunti in Markdown.
+- **Sviluppo Applicazioni Mobili (SAM)**:
+    - Appunti in Markdown (in corso) (*).
+- **Sviluppo Applicazioni Web (SAW)**:
+    - Appunti in Markdown (in corso) (*).
+- **Introduzione IA**:
+    - Appunti in Markdown (in corso).
 
+    (*): I due file `main.md` di SAW e SAM non tentano di coprire tutto il materiale fornito (slide), ma costituiscono più un indice del materiale stesso, con approfondimenti basati sul contenuto delle lezioni.
     
