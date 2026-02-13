@@ -40,11 +40,9 @@ Gli appunti presenti in questa repo sono:
 - **Interazione Uomo Macchina**:
     - Appunti in Markdown.
 - **Sviluppo Applicazioni Mobili (SAM)**:
-    - Appunti in Markdown (in corso) (*).
+    - Appunti in Markdown (in corso).
 - **Sviluppo Applicazioni Web (SAW)**:
-    - Appunti in Markdown (in corso) (*).
+    - Appunti in Markdown (in corso).
 - **Introduzione IA**:
     - Appunti in Markdown (in corso).
-
-    (*): I due file `main.md` di SAW e SAM non tentano di coprire tutto il materiale fornito (slide), ma costituiscono più un indice del materiale stesso, con approfondimenti basati sul contenuto delle lezioni.
     

@@ -342,3 +342,197 @@ Non si procede però espandendo due nodi contemporaneamente, si sceglie infatti 
 </div>
 
 Quindi tutti questi sono detti di ricerca non informata perchè si basano solo sulla definizione del problema.
+
+# Lezione 4 - Strategie di Ricerca Informata o Euristica - 12/02/2025
+
+La ricerca informata si basa sulla conoscenza specifica di dove si potrebbe trovare l'obiettivo per accelerare la ricerca nello spazio degli stati.
+
+**Funzione Euristica**: si definisce una funzione $h(n)$, costo stimato del cammino.
+
+## Ricerca Best-First Greedy
+
+Espandere prima il nodo con il valore più basso di $h(n)$, quindi $f(n) = h(n)$, con $f(n)$ il costo della Best-First.
+
+- Esempio con distanza in linea d'aria, oltre alle informazioni sul problema descritto, abbiamo anche una conoscenza sulla funzione $h$.
+
+Si basa solo sull'euristica.
+
+### Analisi di Best First Greedy:
+
+- Completa in spazi di stati finiti, ma non in quelli infiniti.
+- Non ottima rispetto al costo
+- Complessità spaziale e temporale $O(|V|)$
+
+## Ricerca A*
+
+Ricerca best-first che usa la seguente funzione di valutazione:
+
+$$ f(n) = g(n) + h(n) $$
+
+dove
+
+- $f(n)$: costo stimato del cammino migliore che continua da $n$ fino ad un nodo
+obiettivo
+- $g(n)$: costo del cammino dal nodo iniziale ad $n$.
+- $h(n)$: costo stimato del cammino più breve da $n$ ad uno stato obiettivo.
+
+Quindi il concetto fondamentale è tener conto sia del costo fino ad ora sia il costo dell'euristica in $f(n)$.
+
+### Analisi A*
+
+- Completa
+- Ottima rispetto al costo se l'euristica $h(n)$ è **ammissibile**.
+
+### Ammissibilità di Euristica
+
+Un **euristica** è **ammissibile** se **non sovrastima** mai il **costo** per raggiungere un obiettivo, quindi se $h(n) \leq h^*(n)$, dove $h^*(n)$ è il costo minimo di un cammino da $n$ fino ad un goal.
+
+### Dimostrazione: Se h() ammissibile allora A* è ottimo
+
+Si imposta per assurdo:
+
+$A^*$ restituisce un cammino di costo $C$, ma esiste un $C^* < C$
+
+Allora certamente esiste un nodo n sul cammino ottimo che non è stato espanso.
+
+Denotiamo con
+- $g^*(n)$ costo del cammino ottimo dall'inizio fino ad n
+- $h^*(n)$ costo del cammino dottimo da n fino ad un obiettivo
+
+Quindi:
+
+- $f(n) > C^*$, altrimenti n sarebbe stato espanso.
+- $f(n) = g(n) + h(n)$, per definizione.
+- $f(n) = g^*(n) + h(n)$, siccome n si trova su un cammino ottimo.
+- $f(n) \leq g^*(n) + h^*(n)$, siccome $h(n)$ è ammissibile allora $h(n) \leq h^*(n)$.
+- $f(n) \leq C^*$, dato che per definizione (vedi slide)
+
+quindi per 1. e 5. abbiamo raggiunto l'assurdo.
+
+### Euristica Consistente
+
+Un **euristica** è **consistente** se, per ogni nodo n, e per ogni successore $n'$ di n generato da un azione $a$ risulta essere: $$ h(n) \leq c(n,a,n') + h(n') $$
+
+<div style="text-align: center;">
+    <img src="img/euristicaConsistente.png" width="350">
+</div>
+
+**Consistente** implica **ammissibile**, più **forte come condizione**.
+
+Se $h$ è un euristica consistente allora $f = g + h$ non decresce mai lungo i cammini.
+
+### Euristica Inconsistente
+
+Possiamo trovarci con **più cammini** che raggiungono lo **stesso stato**.
+
+Se ogni cammino nuovo ha costo inferiore al precedente finiremo con l'avere più nodi corrispondenti a quello stato sulla frontiera.
+
+Inconsistente non implica non ammissibile.
+
+### Algoritmo A* con Euristica Consistente, Inconsistente, Inammissibile
+
+- **A\* con Euristica Consistente**:
+    - **Ottimo rispetto** al **costo**.
+    - La **prima volta** che **raggiungiamo uno stato** sarà su un **cammino ottimo**.
+- **A\* con Euristica Inconsistente**:
+    - Possiamo trovarci con **più cammini** che raggiungono lo **stesso stato**.
+    - Se ogni cammino nuovo ha costo inferiore al precedente finiremo con l'avere più nodi corrispondenti a quello stato sulla frontiera, portando ad un **aggravio** di **costo spaziale e temporale**.
+- **A\* con Euristica Inammissibile**:
+    - Può essere ottima rispetto al costo in due casi
+        - Esiste un **cammino ottimo** rispetto al costo lungo cui $h(n)$ è **ammissibile per tutti i nodi sul cammino**.
+        - Se la soluzione ottima ha costo $C^*$ e la seconda soluzione migliore ha costo $C_2$, e se $h(n)$ sovrastima i costi, ma al massimo di una quantità $k \leq C_2 - C^*$
+
+### Confini della Ricerca A* e Caratteristiche A*
+
+- Si basa sullo sviluppo di bande concentriche basate sulla $f$.
+- **Caratteristiche di A\***: Assumendo che $C^*$ sia costo del cammino della soluzione ottima:
+    - **A\* espande tutti i nodi** che possono essere raggiunti dallo stato iniziale su **un cammino in cui per ogni nodo** si ha $f(n) < C^*$.
+    - **A\* può espandere** alcuni dei nodi sul confine obiettivo, quindi dove $f(n) = C^*$ prima di selezionare il nodo obiettivo.
+    - **A\* non espande** alcun nodo con $f(n) > C^*$
+
+### A* come Algoritmo Ottimamente Efficiente
+
+Fornendo ad **A\* un euristica consistente** è **ottimanente efficiente**, quindi qualsiasi altro algoritmo che estente cammini di ricerca a partire dallo stato iniziale e sua la stessa euristica deve espandere tutti i nodi che sono certamente espansi da A*.
+
+### Ricerca Soddisfacente
+
+Il problema di A* è che **espande un grande numero di nodi**, di conseguenza preferiamo a volte accettare **soluzioni subottime** ma **sufficientemente buone**, solo per **diminuire in numero di nodi esplorati**.
+
+### Ricerca A* Pesata
+
+Viene definita un $W > 1$ fattore moltiplicativo per dare maggiore peso al valore dell'euristica, quindi $f(n) = g(n) + W \: h(n)$
+
+In questo modo possiamo esplorare meno stati con un trade-off sul costo, quindi assumendo che la soluzione ottima abbia costo $C^*$, allora troverà una soluzione di costo compreso tra $C^*$ e $W \times C^*$.
+
+In realtà la **ricerca A\* pesata** può essere vista come una **generalizzazione delle altre**.
+
+<div style="text-align: center;">
+    <img src="img/generalizzazioneTramitePeso.png" width="400">
+</div>
+
+### Varianti A* per Limitazioni
+
+- **Algoritmi di Ricerca Subottima**:
+    - **Ricerca a subottimalità limitata**: Cerchiamo una soluzione con granzia che si trovi entro un fattore costante $W$ del costo ottimo, come $A^*$ pesata.
+    - **Ricerca a costo limitato**: cerchaimo una coluzione il cui costo sia inferiore ad una costante C.
+    **Ricerca a costo illimitato**: Accettiamo una soluzione di qualsiasi costo, purchè riusciamo a trovarla rapidamente.
+- **Ricerca con Memoria Limitata**: Si tenta tramite due ottimizzazioni di migliorare l'utilizzo di memoria dell'algoritmo $A^*$.
+    - Gli stati sono **presenti** solo in una delle due posizioni, quindi **frontiera** o **raggiunti**.
+    - Rimuovere gli stati dai raggiunti quando si può dimostrare che non servono più.
+- **Ricerca Beam**: Limitare la **dimensione della frontiera**, mantendendo solo i $k$ nodi con i migliori costi $f$. Questo definisce **incompletezza** e **subottimalità**, esplorando solo un settore dei confini concentrici.
+- **Ricerca A\* con Approfondimento Iterativo - (IDA\*)**: Ricerca ad approfondimento iterativo combinata con $A^*$, quindi non tiene in memoria tutti gli stati raggiunti. La soglia è settata sul valore $f = g + h$.
+    - Si effettua quindi, per ogni iterazione, una ricerca esaustiva in profondità fino ad un costo $f_l$, quindi quando viene trovato un nodo $n$ con costo $f(n) > f_l$, termina iterazione e ricomincia la successiva con $f_l = f(n)$.
+- **Ricerca Best First Ricorsiva - (RBFS)**: Ricerca in BestFirst, con interruzione quando $f$ supera un valore $f_{limite}$. Se viene superato questo limite, la risocrsione torna al cammino alternativo.
+- **Memory Bounded A\* - (SMA\*)**: Si basa sull'utilizzo di **tutta** la **memoria disponibile** fino al suo esaurimento, poi **dimentica** il nodo peggiore memorizzando nel nodo del padre il valore del nodo dimenticato.
+
+## Funzioni Euristiche
+
+- Nel caso del rompicapo degli 8 tasselli possiamo immaginare 2 esempi di funzione $h$ euristica:
+    - $h_1$ numero di tasselli fuori posto.
+    - $h_2$ somma delle distanze di tutti i tasselli dalla loro posizione corrente alla configurazione obiettivo.
+
+Ciascuna di queste funzioni euristiche ha delle caratteristiche:
+- **Fattore di ramificazione effettivo**: Si basa sugli elementi:
+    - $N$ numero totale di nodi generato da $A^*$.
+    - $d$ profondità dell'albero generato da $A^*$.
+    - $b^*$ fattore di ramifiazione che un albero uniforme di profondità $d$ dovrebbe avere per contenere $N+1$ nodi, quindi: $$ N + 1 = 1 + b^* + (b^*)^2 + \cdots + (b^*)^d $$. Una buona funzione euristica dovrebbe avere un valore di $b^*$ vicino ad $1$.
+
+### Dominazione di Euristiche
+
+Date due euristiche $h_1, h_2$ si dice che $h_1$ **domina** $h_2$ se per ogni nodo $n$ vale che $h_1(n) \leq h_2(n)$.
+
+## Costruzione di Euristiche
+
+### Euristica da Problema Rilassato
+
+Costruzione del problema originale con meno vincoli sulle azioni che si possono compiere. Potremmo ad esempio immaginare di aggiungere archi allo spazio degli stati.
+
+Quindi il costo di una soluzione ottima per un problema rilassato è un euristica ammissibile per il problema originale.
+
+### Massimizzazione di Insieme di Euristiche Ammissibili
+
+Dato un insieme di euristiche ammissibili $h_1, \cdots, h_m$ costruiamo $h(n) = max \{ h_1(n), \cdots ,h_m(n) \}$.
+
+Se tutte le funzioni $\{ h_1(n), \cdots ,h_m(n) \}$ sono ammissibili allora anche $h$ lo è, e domina tutte le altre.
+
+### Euristica da Sottoproblema
+
+Un altro metodo per costruire euristiche è quello di tenere in considerazione solo una parte del problema originale.
+
+<div style="text-align: center;">
+    <img src="img/euristicaSottoproblema.png" width="300">
+</div>
+
+Il **costo dela soluzione** ottimale di un **sottoproblema** è una **sottostima del costo del problema originale**, quindi è un **euristica ammissibile**.
+
+### Database di Pattern Soluzioni
+
+Possiamo **memorizzare** i costi esatti delle soluzioni di ogni possibile istanza di un sottoproblema, definendo quindi un **euristica ammissibile** $h_{db}$ per ogni stato **incontrato durante la ricerca**, estraendo dal database la configurazione corrispondente del sottoproblema.
+
+Non possiamo però a priori sommare i valori di ciascuna soluzione di istanza, dato che le soluzioni ai sottoproblemi possono interferire.
+
+- **Landmarks**: Tramite il **pre-calcolo** di alcuni **costi di cammino ottimo** ed il **salvatagglio rispetto a punti di riferimento rilevanti** è possibile ottimizzare il calcolo effettivo a tempo di esecuzione dell'algoritmo.
+
+- **Apprendere dall'esperienza**: Si basa sull'apprensione di istanze del problema già risolte, basandosi sull'utilizzo di features dello stato fornite per predire il valore dell'euristica.
+
+    - Nell'esempio dei tasselli potremmo indicare con $x_1$ in *numero di tasselli fuori posto*, $x_2$ *numero di tasselli adiacenti che sono adiacenti anche nella soluzione* e $c_1, c_2$ *appresi tramite algoritmo di apprendimento* formulando quindi l'euristica come: $$ \boxed{h(n) = c_1 \: x_1(n) + c_2 \: x_2(n)} $$
