@@ -417,7 +417,8 @@ quindi per 1. e 5. abbiamo raggiunto l'assurdo.
 
 ### Euristica Consistente
 
-Un **euristica** è **consistente** se, per ogni nodo n, e per ogni successore $n'$ di n generato da un azione $a$ risulta essere: $$ h(n) \leq c(n,a,n') + h(n') $$
+Un **euristica** è **consistente** se, per ogni nodo n, e per ogni successore $n'$ di n generato da un azione $a$ risulta essere: 
+$$h(n) \leq c(n,a,n') + h(n')$$
 
 <div style="text-align: center;">
     <img src="img/euristicaConsistente.png" width="350">
@@ -446,15 +447,15 @@ Inconsistente non implica non ammissibile.
 - **A\* con Euristica Inammissibile**:
     - Può essere ottima rispetto al costo in due casi
         - Esiste un **cammino ottimo** rispetto al costo lungo cui $h(n)$ è **ammissibile per tutti i nodi sul cammino**.
-        - Se la soluzione ottima ha costo $C^*$ e la seconda soluzione migliore ha costo $C_2$, e se $h(n)$ sovrastima i costi, ma al massimo di una quantità $k \leq C_2 - C^*$
+        - Se la soluzione ottima ha costo $C^{*}$ e la seconda soluzione migliore ha costo $C_{2}$, e se $h(n)$ sovrastima i costi, ma al massimo di una quantità $k \leq C_{2} - C^{*}$
 
 ### Confini della Ricerca A* e Caratteristiche A*
 
 - Si basa sullo sviluppo di bande concentriche basate sulla $f$.
 - **Caratteristiche di A\***: Assumendo che $C^*$ sia costo del cammino della soluzione ottima:
-    - **A\* espande tutti i nodi** che possono essere raggiunti dallo stato iniziale su **un cammino in cui per ogni nodo** si ha $f(n) < C^*$.
-    - **A\* può espandere** alcuni dei nodi sul confine obiettivo, quindi dove $f(n) = C^*$ prima di selezionare il nodo obiettivo.
-    - **A\* non espande** alcun nodo con $f(n) > C^*$
+    - **A\* espande tutti i nodi** che possono essere raggiunti dallo stato iniziale su **un cammino in cui per ogni nodo** si ha $f(n) < C^{*}$.
+    - **A\* può espandere** alcuni dei nodi sul confine obiettivo, quindi dove $f(n) = C^{*}$ prima di selezionare il nodo obiettivo.
+    - **A\* non espande** alcun nodo con $f(n) > C^{*}$
 
 ### A* come Algoritmo Ottimamente Efficiente
 
@@ -466,9 +467,9 @@ Il problema di A* è che **espande un grande numero di nodi**, di conseguenza pr
 
 ### Ricerca A* Pesata
 
-Viene definita un $W > 1$ fattore moltiplicativo per dare maggiore peso al valore dell'euristica, quindi $f(n) = g(n) + W \: h(n)$
+Viene definita un $W > 1$ fattore moltiplicativo per dare maggiore peso al valore dell'euristica, quindi $f(n) = g(n) + W h(n)$
 
-In questo modo possiamo esplorare meno stati con un trade-off sul costo, quindi assumendo che la soluzione ottima abbia costo $C^*$, allora troverà una soluzione di costo compreso tra $C^*$ e $W \times C^*$.
+In questo modo possiamo esplorare meno stati con un trade-off sul costo, quindi assumendo che la soluzione ottima abbia costo $C^{*}$, allora troverà una soluzione di costo compreso tra $C^{*}$ e $W \times C^{*}$.
 
 In realtà la **ricerca A\* pesata** può essere vista come una **generalizzazione delle altre**.
 
@@ -479,31 +480,33 @@ In realtà la **ricerca A\* pesata** può essere vista come una **generalizzazio
 ### Varianti A* per Limitazioni
 
 - **Algoritmi di Ricerca Subottima**:
-    - **Ricerca a subottimalità limitata**: Cerchiamo una soluzione con granzia che si trovi entro un fattore costante $W$ del costo ottimo, come $A^*$ pesata.
+    - **Ricerca a subottimalità limitata**: Cerchiamo una soluzione con granzia che si trovi entro un fattore costante $W$ del costo ottimo, come $A^{*}$ pesata.
     - **Ricerca a costo limitato**: cerchaimo una coluzione il cui costo sia inferiore ad una costante C.
     **Ricerca a costo illimitato**: Accettiamo una soluzione di qualsiasi costo, purchè riusciamo a trovarla rapidamente.
-- **Ricerca con Memoria Limitata**: Si tenta tramite due ottimizzazioni di migliorare l'utilizzo di memoria dell'algoritmo $A^*$.
+- **Ricerca con Memoria Limitata**: Si tenta tramite due ottimizzazioni di migliorare l'utilizzo di memoria dell'algoritmo $A^{*}$.
     - Gli stati sono **presenti** solo in una delle due posizioni, quindi **frontiera** o **raggiunti**.
     - Rimuovere gli stati dai raggiunti quando si può dimostrare che non servono più.
 - **Ricerca Beam**: Limitare la **dimensione della frontiera**, mantendendo solo i $k$ nodi con i migliori costi $f$. Questo definisce **incompletezza** e **subottimalità**, esplorando solo un settore dei confini concentrici.
 - **Ricerca A\* con Approfondimento Iterativo - (IDA\*)**: Ricerca ad approfondimento iterativo combinata con $A^*$, quindi non tiene in memoria tutti gli stati raggiunti. La soglia è settata sul valore $f = g + h$.
-    - Si effettua quindi, per ogni iterazione, una ricerca esaustiva in profondità fino ad un costo $f_l$, quindi quando viene trovato un nodo $n$ con costo $f(n) > f_l$, termina iterazione e ricomincia la successiva con $f_l = f(n)$.
+    - Si effettua quindi, per ogni iterazione, una ricerca esaustiva in profondità fino ad un costo $f_{l}$, quindi quando viene trovato un nodo $n$ con costo $f(n) > f_{l}$, termina iterazione e ricomincia la successiva con $f_{l} = f(n)$.
 - **Ricerca Best First Ricorsiva - (RBFS)**: Ricerca in BestFirst, con interruzione quando $f$ supera un valore $f_{limite}$. Se viene superato questo limite, la risocrsione torna al cammino alternativo.
 - **Memory Bounded A\* - (SMA\*)**: Si basa sull'utilizzo di **tutta** la **memoria disponibile** fino al suo esaurimento, poi **dimentica** il nodo peggiore memorizzando nel nodo del padre il valore del nodo dimenticato.
 
 ## Funzioni Euristiche
 
 - Nel caso del rompicapo degli 8 tasselli possiamo immaginare 2 esempi di funzione $h$ euristica:
-    - $h_1$ numero di tasselli fuori posto.
-    - $h_2$ somma delle distanze di tutti i tasselli dalla loro posizione corrente alla configurazione obiettivo.
+    - $h_{1}$ numero di tasselli fuori posto.
+    - $h_{2}$ somma delle distanze di tutti i tasselli dalla loro posizione corrente alla configurazione obiettivo.
 
 Ciascuna di queste funzioni euristiche ha delle caratteristiche:
 - **Fattore di ramificazione effettivo**: Si basa sugli elementi:
     - $N$ numero totale di nodi generato da $A^*$.
     - $d$ profondità dell'albero generato da $A^*$.
     - $b^*$ fattore di ramifiazione che un albero uniforme di profondità $d$ dovrebbe avere per contenere $N+1$ nodi, quindi: 
-    $$N + 1 = 1 + b^* + (b^*)^2 + \cdots + (b^*)^d$$
-    Una buona funzione euristica dovrebbe avere un valore di $b^*$ vicino ad $1$.
+    
+        $$N + 1 = 1 + b^* + (b^*)^2 + \cdots + (b^*)^d$$
+
+    Una buona funzione euristica dovrebbe avere un valore di $b^{*}$ vicino ad $1$.
 
 ### Dominazione di Euristiche
 
@@ -519,9 +522,9 @@ Quindi il costo di una soluzione ottima per un problema rilassato è un euristic
 
 ### Massimizzazione di Insieme di Euristiche Ammissibili
 
-Dato un insieme di euristiche ammissibili $h_1, \cdots, h_m$ costruiamo $h(n) = max \{ h_1(n), \cdots ,h_m(n) \}$.
+Dato un insieme di euristiche ammissibili $h_{1}, \cdots, h_{m}$ costruiamo $h(n) = max \{ h_{1}(n), \cdots ,h_{m}(n) \}$.
 
-Se tutte le funzioni $\{ h_1(n), \cdots ,h_m(n) \}$ sono ammissibili allora anche $h$ lo è, e domina tutte le altre.
+Se tutte le funzioni $\{ h_{1}(n), \cdots ,h_{m}(n) \}$ sono ammissibili allora anche $h$ lo è, e domina tutte le altre.
 
 ### Euristica da Sottoproblema
 
@@ -544,7 +547,7 @@ Non possiamo però a priori sommare i valori di ciascuna soluzione di istanza, d
 - **Apprendere dall'esperienza**: Si basa sull'apprensione di istanze del problema già risolte, basandosi sull'utilizzo di features dello stato fornite per predire il valore dell'euristica.
 
     - Nell'esempio dei tasselli potremmo indicare con $x_1$ in *numero di tasselli fuori posto*, $x_2$ *numero di tasselli adiacenti che sono adiacenti anche nella soluzione* e $c_1, c_2$ *appresi tramite algoritmo di apprendimento* formulando quindi l'euristica come: 
-    $$\boxed{h(n) = c_1 \: x_1(n) + c_2 \: x_2(n)}$$
+    $$\boxed{h(n) = c_{1} \: x_{1}(n) + c_{2} \: x_{2}(n)}$$
 
 # Lezione 5 - Ricerca Locale e Cenni di Ricerca Online - 17/02/2025
 
@@ -608,8 +611,9 @@ Esistono vari tipi di ricerca dell'ottimo:
     - Il funzionamento si basa sull'**accettare o meno** una **scelta casuale**:
         - Se la mossa è migliorativa allora viene accettata.
         - Altrimenti viene accettata secondo una probabilità $prob < 1$.
-            - La **probabilità** deve **decrescere esponenzialmente** rispetto a quanto **peggiora la valutazione** $\Delta E$, ed oltre a questo **decresce** con la **temperatura** $T$, che scende costantemente, quindi 
-            $$prob = e^{-\frac{\Delta E}{T}}$$
+            - La **probabilità** deve **decrescere esponenzialmente** rispetto a quanto **peggiora la valutazione** $\Delta E$, ed oltre a questo **decresce** con la **temperatura** $T$, che scende costantemente, quindi
+
+                $$prob = e^{-\frac{\Delta E}{T}}$$
         - Il valore della temperatura $T$ diminuisce rispetto ad una velocità di raffreddamento. Se questo valore decresce abbastanza lentamente allora l'algoritmo troverà un massimo globale con probabilità che tende ad $1$.
 
     <div style="text-align: center;">
@@ -651,7 +655,9 @@ Lo spazio non è più discreto ma descritto da **variabili continue** del tipo $
 ### Utilizzo Hill Climbing in Spazi Continui con Gradiente
 
 Possiamo applicare qualcosa come Hill Climbing tramite l'utilizzo del gradiente con la formula 
+
 $$\boxed{x_{new} = x + \eta\nabla f(x)}$$
+
 dove $\eta$ è una costante positiva detta **step size**. 
 
 Questo meccanismo quindi ci fornisce la garanzia di crescita/descrescita.
