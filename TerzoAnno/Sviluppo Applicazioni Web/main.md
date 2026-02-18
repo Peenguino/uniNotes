@@ -124,3 +124,89 @@ Permette la definizione di stile in base al tipo di media, grazie ad esso si pu�
 
 - **Chiusura di tipo statico**, quindi variabili libere vengono risolte a tempo di dichiarazione e non a tempo di chiamata di funzione, portandosi dietro la dichiarazione delle variabili a tempo di dichiarazione delle funzioni.
 
+# Lezione 4 - JavaScript - 16/02/2026
+
+## JSON
+
+Formato standard per interscambio di dati, prima di `JSON` si utilizzava `XML`, ma è stato quasi del tutto sostituito.
+
+### Differenze tra Object JS e JSON
+
+- **Object Literal**: 
+    - È un oggetto
+    - Il nome delle proprietà può essere un numero o una sequenza di caratteri
+    - Il nome delle proprietà può essere una regexp
+    - Il nome delle proprietà può essere undefined
+    - Il nome delle proprietà può essere una funzione
+- **JSON**:
+    - Statico, quindi può essere un numero o una sequenza di caratteri ma non tutti gli altri.
+
+### Classi e Prototipi
+
+L'ereditarietà si basa sulla catena dei prototipi, l'utilizzo dei costrutti come `Class` è zucchero sintattico per effettuare lo stesso tipo di operazione.
+
+### Higher Order Functions
+
+In JS sono presenti `map`, `forEach`, `reduce`...
+
+## Promises
+
+Permette la gestione di computazioni asincrone, ha **tre stati**:
+- **pending**: stato iniziale
+- **fulfilled**: successo
+- **rejected**: fallimento
+
+Le promises hanno hanno dei **fate**, ossia `resolved` oppure `unresolved`.
+
+Utilizzeremo in serie `.catch()`, `.then()`, ma se vogliamo farlo sia in caso di fallimento che di successo allora utilizziamo `.finally()`, che viene eseguita in caso di `settled`.
+
+### Async/Await
+
+Sintassi alternativa per la computazione asincrona.
+
+- `async function`: Dichiarazione di una funzione che restituisce una `Promise`. Oltre a questo ci permette di utilizzare await all'interno della funzione.
+- `await`: attende che la promise sia risolta prima di continuare. Perdiamo quindi la possibilità formalmente di gestire in parallelo più promises, in realtà no però perchè potrei far seguire ad un await una `.all()`, ad esempio.
+
+## Event Loop
+
+Tutto il runtime di JS si basa su quattro oggetti principali:
+- **Stack**: Implementa la pila dei frame d'attivazione delle funzioni. A tempo di `return` tutte le variabili locali ad una funzione vengono rimosse, a meno di chiusure.
+- **Heap**: Zona di memoria di allocazione della memoria, allocata e deallocata automaticamente dal garbage collector.
+- **Queue**: Lista messaggi da processare, modo in cui quindi vengono gestite le `setTimeout()` o altri eventi. Quando viene selezionato quel messaggio nella coda viene handlato dalla funzione passata.
+- **Event Loop**: L'event loop non è nient'altro che un while che si occupa di effettuare delle pop dalla queue.
+    - Tutti gli eventi standard, come l'utilizzo del click del mouse hanno degli handler associati.
+    - Gli eventi senza handler associati vengono ignorati.
+    - Gli iframe e di web worker sono delle eccezioni, perchè hanno i loro stack, heap e queue.
+
+### Gestione con Observer Pattern
+
+Sistema ad eventi si basa su due attori principali, `Observer` e `Subject`, dove il `Subject` quando varia il proprio stato deve notificare gli `Observer`.
+
+<div style="text-align: center;">
+    <img src="img/observerPattern.png" width="400">
+</div>
+
+## Gestione a Moduli di JS
+
+In origine non esisteva alcuna gestione a moduli, ma permette più riusabilità la gestione a moduli.
+
+Esistono vari approcci a pattern:
+
+- **Module Pattern**: Esponiamo le funzionalità attribuendole ad un oggetto globale tramite dichiarazione come primo comando eseguito.
+- **CommonJS**: Primo approccio a moduli effettivi, ma sincrono.
+- **AMD**: Asynchronous Module Definition, che si basa sull'utilizzo della `define()`, che ha bisogno di specifici argomenti per definire un modulo. Oltre a questo si basa RequireJS, come file che si occupa di questa operazione.
+
+In sintesi dei pro di ciascuno di questi pattern è nato **Browserify**, che permette di gestire tutto l'albero delle dipendenze in un `bundle.js` a cui riferità la pagina web.
+
+- **UMD - Universal Module Definition**: Si occupa della gestione della coesistenza di gestione moduli, che a runtime si occupa di capire come sia stato importato un modulo, da utilizzare nel caso in cui si usassero più metodologie di import.
+
+# Lezione 5 - DOM (Document Object Model) - 18/02/2026
+
+Il **DOM** è una **rappresentazione gerarchica** della **struttura del contenuto** di un **documento Web**.
+
+Quindi anche la **rappresentazione in memoria** di un **documento HTML**, e una **API** per la **manipolazione** di **documenti Web**.
+
+La **gerarchia** segue uno **schema ad albero**, mantenendo tra le **risorse delle relazioni**.
+
+Ogni DOM ha un nodo radice, esiste un rapporto tra DOM e JS, perchè è un astrazione (**global object window**) tramite la quale possiamo accedere agli elementi.
+

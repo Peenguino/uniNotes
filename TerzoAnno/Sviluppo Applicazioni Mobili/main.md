@@ -3,7 +3,7 @@
 - Android e Frammentazione: La gestione della frammentazione di tutte le versioni di Android è effetturata tramite degli API Level:
     - **API Level Minimo, Target e Massimo**, il massimo in realtà non è più utilizzato.
 
-# Lezione 02 - Programmazione Android I - 06/02/2026
+# Lezione 02 - Programmazione Android I, Architerrua OS ed App - 06/02/2026
 
 ## Architettura
 
@@ -31,4 +31,46 @@ Segue tre fasi:
     - Un `.apk` è un `.jar` specializzato, che a sua volta è uno `.zip` specializzato.
 - **Run**: $apk \: \to \text{processo}$
 
+# Lezione 03 - Gestione delle Risorse - 06/02/2026
 
+## Resources vs Assets
+
+Di due macro categorie:
+- **Resources**: Risorse di cui l'OS è a conoscenza. Mai gestiti a mano, ma gestiti dal resource manager dell'OS. Quindi sono poste solitamente per convenzione nella sottodir `./res`.  Quindi queste risorse vengono compattate in binario. Nello specifico il tool aapt segue diverse fasi:
+    - **Conversione XML** in **binario**
+    - Generazione **tabella di corrispondenza** fra **ID** e **offset** per accesso $O(1)$.
+    - Si genera una **classe java** `gen/R.java` che **mantiene corrispondenza** tra nome simbolico della risorsa e id nella tabella, quindi fa da indice per tutte le risorse.
+    - Questa **classe viene compilata** e **messa a disposizione** come tutte le altre.
+- **Assets**: Risorse di cui l'OS non è a conoscenza, solitamente compattati in un `.zip`. Questi non vengono identificati da un id di risorsa, vengono quindi trattati tramite un oggetto `AssetManager`
+
+Questa gestione delle risorse ha il vantaggio di poter effettuare un binding dinamico in base al tipo di risorsa che vogliamo richiedere, (ad esempio in base alla nazionalità o a giorno/notte...)
+
+- **Tipi di Risorse**: Sono ad esempio
+    - **Animation**
+    - **Color State List**
+    - **Drawable**
+    - **Layout**
+    - **Menu**
+    - **String**
+
+Possiamo anche riferire risorse all'interno di altre risorse, ad esempio `"@string/hello"`. In Kotlin non viene generato il sorgente di `R` ma direttamente le classi di `R`.
+
+L'accesso alle risorse avviente tramite `@NOMEPACKAGE/tipo/nome`
+
+`Context` e `Environment` classi standard ci permettono rispettivamente di ottenere informazioni sul contesto e sul dispositivo. Le `Activity` sono **sottoclassi** di `Context`.
+
+## Gestione di Risorse Alternative
+
+Le risorse possono essere specializzate tramite tipo di qualificatori, ad esempio tramite una forma della directory del tipo `res/tipo-QUALIFICATORI/file`.
+
+Questo ci permette di qualificare anche sulla versione di Android con la flag `-v[VERSIONE]`.
+
+A runtime il Resource Manager cerca tra le tante alternative secondo una specifica procedura:
+
+<div style="text-align: center;">
+    <img src="img/resourceManager.png" width="220">
+</div>
+
+Quindi vengono riavviate tutte le applicazioni per fare in modo che siano ricaricate le risorse.
+
+Nell'android manifest è possibile dichiarare esplicitamente cosa sia richiesto per installare l'applicazione.

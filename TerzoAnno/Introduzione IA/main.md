@@ -4,6 +4,8 @@ Cenni storici ed introduzione. Vedi slide.
 
 # Lezione 2 - Agenti - 05/02/2025
 
+`Rif: Slide Lezione_1 - AIMA Cap: 2`
+
 ## Agenti ed Ambiente
 
 - **Agente**: Un agente razionale **percepisce** il suo **ambiente** tramite **sensori** ed agisce sull'**ambiente** tramite **attuatori**.
@@ -140,6 +142,8 @@ Possiamo definire un problema di ricerca tramite 6 elementi:
 Quindi un **cammino** rappresenta una **sequenza di azioni**, una **soluzione** è un **cammino** che parte dallo **stato iniziale** ed arriva ad uno **stato obiettivo**. Tra tutte le soluzioni ne esiste una **ottimale**, ossia di **costo minimo**.
 
 # Lezione 3 - Algoritmi di Ricerca e Strategie Ricerca non Informata - 10/02/2025
+
+`Rif: Slide Lezione_2 - AIMA Cap: 3, Sez: 3.3, 3.4`
 
 Ripartendo dalle definizioni della lezione successiva, ricordiamo che $\text{spazio stati} \neq \text{albero di ricerca}$
 
@@ -345,6 +349,8 @@ Quindi tutti questi sono detti di ricerca non informata perchè si basano solo s
 
 # Lezione 4 - Strategie di Ricerca Informata o Euristica - 12/02/2025
 
+`Rif: Slide Lezione_3 - AIMA Cap: 3, Sez: 3.5, 3.6`
+
 La ricerca informata si basa sulla conoscenza specifica di dove si potrebbe trovare l'obiettivo per accelerare la ricerca nello spazio degli stati.
 
 **Funzione Euristica**: si definisce una funzione $h(n)$, costo stimato del cammino.
@@ -495,7 +501,9 @@ Ciascuna di queste funzioni euristiche ha delle caratteristiche:
 - **Fattore di ramificazione effettivo**: Si basa sugli elementi:
     - $N$ numero totale di nodi generato da $A^*$.
     - $d$ profondità dell'albero generato da $A^*$.
-    - $b^*$ fattore di ramifiazione che un albero uniforme di profondità $d$ dovrebbe avere per contenere $N+1$ nodi, quindi: $$ N + 1 = 1 + b^* + (b^*)^2 + \cdots + (b^*)^d $$. Una buona funzione euristica dovrebbe avere un valore di $b^*$ vicino ad $1$.
+    - $b^*$ fattore di ramifiazione che un albero uniforme di profondità $d$ dovrebbe avere per contenere $N+1$ nodi, quindi: 
+    $$N + 1 = 1 + b^* + (b^*)^2 + \cdots + (b^*)^d$$
+    Una buona funzione euristica dovrebbe avere un valore di $b^*$ vicino ad $1$.
 
 ### Dominazione di Euristiche
 
@@ -535,4 +543,129 @@ Non possiamo però a priori sommare i valori di ciascuna soluzione di istanza, d
 
 - **Apprendere dall'esperienza**: Si basa sull'apprensione di istanze del problema già risolte, basandosi sull'utilizzo di features dello stato fornite per predire il valore dell'euristica.
 
-    - Nell'esempio dei tasselli potremmo indicare con $x_1$ in *numero di tasselli fuori posto*, $x_2$ *numero di tasselli adiacenti che sono adiacenti anche nella soluzione* e $c_1, c_2$ *appresi tramite algoritmo di apprendimento* formulando quindi l'euristica come: $$ \boxed{h(n) = c_1 \: x_1(n) + c_2 \: x_2(n)} $$
+    - Nell'esempio dei tasselli potremmo indicare con $x_1$ in *numero di tasselli fuori posto*, $x_2$ *numero di tasselli adiacenti che sono adiacenti anche nella soluzione* e $c_1, c_2$ *appresi tramite algoritmo di apprendimento* formulando quindi l'euristica come: 
+    $$\boxed{h(n) = c_1 \: x_1(n) + c_2 \: x_2(n)}$$
+
+# Lezione 5 - Ricerca Locale e Cenni di Ricerca Online - 17/02/2025
+
+`Rif: Slide Lezione_4 - AIMA Cap: 4, Sez: 4.1, 4.2, 4.3`
+
+Fino ad ora abbiamo assunto **forti condizioni**:
+- Ambienti **deterministici** e **completamente osservabili**.
+- Agenti in grado di produrre offline un piano che può essere eseguito senza imprevisti.
+
+Potremmo quindi tenere conto di ambienti un po' più realistici, quindi:
+- L'agente ha bisogno di un **piano condizionale** (basato su OR, AND, IF...), in un mondo non deterministico, quindi rilassamento del determinismo.
+- Ricerca di stati buoni in spazi discreti o continui.
+- **Rilassamento** della condizione per cui tutti gli **stati** sono **completamente osservabili**, gli agenti avranno visibilità parziale degli stati.
+- **Rilassamento del vincolo** sull'**ambiente noto**, guidando l'agente attraverso uno spazio sconosciuto, mediante ricerca online.
+
+## Ricerca Locale
+
+Gli algoritmi di ricerca locale operano a partire da uno stato iniziale e procedono verso gli stati adiacenti, **senza tenere traccia dei cammini** e **senza tenere traccia** degli **stati** già **raggiunti**.
+- Quindi **per definizione** questi **algoritmi non** sono **sistematici**, quindi potrebbero non esplorare un sottospazio degli stati dove risiede una soluzione.
+- Usano poca memoria e riescono a trovare stati goal (soluzione) in spazi degli stati molto grandi.
+
+### Problemi di Ottimizzazione (Hill Climbing, Simulated Annealing, Local Beam Search)
+
+Lo scopo è quello di **trovare** lo **stato migliore** secondo una **funzione obiettivo**.
+
+<div style="text-align: center;">
+    <img src="img/ottimizzazione1.png" width="400">
+</div>
+
+Esistono vari tipi di ricerca dell'ottimo:
+
+- **Ricerca Hill Climbing**:
+    - Ricerca **locale greedy**, si tiene conto solo dello stato corrente.
+    - Si cerca di andare nella posizione che porta ad un incremento di altezza.
+    - Si **fermerà** quindi al **primo massimo locale** che trova.
+    - Per un minimo locale si utilizza lo stesso algoritmo, negando la funzione obiettivo.
+
+    <div style="text-align: center;">
+        <img src="img/hillClimbing.png" width="380">
+    </div>
+
+    - **Soffre vari pattern comuni** dato il fatto che cerca degli ottimi locali, quindi ad esempio **creste**, **plateau**...
+    - Nel problema delle 8 regine ad esempio l'algoritmo hill climbing **si blocca** nel $86\%$ delle volte e **trova la soluzione** il $14\%$ delle volte, ma è **molto veloce**.
+    - **Miglioramenti Hill Climbing**:
+        - **Mossa Laterale**: Si **permette** l'**esplorazione dei plateau**, permettendo quindi un **numero limitato di passi** anche se il valore della **funzione obiettivo resta invariato**. Questo nel caso del problema delle 8 regine porta ad un successo il $94\%$ delle volte.
+        - **Hill Climbing Stocastico**: Si sceglie a caso tra tutti gli stati che portano ad una crescita della funzione obiettivo. Converge più lentamente dell'originale ma può trovare soluzioni migliori.
+        - **Hill Climbing Con Prima Scelta**: Generare a caso i successori dello stato attuale, fino ad ottenerne uno preferibile a quello corrente.
+        - **Hill Climbing Con Riavvio Casuale**: Serie di ricerche hill climbing partendo da stati iniziali generati casualmente, fino a che non viene raggiunto un obiettivo.
+            - **Tradeoff** quindi di **efficienza per completezza**.
+            - Data $p$ probabilità di successo per l'algoritmo Hill Climbing, allora il numero atteso di riavvii sarà $\frac{1}{p}$.
+    - **Successo ed insuccesso** **dipendono** quindi fortemente dalla **forma** dello **spazio degli stati**, ma in un contesto reale è molto probabile che ci sia uno spazio degli stati eterogeneo.
+
+- **Simulated Annealing**: 
+    - Cerca di **combinare Hill Climbing ed Esplorazione Casuale**, quindi rispettivamente non scendere mai e scelta casuale.
+    - Si cerca di **perturbare** il risultato di **Hill Climbing** per cercare di **uscire da punti di minimo locale** (si ragiona in termini di minimizzazione).
+
+    <div style="text-align: center;">
+        <img src="img/simulatedAnnealing.png" width="300">
+    </div>
+
+    - Il funzionamento si basa sull'**accettare o meno** una **scelta casuale**:
+        - Se la mossa è migliorativa allora viene accettata.
+        - Altrimenti viene accettata secondo una probabilità $prob < 1$.
+            - La **probabilità** deve **decrescere esponenzialmente** rispetto a quanto **peggiora la valutazione** $\Delta E$, ed oltre a questo **decresce** con la **temperatura** $T$, che scende costantemente, quindi 
+            $$prob = e^{-\frac{\Delta E}{T}}$$
+        - Il valore della temperatura $T$ diminuisce rispetto ad una velocità di raffreddamento. Se questo valore decresce abbastanza lentamente allora l'algoritmo troverà un massimo globale con probabilità che tende ad $1$.
+
+    <div style="text-align: center;">
+        <img src="img/simulatedAnnealing1.png" width="500">
+    </div>
+
+- **Local Beam Search**:
+    - Si tiene traccia di $k$ stati, quindi un intervallo attorno allo stato correntem invece che uno solo.
+    - Questo permette l'abbandono preventivo a situazioni infruttuose.
+    - Esiste anche una **versione stocastica**, che sceglie i **successori** con **probabilità** proporzionale al loro **valore**.
+
+- **Algoritmi Evolutivi**: Variante della ricerca beam stocastica basata su un comportamento simile alla selezione naturale:
+    - Degli **stati**, tra questi vengono **trovati i migliori**, questi vengono **ricombinati tra di loro** per essere utilizzati e trovarne ancora dei migliori.
+    - Quindi ogni **stato mappa** su un **individuo**.
+    - Quindi un individuo può ad esempio essere rappresentato con una stringa.
+    - Caratteristiche:
+        - **Numero di genitori** $\rho = 2$ che si uniscono per generare la prole.
+        - **Processo di selezion**e genitori della prossima generazione, si seleziona con una **certa probabilità** rispetto ad un **valore** dipendente dalla funzione obiettivo, detto **fitness**.
+        - **Procedura di ricombinazione**: Si seleziona un **punto di crossover**, quindi assumendo che i due **genitori** siano **due stringhe**, si definiscono dei **punti** in cui le stringhe vengono rispettivamente **tagliate e concatenate tra loro**.
+        - **Mutazione**: A tempo di generazione della prole, i figli non saranno uguali a metà genitori ma esisterà una **mutazione** post-generazione, con **probabilità** data dal **tasso di mutazione**.
+        - La **formazione** della **nuova generazione** potrebbe essere semplicemente la nuova prole, oppure **mantenere** tramite **elitismo** **genitori migliori rispetto a correnti figli**. Oppure anche tramite **abbattimento**, eliminando correnti figli sotto una certa **soglia di fitness**.
+
+        Un esempio di applicazione di questo tipo di algoritmo sul problema delle 8 regine:
+        <div style="text-align: center;">
+        <img src="img/algGenetico8Regine.png" width="500">
+        </div>
+
+        Questi algoritmi genetici si applicano bene a specifici contesti e funziona bene su problemi i cui stati possono essere rappresentati in stringhe.
+
+## Ricerca Locale in Spazi Continui
+
+Lo spazio non è più discreto ma descritto da **variabili continue** del tipo $x_1, \cdots, x_n$. L'**esplorazione** di questo tipi di spazi **può portare** a **fattori di ramificazione infiniti**, se utilizzassimo approcci visti fino ad ora.
+
+- **Approccio di Spazi Continui**:
+    - **Discretizzazione**: Si sovrappone una griglia allo spazio continuo.
+    - **Gradiente Empirico**: Si limita il fattore di ramificazione mediante un campionamento casuale degli stati successori, valutando ad esempio un valore perturbato di un $x$ iniziale, tramite ad esempio una $f(x+\delta)$.
+        - Se $f$ è **continua e differenziabile** rispetto ad $x$, allora è possibile cercare **max e min** utilizzando il **gradiente**, che restituisce la **direzione di massima pendenza**. Quindi ha tutte le derivate parziali rispetto alle dimensioni della funzione $f$.
+
+### Utilizzo Hill Climbing in Spazi Continui con Gradiente
+
+Possiamo applicare qualcosa come Hill Climbing tramite l'utilizzo del gradiente con la formula 
+$$\boxed{x_{new} = x + \eta\nabla f(x)}$$
+dove $\eta$ è una costante positiva detta **step size**. 
+
+Questo meccanismo quindi ci fornisce la garanzia di crescita/descrescita.
+
+## Ricerca con Azioni non Deterministiche
+
+Il piano generato in caso di determinismo è una sequenza di azioni ed eseguita senza imprevisti.
+
+In questo caso **rilassiamo il determinismo**, un **azione** ha come **codominio un insieme di stati** e non uno stato, di conseguenza l'entità agentica dovrà **tramite percezioni che restringe lo spazio degli stati** acquisendo informazioni sullo stato corrente. Questo è detto quindi **stato-credenza**, **insieme** percepito dalle **percezioni dell'agente**.
+
+Quindi dato ad esempio il problema dell'aspirapolvere, per trovare una soluzione non costruiremo un modello di transizione su cui costruiamo un percorso, ma definiamo un **albero AND-OR** che tiene conto delle condizioni su tutte le percezioni fatte durante il percorso e di questo ne **selezioniamo** un **sottoalbero**.
+
+<div style="text-align: center;">
+    <img src="img/alberoAND_OR.png" width="550">
+</div>
+
+In questo caso il sottoalbero soluzione è quello rappresentato in grassetto.
