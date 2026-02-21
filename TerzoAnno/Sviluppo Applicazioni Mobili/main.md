@@ -74,3 +74,65 @@ A runtime il Resource Manager cerca tra le tante alternative secondo una specifi
 Quindi vengono riavviate tutte le applicazioni per fare in modo che siano ricaricate le risorse.
 
 Nell'android manifest è possibile dichiarare esplicitamente cosa sia richiesto per installare l'applicazione.
+
+# Lezione 04 - Componenti di un Applicazione Android - 20/02/2026
+
+## Tipi di Component
+
+`Component` è ua classe astratta, che non viene mai istanziata, ma ha **quattro grandi tipologie**:
+- `Activity`: Una cosa che l'utente fa, un azione atomico. Quindi un codice con corrispondente interfaccia utente **UI**.
+    - Può essere composta da vari `Fragment`.
+- `Service`: Codice senza un interfaccia utente, quindi logica che espone un **API**, non interagendo direttamente con l'utente, ma con le applicazioni, solitamente eseguiti **in background** quindi non visibile.
+- `Content Provider`: Funge da base di dati, quindi un componente che pubblica contenuti. Anche questa offre un interfaccia programmatica, ma offrendo contenuti, non funzionalità.
+- `Broadcast Provider`: Componente che ascolta messaggi globali, si registra come listener per acquisire eventi globali.
+
+## Intent
+
+Tutti questi componenti dialogano tra loro attraverso un **sistema di messaggistica** di `Intent`.
+- Messaggi che definiscono l'intenzione di fare qualcosa, nata dall'Intent di un utente a monte.
+- Possono essere aggiunti dati non fissati tramite payload.
+- Può essere definito un destinatario, oppure inviare questi messaggi in broadcast.
+- Ciascun componente può registrarsi ad `Intent` a cui è interessato.
+- Il filtro non è propriamente un filtro, ma più una registrazione del tipo publisher/subscriber.
+
+### Lancio di App tramite Intent
+
+- Il **launcher** (un tipo di Activity) **avvia** la **prima Activity** dell'App, inviandole un **Intent** che indica l'**intenzione di lanciarla**.
+- L'**Activity** in questione lancia la **propria UI**.
+- Il sistema **chiama** certi **metodi** dell'**Activity** (**callback**) in risposta alle azioni dell'utente.
+- Ciascuna di **queste callback** potrà ad esempio **lanciare altre Activity**, **inviare Intent** ad altre Activity, **interagire** con **Services**, **recuperare dati** dai **Content Provider** o **terminare l'Activity**.
+
+### Tipi di Intent
+
+- **Explicit Intent**: Definisce esplicitamente il destinatario. In questo caso non viene utilizzato l'Intent Filter.
+- **Implicit Intent**: Non si definisce chi sia il destinatario, ma sarà il sistema tramite il filtro degli intenti a capire quale Activity invocare. Se ci fosse più di una possibilità allora si lascia la scelta all'utente.
+
+L'idea e l'astrazione che si vuole fornire è quella che tutti i componenti, anche se non caricati in memoria ma presenti su disco, sono disponibili all'acquisizione di un Intent se registrato tra gli interessati.
+
+### Contenuti di un Intent
+
+Un intent contiene 7 campi:
+- **Action**: Che azione si vuole ottenere, definito tramite una stringa.
+- **Data**: Su quali dati operare, definito tramite URI.
+- **Category**: Categoria dell'azione, definito tramite stringa.
+- **Type**: tipo MIME di Data, definito tramite stringa.
+- **Component**: Componente a cui è indirizzato il messaggio.
+- **Extras**: un Bundle, ossia mappa chiave valore, di campi ulteriori.
+- **Flag**: 32 bit aggiuntivi, riservato a future espansioni.
+
+### Intent Filter
+
+- L'Intent Filter non è propriamente un filtro, ma più una registrazione del tipo publisher/subscriber.
+- Si definiscono le registrazioni solitamente in maniera statica nel `AndroidManifest.xml`, solitamente in base ad Action, Category e Data.
+- Gli interessi possono essere registrati anche a tempo d'esecuzione, ma è più raro.
+
+## Android Manifest XML
+
+Si tratta del manifesto dell'Applicazione che include:
+- Configurazione dell'app (nome, icona, package)
+- Informazioni sui permessi
+    - Fino ad Android 6 era statica la gestione dei permessi, poi sono stati chiesti a runtime. Da Android 11 i permessi più critici vengono chiesti uno per volta, secondo la one-time permission.
+- Elenco dei componenti dell'applicazione
+    - Configurazione di ciascun componente, inclusa classe Java
+    - Dettagli sugli Intent dei vari componenti
+- Altri metadati, come librerie, strumenti di profiling.

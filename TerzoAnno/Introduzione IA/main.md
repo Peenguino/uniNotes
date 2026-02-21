@@ -60,7 +60,7 @@ Gli **ambienti** sono in realtà **definiti come problemi**, cercando di descriv
         - **Dinamico**: L'ambiente cambia mentre l'agente pensa l'azione.
         - **Semidinamico**: L'ambiente non cambia ma la valutazione della prestazione si, ad esempio il tempo che scorre in un gioco influisce sulla valutazione della prestazione finale.
     - **Stati Discreti/Continui**: Se gli stati definiti sono discreti, o stati continui, come il tempo.
-    - **Ambiente Noto/Ignoto**: ** vedi slide **
+    - **Ambiente Noto/Ignoto**: Stato di conoscenza dell'agente circa le leggi fisiche dell'ambiente. Concetto diverso da osservabile, ad esempio l'ambiente di un gioco di carte sarà noto ma parzialmente osservabile, questo perchè l'agente conosce le regole del gioco ma non può vedere tutte le carte.
 
 Gli ambienti possono essere simulati per testare l'agente.
 
@@ -219,9 +219,9 @@ Questa è più una strategia, non un algoritmo reale, perchè non abbiamo defini
 
 Quattro parametri per la valutazione di algoritmi:
 - **Completezza**: Garantisce di riportare una soluzione, se esiste, e di riportare correttamente il fallimento, se esiste. Deve quindi procedere in maniera sistematica.
-- **Ottimalità rispetto al costo**: (vedi slide)
-- **Complessità temporale**: (vedi slide)
-- **Complessità spaziale**: (vedi slide)
+- **Ottimalità rispetto al costo**: L'algoritmo trova la soluzione con il costo di cammino minimo.
+- **Complessità temporale**: Quanto tempo impiega l'algoritmo a trovare una soluzione.
+- **Complessità spaziale**: Quanta memoria utilizza l'algoritmo per effettuare la ricerca.
 
 ### Misurazione della Complessità
 
@@ -261,7 +261,7 @@ Si può **implementare tramite bestFirst** con $f(a)$ settata come costo del cam
 
 - **Completa**: è sistematica, e non entra mai in ciclo infinito sull'assunzione che ogni costo sia sempre positivo.
 - **Ottima rispetto al costo**: La prima soluzione che trova ha un costo basso almeno come quello di ogni altro nodo sulla frontiera.
-- Complessità:
+- **Complessità**:
     - $C^*$: costo della soluzione ottima.
     - $\epsilon$: limite inferiore imposto al costo di ogni azione
     - $floor(\frac{C^*}{\epsilon})$: numero maggiore possibile di azioni che servono per raggiungere il costo della soluzione ottima. Ci permette di supporre una profondità massima.
@@ -320,7 +320,7 @@ Questo potrebbe sembrare uno spreco di iterazioni, ma aumentando profondità sap
 
 ## Direzione della Ricerca
 
-Esiste ricerca in avanti $ statoIniziale \to obiettivo $ o all'indietro $ obiettivo \to statoIniziale $.
+Esiste ricerca in avanti $statoIniziale \to obiettivo$ o all'indietro $obiettivo \to statoIniziale$.
 - **All'indietro** si può applicare solo se l'obiettivo è ben definito.
 - **In avanti** quando ci sono più obiettivi
 
@@ -504,7 +504,7 @@ Ciascuna di queste funzioni euristiche ha delle caratteristiche:
     - $d$ profondità dell'albero generato da $A^*$.
     - $b^*$ fattore di ramifiazione che un albero uniforme di profondità $d$ dovrebbe avere per contenere $N+1$ nodi, quindi: 
     
-        $$N + 1 = 1 + b^* + (b^*)^2 + \cdots + (b^*)^d$$
+    $$N + 1 = 1 + b^* + (b^*)^2 + \cdots + (b^*)^d$$
 
     Una buona funzione euristica dovrebbe avere un valore di $b^{*}$ vicino ad $1$.
 
@@ -621,7 +621,7 @@ Esistono vari tipi di ricerca dell'ottimo:
     </div>
 
 - **Local Beam Search**:
-    - Si tiene traccia di $k$ stati, quindi un intervallo attorno allo stato correntem invece che uno solo.
+    - Si tiene traccia di $k$ stati, quindi un intervallo attorno allo stato corrente invece che uno solo.
     - Questo permette l'abbandono preventivo a situazioni infruttuose.
     - Esiste anche una **versione stocastica**, che sceglie i **successori** con **probabilità** proporzionale al loro **valore**.
 
