@@ -66,15 +66,15 @@ Gli ambienti possono essere simulati per testare l'agente.
 
 ### Struttura di Agenti
 
-L'**agente** quindi è definito come $Agente = Archiettettura + Programma$, dove il programma è la funzione $Programma: Percezione \to  Azione$
+L'**agente** quindi è definito come $Agente = Architettura + Programma$, dove il programma è la funzione $Programma: Percezione \to  Azione$
 
 - **Agente su Tabella**: Si basa sull'accesso all'azione definita in pseudocodice come
 
-    ```
-    azione = tabella.get(percezione)
-    ```
+```JAVA
+azione = tabella.get(percezione)
+```
 
-    Ma questo andrebbe in contro ad un esplosione combinatoria, il gioco degli scacchi dovrebbe ad esempio portarsi dietro tutte le possibili combinazioni (sono tante).
+Ma questo andrebbe in contro ad un esplosione combinatoria, il gioco degli scacchi dovrebbe ad esempio portarsi dietro tutte le possibili combinazioni (sono tante).
 
 - **Agente Reattivo Semplice**: Si **ignora** la **memoria pregressa**, ma si sceglie l'azione in base all'attuale acquisizione e all'insieme di regole. Questo ci permette di scalare, dato che dovranno essere memorizzate solo le regole, non tutte le possibili sequenze.
 
