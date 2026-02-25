@@ -200,9 +200,15 @@ In sintesi dei pro di ciascuno di questi pattern è nato **Browserify**, che per
 
 - **UMD - Universal Module Definition**: Si occupa della gestione della coesistenza di gestione moduli, che a runtime si occupa di capire come sia stato importato un modulo, da utilizzare nel caso in cui si usassero più metodologie di import.
 
-# Lezione 5 - DOM (Document Object Model) - 18/02/2026
+# Lezione 5 - Esercitazione HTML e CSS - 18/02/2026
 
-Il **DOM** è una **rappresentazione gerarchica** della **struttura del contenuto** di un **documento Web**.
+Esercitazione in aula.
+
+# Lezione 6 - DOM (Document Object Model) - 23/02/2026
+
+`Riferisce al pdf delle slide Lezione 05 - DOM`
+
+Il **DOM** è una **rappresentazione gerarchica** della **struttura del contenuto** di un **documento HTML**.
 
 Quindi anche la **rappresentazione in memoria** di un **documento HTML**, e una **API** per la **manipolazione** di **documenti Web**.
 
@@ -210,3 +216,220 @@ La **gerarchia** segue uno **schema ad albero**, mantenendo tra le **risorse del
 
 Ogni DOM ha un nodo radice, esiste un rapporto tra DOM e JS, perchè è un astrazione (**global object window**) tramite la quale possiamo accedere agli elementi.
 
+## Eventi
+
+La programmazione web si basa sugli eventi (click, tastiera...), questi quindi possono essere emessi (**fire**) e successivamente handlati tramite una funzione handler specifica.
+
+<div style="text-align: center;">
+    <img src="img/classiDOM.png" width="400">
+</div>
+
+### Prevent Default
+
+Esistono degli handler di default, se fossimo interessati a non eseguire questo comportamento allora possiamo utilizzare `event.preventDefault()`
+
+### Event Bubbling
+
+Gli eventi, se intercettano più di un elemento HTML, si segue un ordine dal più interno al più esterno, detto **event bubbling**.
+
+Di default si segue una propagazione dall'interno verso l'esterno, bisogna definire una `stopPropagation()` se si vuole esplicitamente spezzare la catena di listening.
+
+Possiamo anche invertire l'ordine, metodologia detta **capturing**, partendo dall'elemento più esterno a quello più interno, ma solitamente si segue l'event bubbling definito prima.
+
+Il target quindi è l'elemento che si occupa del dispatch dell'evento.
+
+### Classe EventTarget
+
+Fornisce metodi che permettono la modellazione della gestione di eventi, tramite ricezione e gestione:
+
+- `addEventListener`: Fornisce un handler ad un evento, secondo la forma
+
+    ```javascript
+    addEventListener(type, listener, options)
+    //oppure
+    addEventListener(type, listener, useCapture)
+    ```
+    - `type`: Rappresenta la stringa del tipo di evento
+    - `listener`: un oggetto che ha il metodo handleEvent oppure una funzione JS per la gestione dell'evento, che abbia come parametro l'evento stesso
+    - `options`: oggetto per passare opzioni
+    - `useCapture`: definisce l'ordine.
+
+- `removeEventListener`: Rimuove l'handler
+    ```javascript
+    removeEventListener(type, listener, options)
+    //oppure
+    removeEventListener(type, listener, useCapture)
+    ```
+    Solitamente utilizzato quando si rimuove un elemento dal DOM.
+
+    Nel caso in cui si volessero rimuovere tutti i listener invece che uno solo dall'elemento specificato nel `listener` possiamo utilizzare un `abort` a cui passiamo un signal registrato nelle option a tempo di registrazione dell'evento.
+
+- `dispatchEvent`: Trasmette un oggetto evento al target in maniera sincrona, invocandone l'handler associato.
+    ```javascript
+    elem.dispatchEvent(evt)
+    ```
+    Dove `evt` è l'evento da trasmettere ed `elem` è l'elemento HTML a cui trasmettere l'evento.
+
+### Custom Event
+
+Non per forza bisogna utilizzare Eventi appartenenti all'API del DOM ma possiamo anche definirne di nuovi
+
+```javascript
+const e = new Event("build")
+elem.addEventListener(
+    "build",
+    (e) => {
+        //...
+    }
+)
+
+elem.dispatchEvent(e);
+const e = new CustomEvent("build", { detail: 42 });
+```
+
+## Oggetto Node nel DOM
+
+Tutti gli oggetti nel DOM sono `Node`, quindi `Node` è la classe astratta che viene implementata ad esempio da `Document` o `Element`.
+
+Alla base della manipolazione degli elementi del DOM, quindi un interfaccia comune per ogni elemento.
+
+Espone una serie di proprietà che ci permettono di navigare tra i nodi con ad esempio `firstChild`, `lastChild`, `parentElement`...
+
+### Metodi dell'Oggetto Node
+
+- `node.appendChild(newNode)`: aggiunge un nodo alla lista dei figli del nodo `node`.
+- `parent.insertBefore(newNode, node)`: inserisce `newNode` come figlio di `parent` prima di `node`.
+
+Esistono anche `removeChild` e `replaceChild` ed ulteriori metodi che permettono la manipolazione del DOM in maniera dinamica.
+
+## Oggetto NodeList nel DOM
+
+Rappresenta una lista di nodi del DOM, e ha metodi molto simili ad una mappa per permetterne la manipolazione:
+
+- `nodeList.forEach()`: applica una funzione a ciascun elemento.
+- `nodeList.keys()`: restituisce un iteratore sulle chiavi dei nodi della lista.
+- `nodeList.values()`: restituisce un iteratore sulla lista.
+- `nodeList.entries()`: restituisce un iteratore sulle coppie $(indice, valore)$ della lista.
+
+
+## Oggetto Document nel DOM
+
+Tramite le proprietà di questo oggetto possiamo accedere ad informazioni sull'intera pagina Web.
+
+Rappresenta la root del documento HTML e serve da entry point a tutto il suo contenuto, tramite attributi come:
+
+- `body`: riferimento al body.
+- `head`: riferimento alla head.
+- `cookie`: stringa di tutti i cookie separati da un `;`
+- `URL`: location del documento sottoforma di stringa.
+- `links`: lista dei link della pagina
+- `images`: la lista di immagini della pagina
+
+## Selezione Elementi tramite querySelector ed elementById
+
+Selezionare elementi della pagina tramite selettori CSS
+
+- `querySelector(selector)`: restituisce il primo elemento secondo il selettore passato.
+- `querySelectorAll(selector)`: restituisce una NodeList (statica).
+- `selectElementById(id)`: restituisce una HTMLElement (dinamica).
+
+## Creazione dinamica di Nodi
+
+Possiamo dinamicamente creare nodi tramite metodi di `Document`:
+
+- `document.createElement(tagName)`: Definisce un elemento, distinguendolo con la stringa passata in `tagName`.
+- `document.createTextNode(text)`: text è il contenuto del nodo testo.
+- `document.createAttribute(name)`: viene assegnato un attributo `name`.
+
+## Oggetto Element del DOM
+
+Rappresenta la classe base per tutti gli elementi, deriva da `Node`, queste possono ad esempio essere `SVGElement` ed `HTMLElement`.
+
+- `element.children`: lista di elementi figli di e.
+- `element.attributes`: lista di attributi di e.
+- `element.id`: identificatore unico dell'elemento.
+- `element.innerHTML`: stringa che rappresenta l'intero sottoalbero dell'elemento, cambiarne il valore modificherebbe appunto tutto il sottoalbero.
+
+### Manipolazione CSS tramite DOM
+
+Ogni `HTMLElement` ha una proprietà style, rappresenta lo stile CSS per l'elemento.
+
+Possiamo dinamicamente modellare lo stile di un elemento modificandone direttamente il valore, oppure accedendo alla proprietà read-only `classList`.
+
+## Oggetto Attr e CharacterData del DOM
+
+- **Attr**: Rappresenta un attributo di un elemento come oggetto e contiene l'associazione tra il nome dell'attributo ed il suo valore
+- **CharacterData**: Interfaccia astratta che rappresenta un nodo che contiene caratteri
+
+# Lezione 7 - NPM (Node Packet Manager) - 25/02/2026
+
+## Definizione Package NPM
+
+- Un package è una directory che contiene un file `package.json`
+- Per NPM un modulo è un qualsiasi file o directory nella cartella `node_modules`
+- Un modulo può non essere un package, per essere un package deve avere un `package.json`, ciascun modulo può essere ad esempio richiesto con require.
+- Possono essere definite con **scoped** tramite l'utilizzo del `scope@package`
+
+### Semantic Versioning
+
+Si segue una sintassi del tipo `vMAJOR.MINOR.PATCH` dove:
+- `MAJOR`: Cambiamenti breaking, non retrocompatibili.
+- `MINOR`: Aggiunta di feature, nuove funzionalità ma retrocompatibile.
+- `PATCH`: Fix, risoluzione di bug retrocompatibile.
+
+### Anatomia di un package.json
+
+```json
+{
+  "name": "test",
+  "private": true,
+  "version": "0.0.0",
+  "main":"index.js",
+  "type": "module",
+  //possiamo eseguire questi comandi come npm run [script]
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "hello": "echo \"HelloWorld\" "
+  },
+  // coppie chiave valore (pacchetto, range versioni) di dipendenze
+  // di cui ha bisogno il nostro pacchetto
+  // nello specifico per dipendenze a runtime
+  "dependencies": {
+    "typescript": ">5.9.3", //tutte quelle maggiori a quelle
+    "vite": "~7.3.1", //circa, accettiamo tutte quelle che variano
+    //  in MINOR o PATCH DEL VERSIONING
+    "vite1": "^7.3.1" //hat indica compatibili, quindi =x.y.z e <(x+1).y.z
+  },
+  // simile, ma non per runtime,
+  // per dipendenze per sviluppo non necessario al runtime
+  "devDependencies": {
+    "typescript": "~5.9.3",
+    "vite": "^7.3.1"
+  }
+}
+
+```
+
+### NPM package-lock.json
+
+Il `package-lock.json` descrive in maniera univoca un albero delle dipendenze.
+
+Se ne utilizza uno aggiuntivo `package.json` perchè il package dipende dal "quando", qualcosa può variare in base al tempo di installazione delle dipendenze. 
+- Potrebbe essere cambiato il pacchetto ma non la sua versione
+
+Quindi il `package.json` definisce le dipendenze del pacchetto, mentre il `package-lock.json` descrive univocamente tutte le sue dipendenze tramite un albero.
+
+### Comando npx
+
+Comando da CLI che esegue un comando locale o remoto, questi vengono cercati nel path `./node_modules/.bin`
+
+### Bun e Deno
+
+Alternative ad npm per gestione pacchetti:
+- **Bun**: Scritto in Zig, pensato per le massime prestazioni in termini di velocità.
+- **Deno**: Scritto dagli stessi autori di Node, pensato per la solidità basandosi sull'esperienza con Node.
+    - Supporto nativo con typescript
+    - Rispetta nativamente le API del browser
+    - Elimina le necessità delle node_modules tramite le registry
