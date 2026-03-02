@@ -433,3 +433,153 @@ Alternative ad npm per gestione pacchetti:
     - Supporto nativo con typescript
     - Rispetta nativamente le API del browser
     - Elimina le necessità delle node_modules tramite le registry
+
+# Lezione 8 - Frameworks - 02/03/2026
+
+- **Framework**: Piattaforma per lo sviluppo di applicazioni software, che fornisce una base su cui gli svilupatori possono costruire programmi per una piattaforma specifica.
+    - Permette la gestione strutturata invece che codice ripetuto in JS, detto boilerplate.
+    - Si seguono principi di design che semplificano lo sviluppo.
+
+- **Frontend**: Tutta la logica con cui interagisce l'utente.
+- **Metaframework**: Framework di framework, permettono l'utilizzo di più framework contemporaneamente, ad esempio con NextJS.
+
+## Concetti Ricorrenti nei Framework
+
+- **Componente**:
+    - Parte della UI che contiene la logica di rendering e la gestione delle informazioni ad essa associata.
+    - Hanno un ciclo di vita e sono riutilizzabili.
+        - Suddiviso quindi in fasi da quando viene aggiunto al DOM fino a quando viene rimosso da esso.
+- **Reattività**:
+    - Gestione della propagazione dei cambiamenti di stato
+    - Capacità per ciascun componente può cambiare, ad esempio a causa dell'esecuzione di un azione da parte dell'utente oppure per informazioni ottenute dal server.
+- **Template**:
+    - Estensione della sintassi HTML per agganciare HTML logica di presentazione con logica di business.
+- **Data Flow**:
+    - Meccanismi di comunicazione inter-componente.
+
+## Strategie di Rendering
+
+- **Client Side Rendering - CSR**:
+    - Il server invia un file **HTML minimale**.
+        - Nel HTML viene riferito anche il JS, che viene fornito in bundle dal server.
+        - Il `div` vuoto riempie la pagina, seguendo la logica fornita nel bundle JS.
+    - **Vantaggi**:
+        - Post rendering la pagina è molto fluida, in Single Page Application
+    - **Svantaggi**:
+        - First Contentful Paint (FCP) lento, impatto negativo dato dal primo caricamento che può risultare lento.
+        - A carico del client, quindi dipendente dal dispositivo da cui stiamo eseguendo.
+
+- **Server Side Rendering - SSR**:
+    - Il server riceve la richiesta, recuperai dati, genera l'intero HTML completo per quella pagina e la invia al browser.
+    - **Vantaggi**:
+        - Caricamento iniziale quasi istantaneo, ideale per dispositivi poco performanti.
+    - **Svantaggi**:
+        - Perdita di interattività immediata, tramite **Hydration**, in cui il framework a tempo d'interazione deve occuparsi di aggiornare la pagina acquisendo le informazioni dal server.
+
+## Introduzione a React
+
+- Libreria **dichiarativa** (si descrive cosa deve essere fatto ma non come deve essere fatto, per ripassare cosa si intenda con dichiarativo) sviluppata da Meta per creare interfacce utente.
+- Nasce per questione di manutenibilità di Facebook, poi disaccoppiato all'acquisizione di Instagram e ancora dopo reso open source.
+- Nasceva come libreria, successivamente diventata un framework.
+
+### Componenti React
+
+Ogni componente è una funzione JS, accetta input tramite `Props` e restituisce un `ReactElement`, utilizzando nel suo corpo la sintassi **JSX**, mescolando **HTML** e **JS**.
+
+```JSX
+function SAW() {
+    return <div>
+        <h1> SAW TODO </h1>
+        <p> Welcome to SAW React </p>
+    </div>
+}
+```
+
+- **Sintassi e Regole JSX**: 
+    - Un espressione JSX deve restituire un singolo elemento radice, racchiudendo ad esempio tutto in un `<div>`.
+    - Tutti i div devono essere chiusi a differenza di **HTML5**.
+
+- **Relazione tra Componenti**: Possiamo chiamare in una funzione che ritorna Componenti delle funzioni che ritornano altri componenti.
+
+    ```JSX
+    function UserInfo() {
+        return (
+            <div>
+                <Avatar />
+                <Age />
+                <Name />
+            </div>
+        )
+    }
+    ```
+
+### Props React
+
+I componenti dovrebbero essere funzioni pure rispetto alle Props passate, non modificandole ma andando solo in readonly.
+
+```JSX
+function Avatar(props) {
+    return <img src={props.url}/>
+}
+```
+
+### Hooks React
+
+Gli Hook in Reacto sono funzioni JavaScript che possono essere usati nei componenti, ora i componenti si definiscono solo secondo il paradigma funzionale.
+
+Evitano scrittura di classi per definire Componenti, permettono la gestione di stato e dei side effects.
+
+Bisogna seguire due regole:
+- Bisogna utilizzare gli hook a top level del componente.
+- Gli hook possono essere chiamati solo dentro altre funzioni chiamate.
+
+#### Hook useState
+
+Hook che permette di gestire una variabile di stato per componente. Lo stato è privato al componente.
+
+Si basa sulla restituzione di un getter ed un setter come primi due valori di un array.
+
+```JSX
+function ClickCounter() {
+    const [n, setN] = useState(0);
+
+    function handleClick() {
+        setN((v) => v + 1)
+        setN((v) => v + 1)
+    }
+
+    return (
+        <button onClick={handleClick}>
+            Add 2 to count: {n}
+        </button>
+    )
+}
+```
+
+Viene utilizzata al **referential equality**, quindi se passiamo un oggetto ad una useState, questi verranno confrontati per riferimento, se vengono modificati questi l'oggetto sarà ancora lo stesso. Quindi va eventualmente copiato e modificata la copia dell'oggetto.
+
+```JSX
+//esempio di deep copy per gestione della referential equality
+function Exam() {
+    const [exam, setExam] = useState({ name: "SAW", grade: 17})
+
+    function incrementGrade() {
+        setExam((e) => ({...exam, grade: e.grade + 1}))
+    }
+
+    return (
+        <div>
+            <p> All'esame di {exam.name} hai preso {exam.grade} </p>
+            <button onClick = {incrementGrade}> Alza il voto </button>
+        </div>
+    )
+}
+```
+
+#### Hook useRef
+
+Restituisce un oggetto con la proprietà `current`, ossia riferimento al valore attuale. È possibile modifcare il valore riferito, utile per ottenere un riferimento ad un elemento HTML.
+
+#### Hook useEffect
+
+Serve a sincronizza re un componente con un sistema esterno, ad esempio per chiamare una API per aggiungere o rimuovere event handler.
