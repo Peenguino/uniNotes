@@ -136,3 +136,101 @@ Si tratta del manifesto dell'Applicazione che include:
     - Configurazione di ciascun componente, inclusa classe Java
     - Dettagli sugli Intent dei vari componenti
 - Altri metadati, come librerie, strumenti di profiling.
+
+# Lezione 05 - Activity I - 25/02/2026
+
+`Basato sul PDF Lezione 05`
+
+Le **activity** sono **componenti** di un **applicazione**.
+- La **dimensione** di un activity **non è prefissata**, la si determina a tempo di sviluppo.
+- I **task utente** si compongono di varie **Activity**.
+    - Lanciando un **Intent** si collegano le varie **Activity** del **Task** che sta eseguendo l'utente. Questo si basa su uno Stack, quindi ogni avvio di Activity provoca un push sullo Stack.
+    - L'Interazione Utente quindi avviene solo sul Top della pila.
+- In realtà in modalità Overview, quando vediamo tutte le applicazioni, non vedo un solo Stack ma molteplici Stack, quindi molteplici Stack di Activities di un Task, dove uno di questi è quello in Foreground. Quindi per ogni Task uno Stack.
+- Tutto quello che vediamo nella Overview sono screenshot del runtime dei Task, ma in realtà non è assolutamente necessario che tali Applicazioni siano caricate in memoria.
+- Da Android Nougat e Oreo sono state rispettivamente aggiunte Split Screen e Picture-in-Picture che permettono di avere più Top sullo Stack contemporaneamente.
+
+## Comportamento a tempo di Avvio di Activity
+
+### Comportamento e Gestione di Flag
+
+Se si avvia un Activity:
+- Se non esisteva un task contenente l'Activity allora viene creato un nuovo task con Stack contenente solo un istanza del Activity richiesta.
+- Se viene riavviata un'activity che era top del suo stack, si torna a quella particolare istanza.
+- Se viene riavviata un activity che non era top del suo stack allora viene lanciata una nuova istanza e messa in cima allo stack
+
+La **gestione** di queste Activities **può essere** anche **personalizzata** tramite l'utilizzo di flags:
+- **Standard**: Crea sempre una nuova istanza dell'Activity nel task di destinazione.
+- **SingleTop**: Se l'Activity è top, riavvia l'istanza esistente, altrimenti crea una nuova istanza.
+- **SingleTask**: Può esistere una sola istanza dell'Activity. Se ce n'è già una in qualche Task viene riavviata quella, altrimenti si crea un nuovo Task, che ha l'Activity come unico elemento.
+- **SingleInstance**: Come la precedente, ma se si crea un nuovo task non consente di creare ulteriori Activity al suo interno.
+
+Anche lato Intent possono essere lanciate con opzioni specifiche tramite la flag `FLAG_ACTIVITY_*`, ad esempio:
+- `FLAG_ACTIVITY_NEW_TASK`: L'Activity viene lanciata in un nuovo stack di cui è unico membro
+- `FLAG_ACTIVITY_CLEAR_TOP`: Se l'Activity esiste nello stack corrente tutte quelle sopra di essa vengono chiuse, e l'Activity diventa top.
+- `FLAG_ACTIVITY_SINGLE_TOP`: Se l'Activity è già quella top nello stack corrente allora non viene lanciata.
+
+### Lancio di un Activity
+
+Il lancio di un App su Android è **disaccoppiato** da un punto di vista **logico** e **fisico**. Quindi un Applicazione può essere in Overview ma non necessariamente caricato in memoria.
+
+Si segue, per il lancio di Intent espliciti un pattern di programmazione asincrona, dato che la UX è fondamentale.
+
+Tutti i metodi di `onCreate()`, `onActivityResult()` sono appartenenti alle Activity e verrano invocate dal sistema per eseguire quell'azione.
+
+### Disaccoppiamento Memoria Logica/Fisica Android
+
+Un **Activity a runtime** è anch'essa **disaccoppiata**, **terminare un Activity** e riavviarla **non necessariamente implica** l'allocazione su Heap, per la stessa questione di prima di disaccoppiamento fisico/logico.
+- Il disaccoppiamento può anche portare alla deallocazione fisica di un oggetto Activity in memoria anche se da un punto di vista logico è ancora attivo.
+- Questo è un approccio completamente opposto all'utilizzo dell Swap ad esempio in Unix, in quel caso l'OS non sa minimamente cosa si stia spostando su disco.
+- Allo stesso tempo Android non usa lo Swap anche perchè impossibile che si utilizzino dei dischi, che non risentono di ripetute scritture.
+
+Si seguono quindi delle **politiche di priorità** per la **gestione della deallocazione**:
+- **Priorità Critica**: Activity top dello Stack corrente, non viene mai deallocata.
+- **Priorità Alta**: Activity visibili tramite le trasparenze di quella top.
+- **Priorità Bassa**: Activity visibili e non utilizzate.
+
+Quindi ogni **Activity** dovrebbe **gestire** le **informazioni di salvataggio** di stato d'istanza, per far conoscere al sistema le informazioni fondamentali se dovesse riprendere in memoria fisica un istanza dell'Activity.
+
+### Fasi di un Ciclo di Vita di un Activity
+
+- `onCreate()`: Creazione dell'attività.
+- `onStart()`: Prepara la UI.
+- `onResume()`: Da un punto di vista logico stai per interagire con l'utente.
+- `onPause()`: Si passa in background da un punto di vista logico, quindi la sua priorità si abbassa da Critica ad Alta. Si dice esplicitamente che non si riceverà input dall'utente, ma potrebbe essere ancora parzialmente visibile tramite ad esempio trasparenza.
+- `onStop()`: L'applicazione oltre ad essere in background non è nemmeno visibile.
+- `onDestroy()`: Da un punto di vista logico l'Activity è terminata.
+
+#### Salvataggio Stato Istanza Activity
+
+Ciascuna Activity dovrebbe fornire al sistema una `onSaveInstanceState()` quando è necessario salvare parte dello stato dell'activity per il ripristino a breve.
+- Se termina il ciclo di vita logico allora questo metodo non verrà mai invocato dal sistema dato che abbiamo la garanzia che fisicamente non avremo mai bisogno di quei dati.
+- Se, al contrario, il ciclo logico non è finito allora `onSaveInstanceState()` è importante se dovesse essere necessario rialzare il processo fisico.
+- Lo stato viene salvato in un oggetto di tipo Bundle, che è una mappa con specifici metodi `putString()`, `putInt()`, `putBundle()`. 
+    - Questo viene anche salvato su disco se il dispositivo viene spento.
+
+## Ripresa Bundle della Lezione Precedente
+
+- Riprendendo dal concetto di Bundle, questo mantiene le informazioni e lo stato dell'astrazione logica del Activity.
+- Con la `onSaveInstanceState()` probabilmente salveremo parte della UI tramite le View.
+    - L'implementazione di default visita l'albero del XML della UI e salva lo stato per ogni nodo dell'intera interfaccia utente, in base a quanto quest'ultimo crede di voler essere salvato.
+
+## Due Stili di User Interface UI
+
+Gestione con due stili
+- **Tradizionale basato su `View`**: nativo di Android ma molto consistente.
+    - Definisce tutta la UI come un albero di oggetti Java.
+- **Moderno basato su `Composable`**: basato sull'utilizzo di lambda, utilizzabile solo in Kotlin.
+    - Utilizza una libreria moderna detta Kotlin, basata su design pattern.
+
+## UI basata su Layout e View
+
+Due classi principali `ViewGroup` e `View`, dove la prima è sottoclasse della seconda e corrisponde ai nodi intermedi, fornendo metodi per la gestione dei figli.
+
+L'interazione è basata su Eventi e relative Handler registrati per la gestione di quell'Evento.
+- Gli handler vengono registrati come inner interfaces all'interno della classe View.
+- Ogni interfaccia definisce un metodo `on ... Listener()`
+
+# Lezione 06 - Esempio di App BMI Calc - 27/02/2026
+
+** aggiunta di snippet dalla BMI APP **
