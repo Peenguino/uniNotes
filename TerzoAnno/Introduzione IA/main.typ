@@ -834,4 +834,198 @@ Quindi dato ad esempio il problema dell'aspirapolvere, per trovare una soluzione
 
 In questo caso il sottoalbero soluzione è quello rappresentato in grassetto.
 
+= Lezione 6 - Agenti Basati su Conoscenza - 05/03/2025
+
+`Riferimento AIMA Cap 7.1 - 7.3`
+
+== Agenti Knowledge Based KB e Dichiarativo vs Procedurale
+
+Si aumentano le capacità degli agenti di visualizzare ed avere la rappresentazione di mondi complessi e astratti.
+
+Questo permette definizione di agenti detti *Knowledge Based KB*:
+- Rappresentiamo il mondo in modo astratto per funzionalità specifiche degli agenti.
+
 #pagebreak()
+
+- Si definisce quindi la *necessità di rappresentare la conoscenza* che siano espressivi e con *capacità di inferenza*.
+
+
+*Approccio Dichiarativo vs Procedurale*:
+
+- *Dichiarativo*: Definito su quello che il modello deve sapere, questo viene defniito tramite una funzione `TELL`.
+  - Si inizia da una conoscenza di base vuota e si aggiungono mano mano formule di conoscenza.
+- *Procedurale*: Definito il programma che implementa il processo decisionale, una volta per tutte.
+
+*Formulazione Agenti Knowledge Based*:
+
+Insieme di enunciati espressi in un linguaggio di rappresentazione, si interagisce con questa conoscenza tramite un interfaccia funzionale `Tell-Ask`:
+
+- `Tell`: per aggiungere nuova Knowledge.
+- `Ask`: per interrogare la Knowledge.
+- `Retract`: per eliminare Knowledge.
+
+== Conseguenza Logica e Knowledge Base (KB)
+
+Definiamo cosa sia una *conseguenza logica*, elencando le *differenze* tra *KB* ed una normale *base di dati*.
+
+*Definizione di Conseguenza Logica*:
+
+Data una *base di conoscenza* $"KB"$, contenente una *rappresentazione dei fatti* che si *ritengono veri*, come dedurre che un certo fatto $alpha$ è vero di conseguenza? $ "KB" models alpha $
+
+Tutte le risposte $alpha$ devono discendere direttamente dalla $"KB"$, quindi $"KB" models alpha$.
+
+Un programma agente sarà:
+
+```
+function Agente-KB (percezione) returns un’azione
+  persistent: KB, una base di conoscenza
+      t, un contatore, inizialmente a 0, che indica il tempo
+
+  TELL(KB, Costruisci-Formula-Percezione(percezione, t ))
+  azione = ASK(KB, Costruisci-Query-Azione( t ))
+  TELL(KB, Costruisci-Formula-Azione(azione, t ))
+  t = t + 1
+  return azione
+```
+
+#v(1cm)
+
+*Knowledge Base vs Base di Dati*:
+- La Base di Conoscenza permette di effettuare inferenza sulle informazioni, a differenza della base di dati che contiene solo fatti specifici, immagazzinati per eventuale recupero.
+- Su questo si basa anche un *trade-off* per cui il linguaggio più è espressivo e *meno efficiente* sarà il *meccanismo inferenziale*.
+
+#pagebreak()
+
+== Logica
+
+Si basa su tre elementi principali:
+- *Sintassi*: Definire quando un espressione sia o meno ben formata.
+- *Semantica*: Esprime il significato della formula.
+- *Meccanismo Inferenziale*: Permette di inferire nuovi fatti, dalla base di conoscenza.
+
+#v(0.5cm)
+
+#figure(
+  image("img/logica.png", width:350pt)
+)
+
+== Agenti Logici: Calcolo e Logica Proposizionale
+
+`AIMA Cap 7.3 e 7.4`
+
+- *Sintassi linguaggio Proposizionale*: Definite tramite una *BNF*:
+
+#figure(
+  image("img/grammaticaLinguaggioProp.png", width:270pt)
+)
+
+#v(1cm)
+
+- *Semantica linguaggio Proposizionale*: Si definisce un interpretazione specificando il valore di verità per ciascun simbolo proposizionale.
+- *Modello di una Formula*: Interpretazione che rende vera la formula.
+
+#v(0.5cm)
+
+=== Definizione Conseguenza Logica
+
+Una formula $alpha$ è conseguenza logica di un insieme di formule $"KB"$ se e solo se in ogni modello di $"KB"$, anche $alpha$ è vera, ossia $"KB" models alpha$. Quindi
+
+$ "KB" models alpha <=> M("KB") subset.eq M(alpha) $
+
+#pagebreak()
+
+=== Definizione Model Checking
+
+Un modo per determinare la *conseguenza logica*:
+- Enumerando i modelli
+- Mostrando che la formula $alpha$ deve valere in tutti i modelli in cui è vera la $"KB"$.
+- Si usa per eseguire inferenza logica.
+
+== Calcolo Proposizionale negli Agenti Logici
+
+`AIMA Cap 7.6`
+
+La *conseguenza logica* non viene definita solo tramite *model checking* ma *anche tramite dimostrazione*:
+- Applicando regole di inferenza direttamente alle formule della $"KB"$.
+- Costruendo una dimostrazione della formula desiderata senza consultare i modelli.
+
+Tutto questo è basato su *tre principi*, ossia:
+- *Equivalenza logica*: Due formule $alpha$ e $beta$ sono equivalenti se sono vere nello stesso insieme di modelli.
+- *Validità*: Una formula $alpha$ è valida se e solo se è vera in ogni interpretazione, queste formule sono dette anche tautologie.
+  - Si basa sul teorema di deduzione, ossia che date due formule $alpha$ e $beta$ vale che $ alpha models beta <=> (alpha => beta) "è valida" $
+- *Soddisfacibilità*: Una formula $alpha$ è soddisfacibile se e solo se esiste almeno un interpretazione in cui $alpha$ è vera.
+
+*Definizione Dimostrazione per Assurdo*:
+- Per il Th. di deduzione vale che $alpha models beta <=> (alpha => beta)$ è valida.
+- $alpha models beta <=> not (alpha => beta)$ è insoddisfacibile.
+- $(alpha => beta) eq.triple (not alpha or beta) eq.triple (alpha and not beta)$
+- Quindi $alpha models beta <=> (alpha and not beta)$ è insoddisfacibile.
+
+*Inferenza per PROP*:
+- *Model Checking*:
+  - Forma di inferenza che fa riferimento alla definizione di conseguenza logica, enumerando i possibili modelli.
+  - Si utilizza una tecnica con tabelle di (TV).
+- *Algoritmi per la Soddisfacibilità (SAT)*:
+  - $"KB" models alpha <=> ("KB" and not alpha)$ è insoddisfacibile, dal teorema di refutazione.
+  - La conseguenza logica può essere ricondotta a un problema SAT.
+
+#pagebreak()
+
+=== Model Checking e Algoritmo TV-Consegue
+
+Consiste in:
+- Enumerare tutti i possibili modelli di KB, tramite l'utilizzo della tabella di verità.
+- Verificare che in essi la formula $alpha$ sia vera.
+
+*Algoritmo TV-Consegue*: Segue questi passi, cercando di capire se $"KB" models alpha$:
+- Enumera tutte le possibili interpretazioni di $"KB"$
+  - Su $k$ simboli produrrà quindi $2^k$ possibili interpretazioni.
+- Per ciascuna interpretazione
+  - Se non soddisfa $"KB"$, allora viene marcata come $"OK"$.
+  - Se soddisfa $"KB"$, si controlla che soddisfi anche $alpha$.
+- Se si trova anche solo una interpretazione che soddisfa $"KB"$ e non $alpha$ la risposta sarà $"NO"$.
+
+=== Algoritmi per la Soddisfacibilità (SAT)
+
+Basata sulla forma a clausole in *forma normale congiuntiva (CNF)*, ossia:
+
+$ (A or B) and (not B or C or D) and (not A or F) $
+
+Non è restrittiva, è sempre possibile ottenerla con trasformazioni che *preservano l'equivalenza logica*. Rappresentata quindi come
+insieme di letterali del tipo
+
+$ {A,B} {not B, C, D} {not A, F} $
+
+==== Trasformazione in Forma Normale Congiuntiva (CNF)
+
+Si basa sui seguenti passi:
+- *Eliminazione del $<=>$*: $(A <=> B) eq.triple (A => B) and (B => A)$ 
+- *Eliminazione del $=>$*: $(A => B) eq.triple (not A or B)$
+- *Negazioni all'interno (De Morgan)*:
+  - $not(A or B) eq.triple (not A and not B)$ 
+  - $not(A and B) eq.triple (not A or not B)$ 
+- *Distribuzione di $or$ su $and$*: $(A or (B and C)) eq.triple (A or B) and (A or C)$
+
+#v(-0.24cm)
+
+==== Algoritmo DPLL
+
+Algoritmo basato sui seguenti passi:
+- Si parte da una $"KB"$ in *forma a clausole*
+  - Prende in input una *formula CNF*, quindi *insieme di clausole*.
+- Si effettua un *enumerazione ricorsiva* in profondità di tutte le possibili interpretazioni alla ricerca di un modello.
+- Si basa su *tre ottimizzazioni* rispetto a `TV-Consegue`:
+  - *Terminazione Anticipata*:
+    - Si può decidere sulla base anche di interpretazioni parziali.
+    - Se anche una sola clausola è falsa, l'interpretazione non può essere un modello dell'insieme di clausole.
+  - *Euristica di Simboli Puri*:
+    - Simboli che appaiono con lo stesso segno in tutte le clausole, possono quindi essere direttamente sostituiti con `true` o `false`.
+  - *Clausole Unitarie*: Una clausola con un solo letterale non assegnato. Conviene quindi assegnare prima valori al letterale in clausole unitarie.
+
+#pagebreak()
+
+/*
+#figure(
+  image("img/algGenetico8Regine.png", width:300pt)
+)
+*/

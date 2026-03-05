@@ -234,3 +234,92 @@ L'interazione è basata su Eventi e relative Handler registrati per la gestione 
 # Lezione 06 - Esempio di App BMI Calc - 27/02/2026
 
 ** aggiunta di snippet dalla BMI APP **
+
+# Lezione 07 - Interazione con la UI - 04/03/2026
+
+## Layout e View
+
+- `LayoutManager`: Particolare tipo di `ViewGroup`, che specifica posizionamento dei figli oltre ad averne e toglierne.
+    - Si definisce il posizionamento tramite un processo di negoziazione, in maniera tale da gestire i figli.
+    - Esistono Layout predefiniti: 
+        - `AbsoluteLayout` fissando le coordinate
+        - `LinearLayout` scalando verticalmente e orizzontalmente
+        - `RelativeLayout` con posizione di ogni componente relativa agli altri o al contenitore
+        - `GridLayout` definita tramite una griglia di celle logiche di dimensione variabile.
+        - `FrameLayout`: I figli di questo nodo vengono messi uno sopra l'altro, utilizzato per presentazione iniziale di UI.
+        - `DrawerLayout`: Utilizzati per i menù a scorrimento laterale.
+        - `SwipeRefreshLayout`: Supporta lo swipe to refresh.
+
+Esistono anche `Layout` contenitori specifici che non sono `LayoutManager` con figli prefissati come `Gallery`, `CalendarView`...
+
+- Le `View` sono invece le foglie della UI, e non per forza di cose bisogna utilizzare quelli predefiniti, se ne possono anche definire di personalizzati.
+
+- Le `View` tra `XML` e classi Java devono corrispondere.
+    - Questo permette di fare riferimento a classi del package `android.widget` per **tag non qualificati** e classi custom per tag qualificati
+
+## Listener
+
+Citate solo alcune delle interfacce, non tutte, consulta slide per maggiori informazioni.
+
+- `OnAttachStateChangeListener`
+    - Le `View` possono essere inserite o rimossa da un albero dinamicamente (a run-time)
+    - `onViewAttachedToWindow(View v)`
+    - `onViewDetachedFromWindow(View v)`
+- `OnDragListener`
+    - Le `View` possono essere drag-droppate una sull'altra
+    - `onDrag(View v, DragEvent e)`
+    - Vengono chiamati gli `onDrag()`, secondo un protocollo
+    noto
+        - della vista draggata
+        - di quella da cui viene draggata
+        - di quelle su cui passa
+        - di quella su cui viene droppata
+
+## Menu, Opzioni e ActionBar
+
+- `Menu`: L'App dichiara quali scelte offre all'utente, ed il sistema sceglie come presentarli. Quindi non bisogna strutturare in maniera gerarchica il contenuto, va solo listato.
+
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/menu1" android:icon="@drawable/ic_menu1"
+    android:title="@string/menu1" />
+    <item android:id="@+id/menu2" android:icon="@drawable/ic_menu2"
+    android:title="@string/menu2" />
+    <item android:id="@+id/sottomenu" android:icon="@drawable/ic_sottomenu"
+    android:title="@string/sottomenu" >
+    <menu>
+        <item android:id="@+id/sotto1" android:title="@string/sotto1" />
+        <item android:id="@+id/sotto2" android:title="@string/sotto2" />
+    </menu>
+    </item>
+</menu>
+```
+
+Quindi questo permette di dichiarare un menu in senso logico, ma non abbiamo nessuna garanzia sul come questo menù verrà mostrato.
+
+- Il ciclo di vita dei menu si basa su dei metodi relativi alla transizione di stato specifica:
+    - `onCreateOptionsMenu()`: crea il menu
+    - `onPrepareOptionsMenu()`: sta per visualizzare il
+    menu
+    - `onOptionsItemSelected()`: reagisce alle selezioni
+
+    Da Android 3 in poi viene dato per scontato che il menu non venga modificato fino ad una specifica invocazione di metodo
+
+** vedi slide **
+
+### Context Actions
+
+Normalmente esiste una actionbar, ma questa può completamente variare in base al `Context Action`, implementando un interfaccia `ActionMode.Callback`, specificando anche come si entra in questa nuova modalità tramite il metodo `startActionMode(ActionMode mode, Menu menu)`
+
+### Popup Menu
+
+Simile ad un menu, ma anche collegato ad una View anche fisicamente, non solo logicamente.
+
+### Creazione Menu Dinamico in base ad Intent Filter
+
+** vedi slide **
+
+### Menu con Jetpack Compose Introduzione
+
+** vedi slide **

@@ -434,7 +434,7 @@ Alternative ad npm per gestione pacchetti:
     - Rispetta nativamente le API del browser
     - Elimina le necessità delle node_modules tramite le registry
 
-# Lezione 8 - Frameworks - 02/03/2026
+# Lezione 8 - Frameworks e Introduzione React - 02/03/2026
 
 - **Framework**: Piattaforma per lo sviluppo di applicazioni software, che fornisce una base su cui gli svilupatori possono costruire programmi per una piattaforma specifica.
     - Permette la gestione strutturata invece che codice ripetuto in JS, detto boilerplate.
@@ -583,3 +583,83 @@ Restituisce un oggetto con la proprietà `current`, ossia riferimento al valore 
 #### Hook useEffect
 
 Serve a sincronizza re un componente con un sistema esterno, ad esempio per chiamare una API per aggiungere o rimuovere event handler.
+
+# Lezione 9 - React - 04/03/2026
+
+## Custom Hooks
+
+Si possono definire hooks personalizzati per condividere logica tra componenti.
+
+Tutti gli hooks iniziano per `use` per convenzione, e vengono chiamati tutte le volte che il componente viene nuovamente renderizzato.
+
+Si utilizza anche la convenzione per cui gli hook vengono scritti in testa ai componenti per fare in modo che
+questi non vengano definiti in `for` o `if`, e non dipendano quindi dalla logica del programma ma si può definire
+staticamente quali hooks verranno chiamati da un componente.
+
+## Error Boundary
+
+Permette la reazione ad errori, tramite la renderizzazione del componente definito nel fallback.
+
+** vedi snippet **
+
+## Suspense
+
+Utilizzato per gestione di eventi asincroni
+
+** vedi snippet **
+
+## Costrutto use
+
+Permette la gestione delle `Promise`, come in std `async` avremmo fatto con await, permette quindi la valutazione di `Promises`.
+
+## Condivisione Stato tramite Prop/Context
+
+- **Tramite Props**: Un modo che potremmo immaginare per condividere lo stato tra `Components` tramite le Prop passando per la gerarchia di componenti. Questo può portare alla Prop Drilling, magari condividendo stato tra componenti che non necessitano di quello stato.
+- **Tramite Context**: Si proietta l'informazione tramite un `Context`.
+    - Si basa sulla creazioni di contesto nel Componente più alto nella gerarchia e tutti quelli sotto avranno visibilità su quelle informazioni di `Context`.
+    - Utili quindi quando bisogna passare informazioni ad un grande sottoalbero di componenti di un componente radice, come ad esempio il tema, l'informazione del corrente utente connesso...
+
+## useReducer
+
+Maniera alternativa per gestire lo stato rispetto a `useState()`:
+- Si definiscono delle funzioni pure `reducer()` fuori dal componente.
+- Non si invoca quindi `setState()` ma si effettua un **dispatch di action**.
+- In questo modo si sposta la logica del funzionamento fuori dal componente, utile se aumenta la complessità per disaccoppiare le due cose.
+
+### useState vs useReducer
+
+- Dimensione del codice minore con `useState()`, ma `useReducer()` permette di fattorizzare la logica del componente per riutilizzarla, quindi potrebbe risultare anche più leggibile.
+- Anche da un punto di vista del testing risulta meglio `useReducer()`, potendo riferire a delle funzioni pure.
+
+## Actions
+
+Supporto nativo per gestione dei tag form e l'utilizzo in essi di prop action.
+
+** vedi snippet **
+
+- La gestione dello stato delle Action avviene tramite l'utilizzo di un hook `useActionState`, restituisce infatti lo stato corrente, la funzione da collegare ai form.
+
+## Optimistic Update tramite useOptimistic
+
+Si mostra all'utente uno stato diverso mentre l'operazione è in esecuzione:
+- Se l'esecuzione ha avuto successo il valore viene confermato
+- Se l'esecuzione fallisce allora si fornisce un fallback da eseguire.
+
+Quindi si basa sull'utilizzo di due stati, uno **reale** ed uno **ottimistico**, chiamando la funzione di aggiornamento subito prima di far partire l'operazione verso il server.
+
+## React Server Components
+
+React offre un servizio di rendering lato server, di default con il settato con Vite della lezione è client side.
+
+Porta vari vantaggi, è il default da React 19, vantaggi come:
+- **Bundle Size ridotto**: Il componente si trova sul server e non sul client.
+- **Accesso Diretto al Backend**: Possibile interrogare databases direttamente dal backend senza utilizzo di token per API.
+- Segue un "paradigma" differente rispetto al client side.
+
+## Passi per Costruzione Web App in React
+
+- Divisione della UI in una gerarchia di componenti.
+- Costruire una versione statica in React.
+- Identificare lo stato dell'Applicazione.
+- Identificare dove dovrebbe stare lo stato.
+- Gestire il flusso inverso dei dati per la gestione del cambiamento di stato.
