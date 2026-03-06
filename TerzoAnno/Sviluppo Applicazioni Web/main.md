@@ -600,17 +600,36 @@ staticamente quali hooks verranno chiamati da un componente.
 
 Permette la reazione ad errori, tramite la renderizzazione del componente definito nel fallback.
 
-** vedi snippet **
+```JSX
+<ErrorBoundary fallback={<p> Errore </p>}>
+    <Children/>
+</ErrorBoundary>
+```
 
 ## Suspense
 
-Utilizzato per gestione di eventi asincroni
+Utilizzato per gestione di eventi asincroni:
 
-** vedi snippet **
+```JSX
+<Suspense fallback={<h1> Loading </h1>}>
+    <InnerComponent p = {loadData()} />
+</Suspense>
+```
+
+In questo caso la funzione passata al `InnerComponent` è asincrona e ritorna una `Promise`, di conseguenza viene gestita wrappandola con il componente `Suspense`.
 
 ## Costrutto use
 
 Permette la gestione delle `Promise`, come in std `async` avremmo fatto con await, permette quindi la valutazione di `Promises`.
+
+Questo può tornare utile per gestire `Promises` all'interno di if o for, quindi non utilizzando un hook ma direttamente all'interno della logica del componente.
+
+```JSX
+function Message({ messagePromise }) {
+    const content = use(messagePromise)
+    return <p> Message: {content} </p>
+}
+```
 
 ## Condivisione Stato tramite Prop/Context
 
@@ -635,9 +654,23 @@ Maniera alternativa per gestire lo stato rispetto a `useState()`:
 
 Supporto nativo per gestione dei tag form e l'utilizzo in essi di prop action.
 
-** vedi snippet **
+```JSX
+<form action = {async (formData) => {
+    await updateName(formData.get("name"));
+}}>
+```
 
 - La gestione dello stato delle Action avviene tramite l'utilizzo di un hook `useActionState`, restituisce infatti lo stato corrente, la funzione da collegare ai form.
+
+### UseActionState per gestione stato Actions
+
+Hook per gestire risultato di una `Action`, sostituisce `useFormState`.
+
+```JSX
+const [state, formAction, isPending] = useActionState(fn, initialState)
+```
+
+Si definisce quindi in `fn` la funzione da eseguire e in `initialState` lo stato iniziale, qualora si volesse partire ad esempio disattivando pulsanti.
 
 ## Optimistic Update tramite useOptimistic
 

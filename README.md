@@ -44,5 +44,5 @@ Gli appunti presenti in questa repo sono:
 - **Sviluppo Applicazioni Web (SAW)**:
     - Appunti in Markdown (in corso).
 - **Introduzione IA**:
-    - Appunti in Markdown (in corso).
+    - Appunti in Typst (in corso).
     
