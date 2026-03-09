@@ -233,7 +233,7 @@ L'interazione è basata su Eventi e relative Handler registrati per la gestione 
 
 # Lezione 06 - Esempio di App BMI Calc - 27/02/2026
 
-** aggiunta di snippet dalla BMI APP **
+Interamente riferita alla gestione su Android Studio di un dummy di una App BMI Calc.
 
 # Lezione 07 - Interazione con la UI - 04/03/2026
 
@@ -304,9 +304,11 @@ Quindi questo permette di dichiarare un menu in senso logico, ma non abbiamo nes
     menu
     - `onOptionsItemSelected()`: reagisce alle selezioni
 
-    Da Android 3 in poi viene dato per scontato che il menu non venga modificato fino ad una specifica invocazione di metodo
+    Da Android 3 in poi viene dato per scontato che il menu non venga modificato fino ad una specifica invocazione di metodo.
 
-** vedi slide **
+### Context Menu
+
+Da un punto di vista concettuale sono **l'equivalente del tasto destro** su Windows, **dipendono** dalla **View** specifica dove si invocano.
 
 ### Context Actions
 
@@ -314,12 +316,114 @@ Normalmente esiste una actionbar, ma questa può completamente variare in base a
 
 ### Popup Menu
 
-Simile ad un menu, ma anche collegato ad una View anche fisicamente, non solo logicamente.
+Simile ad un menu, ma anche **collegato ad una View** anche **fisicamente**, non solo logicamente.
 
 ### Creazione Menu Dinamico in base ad Intent Filter
 
-** vedi slide **
+Un Menu può essere definito anche in base all'Intent Filter, inserendo tutti i receiver per qui dati.
+
+Si può anche definire tramite un azione definita nell'Intent Filter, inserendo quindi tutti i receiver in grado di compiere quell'azione.
 
 ### Menu con Jetpack Compose Introduzione
 
-** vedi slide **
+Approccio moderno di definizione di Menu, sotto uno snippet per rendere l'idea.
+
+```kotlin
+@Composable
+fun MinimalDropdownMenu() {
+    var expanded by remember { mutableStateOf(false) }
+    Box( modifier = Modifier.padding(16.dp) ) {
+    IconButton(onClick = { expanded = !expanded }) {
+            Icon(Icons.Default.MoreVert, contentDescription = "More options")
+        }
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false }
+        ) {
+            DropdownMenuItem(
+            text = { Text("Option 1") },
+            onClick = { /* Do something... */ }
+            )
+            DropdownMenuItem(
+            text = { Text("Option 2") },
+            onClick = { /* Do something... */ }
+            )
+        }
+    }
+}
+```
+
+# Lezione 08 - View e Layout Custom - 06/03/2026
+
+Definire proprie View secondo l'approccio della rappresentazione in memoria degli oggetti View e Layout, approccio Java.
+
+## Definire una Propria View
+
+Tutte le View personalizzate sono sottoclassi di View, quindi estendendo View ed implementando specifici metodi per:
+- `onMeasure(int widthSpec, int heightSpec)`: Gestisce la negoziazione tramite i requisiti passati come argomenti, non solo **dimensioni** ma anche **modi**.
+    - Deve essere invocato all'interno della funzione `onMeasure` il metodo `setMeasuredDimension(int width, int height)`, che passa le dimensiori richieste.
+    - Si basa su un costrutto di sovrascrittura di eventuali implementazioni di sottoclassi, disaccoppiando definizione della funzione e suo ritorno, pattern non comune nella programmazione ad oggetti.
+    - Questo processo permette di gestire la negoziazione delle dimensioni tra genitori 
+- `onDraw()`: Tempo di rappresentazione viene invocato questo metodo, a cui viene passato un `Canvas` dal sistema. Da un punto di vista logico è la superficie di disegno.
+    - In questo `Canvas` si disegnano oggetti di tipo `Paint`, quindi cosa disegno.
+    - Supporta primitive di disegno **geometriche**, **immagini**, **testo** e trasformazioni affini come **rotazioni** e **spostamento**.
+    - Tipi di Metodi di `Canvas`:
+        - Clipping
+        - Trasformazioni Affini
+        - Primitive di Disegno
+        - Informative
+    - `Paint`: Oggetto che permette la definizione di una primitiva grafica che deve essere disegnata.
+    - **Reinvocazione**: A tempo di aggiornamento di stato, andrebbe ridisegnata la grafica, di conseguenza esiste un metodo `invalidate()` che va invocato per dire esplicitamente ad Android che la visualizzazione va aggiornata.
+
+## Definizione Attributo Custom in XML
+
+In un container resources va dichiarato un nodo di tipo `<declare-stylable>`
+
+```xml
+<resources>
+    <declare-styleable name="CartaQuadretti">
+        <attr name="dimquad" format="integer"/>
+        <attr name="righino" format="color"/>
+    </declare-styleable>
+</resources>
+```
+
+E successivamente va importato come nuove risorse stylable con relativo namespace:
+
+```xml
+<LinearLayout
+ xmlns:android="http://schemas.android.com/apk/res/android"
+ xmlns:tools="http://schemas.android.com/tools"
+ xmlns:cq="http://schemas.android.com/apk/res/it.unipi.di.sam.customviewtest"
+ …
+>
+…
+ <it.unipi.di.sam.customviewtest.CartaQuadretti
+cq:righino=”@color/red” cq:dimquad=”32” … />
+…
+</LinearLayout>
+```
+
+Si gestiscono quindi così i namespace.
+
+## Scrivere un Proprio Layout
+
+Un layout personalizzato deve fare override di un solo metodo ossia `onLayout`.
+
+```java
+@Override
+protected void onLayout(boolean changed, int left, 
+    int top, int right, int bottom) {
+    int lato = getLato();
+    int w = (right-left)/lato;
+    int h = (bottom-top)/lato;
+    for (int i = 0; i < this.getChildCount(); i++) {
+        View v = getChildAt(i);
+        int x = i%lato, y = i/lato;
+        v.layout(x*w, y*h, (x+1)*w, (y+1)*h);
+    }
+}
+```
+
+Si eredita dalla classe `ViewGroup`, lasciando la possibilità di disporre i figli secondo criteri personalizzati.
+

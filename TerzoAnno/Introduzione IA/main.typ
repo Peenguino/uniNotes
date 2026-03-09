@@ -3,6 +3,20 @@
 
 #set heading(numbering: "1.1")
 
+// Gestione delle tre sezioni, senza modificare tutta la struttura a capitoli
+// già definita
+
+#show outline.entry.where(level: 1): it => {
+  // Accediamo al testo dell'header a cui l'entry dell'indice fa riferimento
+  if it.element.func() == heading and it.element.body.has("text") and it.element.body.text.contains("PARTE") {
+    v(0.6em)
+    strong(it)
+  } else {
+    // Rientro per le lezioni
+    pad(left: 1.5em, it)
+  }
+}
+
 // --- COPERTINA ---
 #v(1.5cm) 
 
@@ -46,6 +60,7 @@
 #set page(numbering: "1")
 #counter(page).update(1)
 
+= *PARTE I: Algoritmi Informati e Non* <parte1>
 
 = Lezione 1 - Introduzione al Corso - 05/02/2025
 
@@ -834,6 +849,9 @@ Quindi dato ad esempio il problema dell'aspirapolvere, per trovare una soluzione
 
 In questo caso il sottoalbero soluzione è quello rappresentato in grassetto.
 
+// Creiamo un'ancora per l'indice senza stravolgere i numeri delle lezioni
+= *PARTE II: LOGICA E AGENTI* <parte2>
+
 = Lezione 6 - Agenti Basati su Conoscenza - 05/03/2025
 
 `Riferimento AIMA Cap 7.1 - 7.3`
@@ -843,7 +861,6 @@ In questo caso il sottoalbero soluzione è quello rappresentato in grassetto.
 Si aumentano le capacità degli agenti di visualizzare ed avere la rappresentazione di mondi complessi e astratti.
 
 Questo permette definizione di agenti detti *Knowledge Based KB*:
-- Rappresentiamo il mondo in modo astratto per funzionalità specifiche degli agenti.
 
 #pagebreak()
 
@@ -1010,7 +1027,7 @@ Si basa sui seguenti passi:
 
 ==== Algoritmo DPLL
 
-Algoritmo basato sui seguenti passi:
+Algoritmo *completo e che termina sempre* basato sui seguenti passi:
 - Si parte da una $"KB"$ in *forma a clausole*
   - Prende in input una *formula CNF*, quindi *insieme di clausole*.
 - Si effettua un *enumerazione ricorsiva* in profondità di tutte le possibili interpretazioni alla ricerca di un modello.
@@ -1023,6 +1040,88 @@ Algoritmo basato sui seguenti passi:
   - *Clausole Unitarie*: Una clausola con un solo letterale non assegnato. Conviene quindi assegnare prima valori al letterale in clausole unitarie.
 
 #pagebreak()
+
+==== Metodi Locali per SAT - WalkSat
+
+Gli stati sono interpretazioni, l'obiettivo è un assegnamento che soddisfa tutte le clausole.
+
+- Si *flippano* gli stati per *spostarsi* tra il numero di *clausole soddisfatte*.
+
+*Algoritmi per Metodi Locali SAT*
+
+Abbiamo già visto `Hill Climbing` e `Simulated Annealing`, ma in questo contesto si utilizza il `WalkSat`.
+
+*WalkSat* Ad ogni passo si eseguono queste operazioni:
+- Sceglie a caso una clausola non ancora soddisfatta
+- Individua un simbolo da modificare `flip`, scegliendo con probabilità `p = 0.5` tra:
+  - Scegliere un simbolo a caso, secondo il *random walk*.
+  - Scegliere quello che rende più clausole soddisfatte, secondo il *passo di ottimizzazione*.
+- L'algoritmo si ferma dopo un certo numero di `flip` predefinito.
+
+*Caratteristiche WalkSat*: Va bene per cercare un modello sapendo che esiste, ma se l'insieme delle clausole fosse insoddisfacibile allora non terminerebbe mai. Quindi non può essere utilizzato per trovare insoddisfacibilità.
+
+Quindi utilizziamo questo algoritmo per poter dire *che non possiamo dimostrare che vale la conseguenza logica*.
+
+*Problemi SAT difficili*:
+
+Si basa sul rapporto $m/n$ dove $m$ è il numero di clausole ed $n$ numero di simboli, quindi in qualche senso grado di libertà. Quindi maggiore è $m/n$ e più vincolato è il problema.
+
+#v(0.5cm)
+
+#figure(
+  image("img/probabilitaSoddisfacibilitàWalkSat.png", width:350pt)
+)
+
+#v(0.5cm)
+
+Nella zona evidenziata dei problemi difficili ci comporta meglio `Walksat`, ma se sono in una zona non difficile allora utilizzo `DPLL` e non `Walksat`.
+
+#pagebreak()
+
+= Lezione 7 - Calcolo Proposizionale - 06/03/2025
+
+`Rif AIMA 7.5, 7.6`
+
+== Inferenza come deduzione
+
+Per determinare se $"KB" models A$ è usare un *sistema di deduzione*.
+- Definiamo la derivabilità con $"KB" tack.r A$
+- Si specificano *regole di inferenza*.
+  - Si dovrebbero derivare *solo* formule che sono conseguenza logica.
+  - Si dovrebbero derivare *tutte* le formule che sono conseguenza logica.
+
+=== Correttezza e Completezza
+
+- *Correttezza*: Se $"KB" tack.r alpha$ allora $"KB" models alpha$ quindi
+  - Tutto ciò che è derivabile è conseguenza logica.
+  - Le regole preservano la verità.
+- *Completezza*: Se $"KB" models alpha$ allora $"KB" tack.r alpha$ quindi
+  - Tutto ciò che è conseguenza logica è ottenibile tramite il sistema deduttivo.
+
+=== Dimostrazione come Ricerca (Direzione, Strategia)
+
+Una dimostrazione diventa una visita di spazi di stati, tramite una procedura che specifica:
+- *Direzione della ricerca*: Nella dimostrazione di teorema si preferisce andare in direzione opposta.
+- *Strategia della ricerca*: Un algoritmo che sia *completo* ed *efficiente*.
+
+* Utilizzo in Composizione di Th. Refutazione e Th. Risolzione *
+
+- *Th. Refutazione*: Offre un modo alternativo per procedere 
+$ "KB" models alpha <=> ("KB" union {not alpha}) "è insoddisfacibile" $
+- *Th. Risoluzione*: Vale che 
+$ "KB insoddisfacibile" <=> "KB" tack.r_("res") {} $
+
+Quindi volendo *istanziare* un *utilizzo* di questo metodo con $alpha = {A,not A}$
+
+- Per il Th. Refutazione vale che 
+$ "KB" union "FC"(not(A or not A)) $
+- Quindi passando alla *formulazione a clausole* ed applicando *Th. Risoluzione*
+$ "KB" union {A} union {not A} tack.r _("res") {} $
+- In conclusione vale che $"KB" models {A, not A}$
+
+*Sintetizzando*
+
+Abbiamo tre metodologie: Tavole verità, SAT e Refutazione.
 
 /*
 #figure(
