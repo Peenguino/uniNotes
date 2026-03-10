@@ -60,7 +60,7 @@
 #set page(numbering: "1")
 #counter(page).update(1)
 
-= *PARTE I: Algoritmi Informati e Non* <parte1>
+= *PARTE I: FORMULAZIONE PROBLEMI SU GRAFI E ALGORITMI INFORMATI E NON INFORMATI* <parte1>
 
 = Lezione 1 - Introduzione al Corso - 05/02/2025
 
@@ -1078,7 +1078,7 @@ Nella zona evidenziata dei problemi difficili ci comporta meglio `Walksat`, ma s
 
 #pagebreak()
 
-= Lezione 7 - Calcolo Proposizionale - 06/03/2025
+= Lezione 7 - Calcolo Proposizionale (PROP) - 06/03/2025
 
 `Rif AIMA 7.5, 7.6`
 
@@ -1122,6 +1122,178 @@ $ "KB" union {A} union {not A} tack.r _("res") {} $
 *Sintetizzando*
 
 Abbiamo tre metodologie: Tavole verità, SAT e Refutazione.
+
+#pagebreak()
+
+= Lezione 8 - Logica del Prim'Ordine (FOL) - 10/03/2025
+
+`Rif. AIMA 8.1 8.2 8.3`
+
+In questa lezione il focus è sulla *sintassi* e sulla *semantica* della FOL.
+
+Si inizia a concettualizzare, rappresentando oggetti tramite *simboli* o *mediante funzioni*.
+
+Si definiscono quindi *relazioni* tra oggetti e *proprietà* di oggetti, viste come *relazioni unarie*.
+
+== Sintassi della FOL
+
+Gli elementi sintattici di base sono i siboli usati per indicare gli oggetti, le relazioni e le funzioni, quindi:
+
+- Simbolo di *costante*
+- Simbolo di *predicato*
+- Simbolo di *funzione*
+
+*Termini*: Espressione logica che si riferisce ad un oggetto.
+
+$ "Termine" arrow "Costante" | "Variabile" | "Funzione(Termine)" $
+
+*Uguaglianza*: Si utilizza per definire che due termini riferiscono allo stesso oggetto
+
+$ "Padre(Claudio)" = "Giampiero" $
+
+*Formule Atomiche/Complesse*:
+  - *Atomica*: 
+  $ "FormulaAtomica" arrow "True" | "False" | "Termine" = "Termine" $
+  - *Complessa*:
+  $ "Formula" arrow "FormulaAtomica" | "Formula" "Connettivo" "Formula"
+  | \ | "Quantificatore" "Variabile" "Formula" | \ | not "Formula" | ("Formula") $
+
+*Quantificatori*:
+- *Quantificazione Esistenziale/Universale*:
+  - *Universale*: La relazione si applica a tutti gli elementi del dominio.
+  - *Esistenziale*: La relazione si applica ad almeno un elemento del dominio.
+- *Scope dei Quantificatori*:
+  - *Esempio*: $forall x (exists y P(x,y))$ tutto è scope del $forall$, mentre solo $P(x,y)$ appartiene allo scope di $exists$.
+  - *Binding*: Se una variabile è in uno scope di quantificatore allora si dice che la variabile è legata, altrimenti è libera.
+
+*Precedenze tra Operatori*: Seguono quest'ordine
+$ =, not , and, or, =>, <=>, forall, exists $
+
+#pagebreak()
+
+== Semantica della FOL
+
+Le interpretazioni sono più complesse rispetto alla PROP, vanno mappati i simboli sul dominio modellato.
+
+- *Universo del Discorso*: Un insieme non vuoto di elementi che rappresenta l'insieme di tutti gli oggetti che si prendono in considerazione.
+- *Assegnazione di Valori*:
+  - *Costanti*: Assegnate ad un elemento specifico dell'universo.
+  - *Variabili*: Si possono assegnare ad elementi del dominio tramite funzioni di Assegnazione
+  - *Funzioni*: Si mappano una sequenza di elementi del dominio su un singolo elemento.
+  - *Predicati*: Assegnata una relazione sull'universo di discorso.
+- *Verità di Formule*:
+  - *Formula Atomica*: Una formula atomica è detta vera se l'interpretazione assegna ai suoi termini una sequenza che rientra nella relazione specificata dal predicato.
+  - *Formula Complessa*: Sono valutate sulla base dei loro componenti usando il significato dei connettivi logici e dei quantificatori.
+- *Interpretazione*: Stabilisce una *corrispondenza* precisa tra *elementi atomici* del *linguaggio* ed *elementi* della *concettualizzazione*.
+
+Si basa sulla *composizionalità*, quindi predicati e funzioni vengono utilizzati tra loro in composizione.
+
+=== Semantica degli Operatori di Quantificazione
+
+* vedi slide *
+
+Esiste una relazione tra $forall$ e $exists$ ossia:
+
+$ 
+  forall x not P(x) eq.triple not exists x P(x) \
+  not forall x P(x) eq.triple exists x not P(x) \
+  forall x P(x) eq.triple not exists not P(x) \
+  not forall x not P(x) eq.triple exists x P(x)
+$
+
+#v(0.5cm)
+
+== Interazione con Knowledge Base KB in FOL
+
+Grazie alla FOL possiamo definire *asserzioni* ed *interrogazioni* ad una *KB* tramite rispettivamente le funzioni `TELL` e `ASK`.
+
+```
+  TELL(KB, Re(Giovanni)) //asserzione
+  ASK(KB, exists x Persona(x)) //query
+```
+
+#v(0.25cm)
+
+== Inferenza nella FOL
+
+`Rif. AIMA 9.1 9.2`
+
+Dato che già conosciamo come inferire su PROP, allora possiamo convertire KB della FOL in PROP ed applicare metodi già visti, handlando i quantificatori che non esistono in PROP.
+
+#pagebreak()
+
+=== Istanziazione Universale/Esistenziale
+
+*Istanziazione Universale - Gestione $forall$*: Sostituiamo le variabili quantificate universalmente con termini ground, quindi una $"SUBST"({x slash g}, A)$, quindi sostituisco $x$ con $g$ nella formula $A$ e
+ g è detto termine ground e $A[x slash g]$ è il risultato della sostituzione.
+
+*Istanziazione Esistenziale con Skolem - Gestione $exists$*: Esistono *due casi*:
+- Se $exists$ non compare nello scope di $forall$ allora $k$ è una costante nuova.
+- Altrimenti va introdotta una funzione di Skolem nelle variabili quantificate universalmente
+
+$ 
+  exists x "Padre"(x, G) "diventa" "Padre"(K, G) \
+  forall x thin exists y "Padre"(x,y) "diventa" forall x "Padre"(x, p(x))
+$
+
+=== Grounding e Teorema di Herbrand
+
+*Grounding*: Processo di proposizionalizzazione, segue questi passi:
+
+- Si creano tante istanze delle formule quantificate universalmente quanti sono gli oggetti menzionati.
+- *Eliminare* i quantificatori *esistenziali* *skolemizzando*.
+- *Sostituire* le *formule atomiche* ground con *simboli proposizionali*.
+
+Questo può portare problematiche, infatti *costanti* sono *finite* ma il *numero di istanze* è *infinito*.
+
+*Th. di Herbrand* Se $"KB" models alpha$ c'è una dimostrazione che coinvolge solo un sottoinsieme finito della $"KB"$ proposizionalizzata.
+
+=== Forma a Clausole della FOL
+
+Definiamo che una clausola è un insieme di letterali che rappresenta la loro disgiunzione, quindi lasciando la possibilità di rappresentare KB
+in forma a clausole.
+
+*Teorema* Per ogni formula chiusa $alpha$ della FOL è possibile trovare in maniera effettiva un insieme di clausole $"FC"(alpha)$ che è soddisfacibile se e solo se $alpha$ è soddisfacibile.
+
+=== Trasformazione in FC della FOL
+
+Come nella PROP, anche nella FOL esiste una procedura per convertire formule in forma a clausole:
+
+- *Eliminazione delle implicazioni*.
+- *Negazioni all'interno*.
+- *Standardizzazione delle variabili*: Ogni quantificatore usa variabili diverse, anche se non abbiamo conflitti in scope.
+- *Skolemizzazione*: Eliminazione della quantificazione esistenziale, tramite costante di Skolem se non in scope di universale, e tramite funzione di Skolem se in scope di universale.
+- *Eliminazione Quantificazione Universale*: Si portano fuori tutti i quantificatori universali usando la convenzione che tutte le variabili libere sono quantificate universalmente.
+- *Forma Normale Congiuntiva*: Congiunzione di disgiunzione di letterali.
+#pagebreak()
+- *Notazione a Clausole*.
+- *Separazione delle Variabili*: Clausole diverse, variabili diverse.
+
+=== Unificazione ed Algoritmo di Unificazione
+
+Operazione mediante la quale si determina se due espressioni possono essere rese identiche mediante una sostituzione di termini a variabili.
+
+Questo ci serve per *identificare un simil $A, not A$* come nel passo di risoluzione in PROP, ma qui non è così semplice identificare $A, not A$. Per questo motivo esiste questo *procedimento di unificazione*.
+
+Si basa su una *sostituzione*, ossia un insieme finito di associazioni tra variabili e termini in cui ogni variabile compare una sola volta sulla sinistra. Ad esempio potrebbe essere della forma 
+$ sigma = { x_1 slash A, x_2 slash f(f_4), x_3 slash B } $
+
+Quindi utilizzandola nella funzione $"subst()"$:
+
+$ "subst"(sigma, A) $
+
+*Espressioni Unificabili* Se esiste una sostituzione che rende le espressioni *identiche* oppure *fail*.
+Si cerca in particolare non una semplice sostituzione ma la *Most General Unifier MGU*, che viene definita con il numero più piccolo
+possibile di sostituzioni.
+
+*Algoritmo di Unificazione* L'algoritmo prende in input due espressioni $p,q$ e restituisce un *MGU* $theta$ se esiste:
+- $"UNIFY"(p,q) = theta$ tale che $"SUBST"(theta, p) = "SUBST"(p, theta)$
+- altrimenti $"fail"$
+L'algoritmo esplora in parallelo le due espressioni e costruisce l'unificatore.
+
+Appena trova espressioni non unificabili fallisce.
+
+Una causa di fallimento sono sostituzioni del tipo $x = f(x)$, e questo controllo è detto *occur check*.
 
 /*
 #figure(
