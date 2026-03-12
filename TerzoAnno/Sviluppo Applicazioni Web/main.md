@@ -645,6 +645,102 @@ Maniera alternativa per gestire lo stato rispetto a `useState()`:
 - Non si invoca quindi `setState()` ma si effettua un **dispatch di action**.
 - In questo modo si sposta la logica del funzionamento fuori dal componente, utile se aumenta la complessità per disaccoppiare le due cose.
 
+```JSX
+// ESEMPIO DALLA DOCUMENTAZIONE DI REACT
+import { useReducer } from 'react';
+import AddTask from './AddTask.js';
+import TaskList from './TaskList.js';
+
+// FUNZIONE REDUCER: Per convenzione ha tasks ed action, dove un action
+// ha un campo .type che permette di differenziare le operazioni da eseguire
+function tasksReducer(tasks, action) {
+  switch (action.type) {
+    case 'added': {
+      return [...tasks, {
+        id: action.id,
+        text: action.text,
+        done: false
+      }];
+    }
+    case 'changed': {
+      return tasks.map(t => {
+        if (t.id === action.task.id) {
+          return action.task;
+        } else {
+          return t;
+        }
+      });
+    }
+    case 'deleted': {
+      return tasks.filter(t => t.id !== action.id);
+    }
+    default: {
+      throw Error('Unknown action: ' + action.type);
+    }
+  }
+}
+
+export default function TaskApp() {
+// Come per l'useState, la useReducer restituisce:
+// 1. Lo stato corrente della collezione/variabile che stiamo modellando
+// 2. Non un getter diretto ma una funzione di dispatch, che ci permette 
+    // di fare di più rispetto ad un semplice setter, in questo caso infatti 
+    // ci permette di differenziare il tipo di azioni in base, in questo caso,
+    // al type passato
+// 3. Il dispatch, come il setter, va invocato all'interno 
+    // di una funzione di Handle, che verra registata sull'evento nel div
+
+  const [tasks, dispatch] = useReducer(
+    tasksReducer,
+    initialTasks
+  );
+
+  function handleAddTask(text) {
+    dispatch({
+      type: 'added',
+      id: nextId++,
+      text: text,
+    });
+  }
+
+  function handleChangeTask(task) {
+    dispatch({
+      type: 'changed',
+      task: task
+    });
+  }
+
+  function handleDeleteTask(taskId) {
+    dispatch({
+      type: 'deleted',
+      id: taskId
+    });
+  }
+
+  return (
+    <>
+      <h1>Prague itinerary</h1>
+      <AddTask
+        onAddTask={handleAddTask}
+      />
+      <TaskList
+        tasks={tasks}
+        onChangeTask={handleChangeTask}
+        onDeleteTask={handleDeleteTask}
+      />
+    </>
+  );
+}
+
+let nextId = 3;
+const initialTasks = [
+  { id: 0, text: 'Visit Kafka Museum', done: true },
+  { id: 1, text: 'Watch a puppet show', done: false },
+  { id: 2, text: 'Lennon Wall pic', done: false }
+];
+
+```
+
 ### useState vs useReducer
 
 - Dimensione del codice minore con `useState()`, ma `useReducer()` permette di fattorizzare la logica del componente per riutilizzarla, quindi potrebbe risultare anche più leggibile.
@@ -672,6 +768,101 @@ const [state, formAction, isPending] = useActionState(fn, initialState)
 
 Si definisce quindi in `fn` la funzione da eseguire e in `initialState` lo stato iniziale, qualora si volesse partire ad esempio disattivando pulsanti.
 
+```JSX
+// ESEMPIO DALLA DOCUMENTAZIONE DI REACT
+import { useActionState, startTransition } from 'react';
+import { addToCart, removeFromCart } from './api';
+import Total from './Total';
+
+async function updateCartAction(prevCount, actionPayload) {
+    switch (actionPayload.type) {
+    case 'ADD': {
+        return await addToCart(prevCount);
+    }
+    case 'REMOVE': {
+        return await removeFromCart(prevCount);
+    }
+    }
+    return prevCount;
+}
+
+// La useActionState, dopo aver visto la useReducer, è abbastanza lineare:
+// 1. Il getter count permette l'accesso al corrente stato della variabile
+// 2. La dispatchAction è l'operazione identica di dispatch vista prima, 
+    // solo che questa volta viene utilizzata in un contesto di azione async,
+    // quindi si invoca all'interno di una startTransaction
+// 3. isPending viene utilizzato nel rendering condizionale del componente, per
+    // avere la possibilità di gestire dei caricamenti ed 
+    // eventuali cambi di stato
+
+export default function Checkout() {
+  const [count, dispatchAction, isPending] = useActionState(updateCartAction, 0);
+
+  function handleAdd() {
+    startTransition(() => {
+      dispatchAction({ type: 'ADD' });
+    });
+  }
+
+  function handleRemove() {
+    startTransition(() => {
+      dispatchAction({ type: 'REMOVE' });
+    });
+  }
+
+  return (
+    <div className="checkout">
+      <h2>Checkout</h2>
+      <div className="row">
+        <span>Eras Tour Tickets</span>
+        <span className="stepper">
+          <span className="qty">{isPending ? '🌀' : count}</span>
+          <span className="buttons">
+            <button onClick={handleAdd}>▲</button>
+            <button onClick={handleRemove}>▼</button>
+          </span>
+        </span>
+      </div>
+      <hr />
+      <Total quantity={count} isPending={isPending}/>
+    </div>
+  );
+}
+
+```
+
+## useFormStatus
+
+Hook che permette l'acquisizione di informazioni sull'ultimo form compilato.
+
+```JSX
+const { pending, data, method, action } = useFormStatus();
+```
+
+Mostriamo e commentiamo un esempio completo:
+
+```JSX
+// ESEMPIO DALLA DOCUMENTAZIONE DI REACT
+import {useState, useMemo, useRef} from 'react';
+import {useFormStatus} from 'react-dom';
+
+export default function UsernameForm() {
+  const {pending, data} = useFormStatus();
+
+  return (
+    <div>
+      <h3>Request a Username: </h3>
+      <input type="text" name="username" disabled={pending}/>
+      <button type="submit" disabled={pending}>
+        Submit
+      </button>
+      <br />
+      <p>{data ? `Requesting ${data?.get("username")}...`: ''}</p>
+    </div>
+  );
+}
+```
+
 ## Optimistic Update tramite useOptimistic
 
 Si mostra all'utente uno stato diverso mentre l'operazione è in esecuzione:
@@ -696,3 +887,24 @@ Porta vari vantaggi, è il default da React 19, vantaggi come:
 - Identificare lo stato dell'Applicazione.
 - Identificare dove dovrebbe stare lo stato.
 - Gestire il flusso inverso dei dati per la gestione del cambiamento di stato.
+
+# Lezione 10 - React II (Esercitazione To Do) - 11/03/2026
+
+Tutta la lezione è basata su esercitazione React, si riportano solo alcune note.
+
+## Note
+
+In single page application più pagine vanno gestite in routing.
+
+Il routing non è gestito nativamente, nella lezione si cita quindi la libreria `React Routing`, wrappando tutta l'App annidando in `Route` i componenti da renderizzare:
+
+```JSX
+<BrowserRouter>
+  <Routes>
+    <Route ... />
+    <Route ... />
+  </Routes>
+</BrowserRouter>
+
+```
+

@@ -62,13 +62,19 @@
 
 = *PARTE I: FORMULAZIONE PROBLEMI SU GRAFI E ALGORITMI INFORMATI E NON INFORMATI* <parte1>
 
+#v(-0.2cm)
+
 = Lezione 1 - Introduzione al Corso - 05/02/2025
 
 Cenni storici ed introduzione. Vedi slide.
 
+#v(-0.2cm)
+
 = Lezione 2 - Agenti - 05/02/2025
 
 `Rif: Slide Lezione_1 - AIMA Cap: 2`
+
+#v(-0.2cm)
 
 == Agenti ed Ambiente
 
@@ -78,6 +84,8 @@ Cenni storici ed introduzione. Vedi slide.
 - *Percezione e Sequenza Percettiva*: La percezione singola è l'acquisizione di informazioni sull'ambiente da parte dell'agente.
 - *Scelta dell'Azione*: Dipende da cosa l'agente ha percepito fino ad ora e cosa ha come conoscenza iniziale.
 - *Funzione/Programma Agente*: La funzione agente è una funzione matematica astratta, mentre il programma agente è l'implementazione concreta. Il nostro obiettivo è quello di *implementare* il *programma agente*.
+
+#v(-0.2cm)
 
 === Razionalità degli Agenti
 
@@ -90,9 +98,13 @@ L'obiettivo è che l'agente interagisca in maniera corretta nell'ambiente second
 - *Azioni*: che l'agente può eseguire.
 - *Sequenza Percettiva*: dell'agente fino all'istante corrente.
 
+#v(-0.2cm)
+
 *Definizione di Agente Razionale*: per ogni sequenza di percezioni compie l’azione che massimizza il valore atteso della misura di prestazione considerando le sue percezioni passate e la sua conoscenza pregressa.
 
 Questo *non implica l'onniscenza o l'onnipotenza* dell'agente, ma deve essere in grado di imparare man mano che acquisisce più *percezioni* ed *esperienza*.
+
+#v(-0.2cm)
 
 === Natura degli Ambienti
 
@@ -849,7 +861,6 @@ Quindi dato ad esempio il problema dell'aspirapolvere, per trovare una soluzione
 
 In questo caso il sottoalbero soluzione è quello rappresentato in grassetto.
 
-// Creiamo un'ancora per l'indice senza stravolgere i numeri delle lezioni
 = *PARTE II: LOGICA E AGENTI* <parte2>
 
 = Lezione 6 - Agenti Basati su Conoscenza - 05/03/2025
@@ -1190,8 +1201,6 @@ Si basa sulla *composizionalità*, quindi predicati e funzioni vengono utilizzat
 
 === Semantica degli Operatori di Quantificazione
 
-* vedi slide *
-
 Esiste una relazione tra $forall$ e $exists$ ossia:
 
 $ 
@@ -1294,6 +1303,97 @@ L'algoritmo esplora in parallelo le due espressioni e costruisce l'unificatore.
 Appena trova espressioni non unificabili fallisce.
 
 Una causa di fallimento sono sostituzioni del tipo $x = f(x)$, e questo controllo è detto *occur check*.
+
+#pagebreak()
+
+= *PARTE III: MACHINE LEARNING* <parte3>
+
+= Lezione 9 - Introduzione al Machine Learning - 12/03/2026
+
+Quando bisogna utilizzare soluzioni basate sul Machine Learning?
+- In caso di ambienti dinamici.
+- Ambienti in cui non è stata formalizzata la teoria.
+- Bisogna che esistano dataset su cui basare l'allenamento del modello.
+
+Quindi se la priorità fosse quella di avere una precisione del $100%$ allora potrebbe essere il caso di non utilizzare il Machine Learning.
+
+== Overview di un ML
+
+L'idea è quella di una approssimazione di funzioni sconosciute partendo da esempi dati.
+
+Un esempio potrebbe essere il riconoscimento di caratteri data una matrice di pixel:
+
+#grid(
+  columns: (1fr, 1fr),
+  image("img/esempioTrascrizioneCaratteri.png", width: 100%),
+  image("img/overviewML.png", width: 100%)
+)
+
+L'obiettivo è quindi quello di approssimare la funzione $f$.
+
+#v(0.3cm)
+
+== Supervised Learning e Classification/Regression
+
+*Definizione Supervised Learning*
+- *Dato* un insieme di esempi di training $("input", "output") = (x,d)$, dove $d$ è una label, per definire la funzione $f$.
+- Si *trova* una buona approssimazione della $f$
+
+- *Classificazione*: $f(x)$ ritorna la classe corretta per $x$, quindi esce in un insieme di classi discreto del tipo ${1, 2, dots, k}$
+- *Regressione*: $f(x)$ che ritorna reali in output, quindi rispetto al tipo precedente varia il codominio.
+
+#v(0.7cm)
+
+== Unsupervised Learning
+
+Il Training Set si compone di elementi senza label, quindi $(x)$, basato sul *clustering*, quindi *partizione* dei *dati* in *sottoinsiemi*.
+
+#pagebreak()
+
+== Modello
+
+Cerca di catturare la relazione tra i dati e definisce la classe delle fuznioni che il modello può implementare:
+- *Esempio di Training*: Un esempio della forma $(x, f(x) + "noise")$, dove $x$ è un vettore di features.
+- *Funzione Target*: La reale funzione $f$.
+- *Ipotesi* : Una funzione $h$ proposta che si ipotizza essere simile alla $f$ target. Un espressione in un linguaggio dato che descrive la relazione tra i dati.
+- *Spazio Ipotesi* : Lo spazio di tutte le ipotesi che dovrebbe corrispondere all'output dell'algoritmo di apprendimento.
+
+=== Tipi di Modelli - (Lineari, Simbolici, Probabilistici, Instance Based)
+
+- *Lineari*: Basati sulla rappresentazione di una funzione $h$ parametrica e successivamente istanziata, quindi *rappresentazione continua* di uno *spazio di ipotesi*:
+
+$ h_(w)(x) = w_1 x + w_0 #h(1cm) h_(w)(x) = 0.232x + 246 $
+
+- *Simbolici*: Lo spazio di ipotesi è rappresentato in modo discreto, ad esempio:
+
+  ```
+  if (x1 = 0 && x2 = 1) 
+    then h(x) = 1
+    else h(x) = 0
+  ```
+
+- *Probabilistici*: Basati su una stima probabilistica $p(x,y)$.
+- *Instance Based*: Basati sulla predizione del valore medio di $y$ dei vicini.
+
+Questo ci permette di definire come viene formulato in formule, ma non come questi parametri vengano scelti. Questo sta all'*algoritmo* di *learning scelto*.
+
+== Algoritmo di Learning
+
+Basati sulla *ricerca* nello *spazio di ipotesi* della *migliore* tra tutte le *ipotesi*.
+- La *migliore approssimazione* della *funzione target sconosciuta*, quindi cercare la $h$ con il *minor errore*.
+
+== Generalizzazione del ML
+
+La *bontà di un modello non* si misura *solo sul fitting* generato sul dataset e la funzione di approssimazione, ma *soprattutto*
+sulla *generalizzazione*, ossia sulla *capacità di rispondere* in maniera appropriata *a nuovi casi*, non appartenenti al dataset di partenza.
+
+*Def. Errore di Generalizzazione* L'errore che misura quanto accuratamente il modello predice nuovi sample di dati, definendo quindi anche misure di $"error"$ e $"loss"$.
+
+- *Fasi della Generalizzazione*
+  - *Fase di Learning (training e fitting)*: Si costruisce il modello dai dati conosciuti, tramite fase di training.
+  - *Fase di Predizione (testing)*: Preso un nuovo input $x^'$, questo viene dato al modello che computa una risposta sulla base del nuovo input e questo viene valutato in base alla capacità di generalizzazione.
+
+
 
 /*
 #figure(
