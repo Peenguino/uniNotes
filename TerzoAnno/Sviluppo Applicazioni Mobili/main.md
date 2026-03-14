@@ -427,3 +427,134 @@ protected void onLayout(boolean changed, int left,
 
 Si eredita dalla classe `ViewGroup`, lasciando la possibilità di disporre i figli secondo criteri personalizzati.
 
+# Lezione 09 - Kotlin e Compose - 11/03/2026
+
+Per tutti gli aspetti sintattici del Kotlin si consiglia la [documentazione Kotlin](https://kotlinlang.org/docs/home.html).
+
+In queste note analizziamo alcuni elementi fondamentali (caratteristiche e zucchero sintattico del Kotlin):
+
+## Lambda in Coda
+
+Se una funzione ha come ultimo argomento, *anche se unico*, una lambda, allora questa può essere portata fuori dalle parentesi in questo modo:
+
+    ```
+    // forma iniziale
+    f(args, () -> g(...))
+
+    // forma kotlin
+    f(args) g(...)
+    ```
+
+    Questo caratterizza il modo in cui vengono scritte le `@Composable`:
+
+    ```
+    Row {
+        Text("Altezza")
+        TextField(value = altezza, {altezza = it})
+        Text("m")
+    }
+    ```
+
+Abbiamo quindi l'**impressione** che siano tutte **funzioni invocate una dopo l'altra**, ma in realtà sono **ciascuna argomento** della **funzione precedente**.
+
+## Classi Sealed di Default
+
+Di default le classi non sono estendibili, solo se dichiarate con `open` lasciamo la possibilità di estensione di queste.
+
+Lo stesso vale per i metodi, non possono essere overridati se non dichiarati come `open`.
+
+## Proprietà Delegate
+
+Esiste un costrutto nativo per la gestione della **delega**, ossia il `by` utilizzato secono la sintassi `var id: T by exp`.
+- L'oggetto risultante dall'evalutazione di `exp` deve implementare per la variabile un **setter** ed un **getter**.
+- Un esempio potrebbe essere:
+    ```
+    var showDialog by remember { mutableStateOf(false) }
+    ```
+    - `by` permette la delega al getter/setter restituito da `remember`
+    - `remember` implementa il pattern lazy di memoization, quindi tiene cachato il valore fino a quando questo non viene modificato.
+    - `{ mutableStateOf() }` Implementa qualcosa di simile al *pattern publish/subscriber*, in particolare:
+        - Se viene chiamato `setValue()` e c'è stato almeno un `readValue()` allora invalida la corrente composizione.
+    - Un eventuale `showDialog = true` quindi farebbe partire tutto il procedimento di redraw, detto **recompositing**, grazie a tutta la logica spiegata sopra.
+
+## Accenno a logica di Jetpack Compose
+
+La GUI, non più gestita con un albero di `View`, si compone di questi elementi:
+
+- Si dichiara una **gerarchia** di **chiamate di funzione**, ciascuna delle quali ha pezzi di stato come argomenti.
+- Quando lo stato viene modificato, il sistema invoca la prima funzione.
+- Si utilizzano sistemi di caching per evitare chiamate inutili (come mostrato prima con `remember`).
+- Tutte le funzioni sono `@Composable`, prendono come argomenti **stato** e **configurazione** e producono **pezzi di GUI**.
+    - L'argomento `contents=...` permette di rappresentare i figli nella gerarchia di contenimento.
+    - I `@Composable` possono essere chiamati in parallelo o in qualsiasi ordine.
+
+### Stato ed Eventi secondo il Paradigma Model/View con Kotlin e Compose
+
+Mostriamo quindi un micro esempio di Model/View citando gli elementi mostrati sopra:
+
+```
+var peso by remember { mutableStateOf("40") }
+// ...
+TextField(value = peso, onValueChange = { peso = it })
+```
+
+Quindi stato ed eventi seguono due versi opposti:
+- **Direzione Stato**: Lo stato segue il verso $ chiamante \to chiamato $.
+- **Direzione Eventi** Gli eventi seguono il verso $ chiamato \to chiamante $.
+
+# Lezione 10 - ListView e Data Adapter - 13/03/2026
+
+Definiamo il meccanismo molto utilizzato di lista nella GUI di Android.
+
+- La `ListView` è un `ViewGroup`, anche non essendo un `Layout`, composta da figli che vengono aggiunti man mano che la lista viene visitata.
+    - **ListView Statiche**: Definite tramite il file XML, con righe definite tramite l'attributo `android:entries`. Questo può avere senso se sono risorse fisse e abbiamo la necessità di configurarle in base a lingua, regione ecc...
+    - **ListView Dinamiche**: Generati dal programma, magari dopo una query di un DB.
+        - Funziona tramite un **Adapter**, che pareggia il dato acquisito verso la `ListView`. Nello specifico segue fasi precise:
+            - Ottiene i dati raw
+            - Costruisce una View che rappresenti graficamente i dati raw.
+            - Fornire la View al ViewGroup a cui l'Adapter è associato.
+            - Notificare gli Observer quando cambiano i dati.
+            - Altri compiti di gestione.
+## Adapters
+
+Tipi diversi di Adapters, non tutti, ne accenniamo alcuni
+
+- `ArrayAdapter<T>`: Array Java di elementi, con specifici argomenti da passare al costruttore, come ad esempio:
+    - `Context` per l'accesso alle risorse.
+    - `ID` del `Layout XML` da utilizzare.
+    - `ID` della `TextView` dentro il Layout da popolare con i dati.
+
+- `CursorAdapter`: Sottoclasse di Adapter che gestisce i dati ottenuti da una query SQL.
+- `ResourceCursorAdapter`: Adatta i risultati di un Cursor cun un layout da risorsa XML.
+
+Il motivo per cui esiste l'Adapter è proprio quello di non tirare giù in memoria tutte le entry dal DB, ma passarle in maniera dinamica in base alla ListView corrente.
+
+### Gallery
+
+Dato che l'`Adapter` ci permette di decidere quali `View` visualizzare in `ViewGroup` è usata in altri widget.
+
+Gallery mostra una striscia di `View`.
+
+## ListActivity
+
+Sottoclasse di `Activity`, deprecata, specializzata per contenere `ListView`.
+- Ha solo due figli `View`, uno da mostrare se sono presenti 0 items o almeno 1 l'altro.
+
+## RecyclerView
+
+Si disaccoppiano le operazioni di **adattamento delle View con dati dinamici** e **riciclo per risparmiare memoria**.
+- Bisogna quindi dividere questi comportamenti:
+- `RecyclerView` si occupa della gestione della memoria, e riferisce a classi esterne per operazioni che non siano questa di gestione memoria:
+    - **LayoutManager**: Definita come inner class, ereditata da `RecylerView.LayoutManager`.
+    - **Adapter**: Eredita da `VH extends RecyclerView.ViewHolder`, ossia un contenitore per View "cachate".
+        - Bisogna implementare i soliti metodi `getItemCount()`, `getItemId()`.
+    - **Operazioni di Binding**: Il processo di binding consiste nel modificare un `ViewHolder` in modo da mostrare i dati corrispondenti a un dato indice.
+    - **Decorazioni e Animazioni**: Permettono la decorazione di una vista, tramite il metodo `onDraw()` della classe `RecyclerView.ItemDecoration` 
+
+- Riferisce quindi ad un architettura un po' più complessa di quella precedente
+
+- Spesso si usa una `RecyclerView` come contenitore e delle `CardView` come contenuto.
+
+<div style="text-align: center;">
+    <img src="img/architetturaRecyclerView.png" width="360">
+</div>

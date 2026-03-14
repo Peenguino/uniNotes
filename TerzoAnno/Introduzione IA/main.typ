@@ -1304,6 +1304,62 @@ Appena trova espressioni non unificabili fallisce.
 
 Una causa di fallimento sono sostituzioni del tipo $x = f(x)$, e questo controllo è detto *occur check*.
 
+== Inferenza e Completezza del Metodo di Risoluzione
+
+Si prosegue per refutazione anche in questo caso, dato che questo metodo è completo, quindi come visto in PROP quindi
+
+$ "KB" union {not alpha} "è insoddisfacibile" <=> "KB" models alpha $
+
+quindi come già visto in PROP, applichiamo il teorema per cui
+
+$ "KB" "è insoddisfacibile" <=> "KB" tack.r {} $
+
+#pagebreak()
+
+== Cenni di Sistemi a Regole
+
+`Rif Cap 9.3, 9.4`
+
+=== Clausole di Horn
+
+Una clausola di Horn è una *disgiunzione di letterali* che contiene *al massimo* un *letterale positivo*.
+
+Questo ci permette in modo efficiente di rappresentare la conoscenza in FOL.
+
+Basato sul concetto per cui la parte a sinistra di un implicazione, se è congiunzione, post trasformazione dell'implicazione
+diventa una disgiunzione.
+
+Quindi definendo formalmente le *Clausole di Horn Definite*, quindi con esattamente un letterale positivo:
+
+$ {Q, not P_1, dots, not P_k } "dato" (k >= 0) $
+
+Quindi una KB può essere espressa in regole come
+
+$ P_1, dots, P_k => Q "(regola)" \
+  Q "(fatto)"
+$
+
+In questo modo si definiscono meccanismi inferenziali sono molto più semplici, senza rinunciare alla completezza del metodo, anche se non corrisponde esattamente alla FOL, è una sorta di suo sottoinsieme.
+
+=== Backward/Forward Chaining
+
+- *Forward Chaining*: Inizia dalle conclusioni, ossia l'obiettivo da dimostrare, e lavora a ritroso per trovare le premesse. Approccio utilizzato spesso nella programmazione logica, come nel PROLOG.
+- *Backward Chaining*: Si inizia dalle premesse e si procede verso le conclusioni. Utilizzato nei sistemi esperti per dedurre conclusioni partendo da un insieme di fatti.
+
+=== Programmazione Logica
+
+Basata su programmi logici, ossia KB costituiti da clausole di Horn, definite come *fatti* e *regole*, quindi una sintassi alternativa.
+
+Le variabili sono indicate con lettere maiuscole, le costanti con lettere minuscole.
+
+Quindi un goal del tipo $ B_1 and B_2 thin dots thin B_(n-1) and B_n "viene espresso come" ":-" B_1 , B_2 thin dots thin B_(n-1) , B_n $ 
+
+==== Risoluzione Selection Linear Definite-clauses (SLD)
+
+Strategia ordinata e completa per clausole di Horn, si parte da un programma $P$ definito in PL e dato un goal $G$ si costruisce l'albero di risoluzione.
+
+Partendo quindi da un insieme di goals del tipo $G_1 , G_2 thin dots thin G_(n-1) , G_n $ proviamo ad unificare, dal primo in poi, con la testa di una delle regole date.
+
 #pagebreak()
 
 = *PARTE III: MACHINE LEARNING* <parte3>
