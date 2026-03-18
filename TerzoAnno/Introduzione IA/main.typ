@@ -1449,8 +1449,164 @@ sulla *generalizzazione*, ossia sulla *capacità di rispondere* in maniera appro
   - *Fase di Learning (training e fitting)*: Si costruisce il modello dai dati conosciuti, tramite fase di training.
   - *Fase di Predizione (testing)*: Preso un nuovo input $x^'$, questo viene dato al modello che computa una risposta sulla base del nuovo input e questo viene valutato in base alla capacità di generalizzazione.
 
+= Lezione 10 - Concept Learning - 17/03/2026
+
+`Rif. Slide IIA-26-ML-concept-learning-v0.1.pdf`
+
+Il *Concept Learning* si basa su inferenza di una funzione booleana partendo da esempi di training.
+
+Il *primo modello* per che possiamo immaginare è quello basato su *lookup table*, che *non scala per nulla*, in cui dati gli input guardiamo la tabella e rispondiamo rispetto alla sua entry.
+
+== Regole Congiuntive
+
+Nel contesto della costruzione di ipotesi, quante regole congiuntive (di letterali in congiunzione) possiamo definire? Utilizziamo le cardinalità, quindi semplici regole congiuntive possono essere $|H| = 2^n$, con $n$ lunghezza di una $l_i$ istanza di ipotesi $h_i$.
+
+== Rappresentazione di Ipotesi
+
+Un ipotesi $h$ è una *congiunzione* di *vincoli su attributi*.
+
+Nel Mitchell si usa la corrente notazione per esprimere vincoli sugli attributi:
+
+#figure(
+  image("img/vincoliSuAttributi.png", width:300pt)
+)
+
+Quindi riferiremo ad una composizione più specifica ed una più generale, ossia:
+
+#figure(
+  image("img/vincoliSuAttributiSpecificoGenerico.png", width:300pt)
+)
+
+=== Definizione di Prototypical Concept Learning Task
+
+Siano *dati*:
+
+- Gli *attributi* $X = {"Sky", "Temp", "Humidity", "Wind" ...}$ definiamo:
+- Una *funzione target* $c : "EnjoySport" X -> {0,1} $
+- Un *ipotesi H*, ossia congiunzione di un insieme finito di letterali, quindi ad esempio 
+
+$ < "Sunny" "?" "?" "Strong" "Same" > $
+- Degli *esempi di training* $D$, ossia esempi positivi e negativi della funzione target.
+
+Si *trovi*:
+- Un *ipotesi* $h$ in $H$ tale per cui vale che $h(x) = c(x)$ per ogni $x in X$.
+
+Il concetto di learning si basa quindi sulla ricerca nello spazio delle ipotesi $H$.
 
 
+=== Assunzione sulla Inductive Learning Hypotesis
+
+*Assunzione*: Tutta questa lezione si basa su un assunzione della Inductive Learning Hypotesis, ossia che tutte le ipotesi che approssimano bene la funzione target per gli esempi di training lo faranno anche per la funzione target degli esempi non osservati. Questo verrà dimostrato, ma per adesso viene assunto.
+
+#pagebreak()
+
+*Ordinamento su Specificità di Ipotesi*: Un ipotesi $h_1$ può essere più larga rispetto ad una $h_2$ mettendo meno vincoli sugli attributi, questo permette una definizione di ordinamento parziale tra le ipotesi.
+
+Formalmente: Date $h_j, h_k$ due funzioni booleane definite su $X$. Se $h_j$ è più generale o uguale $h_k$, quindi vale che  $h_j >= h_k$ se e solo se
+
+$ forall x in X : [(h_(k)(x) = 1) -> (h_(j)(x) = 1)] $
+
+=== Algoritmo Find-S
+
+*Funzionamento a Passi*:
+- Si inizializza $h$ con l'ipotesi più specifica in $H$.
+- Per ogni istanza di training positiva:
+  - Per ogni attributo $a_i$ in $h$
+    - Se l'attributo è già soddisfatto in $h$ da $x$ allora non succede nulla.
+    - Altrimenti sostituisci $a_i$ in $h$ con il vincolo più generale possibile soddisfatto da $x$ e rimuovi da $h$ i letterali che non soddisfano $x$.
+
+Quindi si parte dalla più specifica e si cerca di scendere verso una più generica che rispetti gli input passati.
+
+*Proprietà Find-S*: 
+- Spazio delle ipotesi descritto da congiunzioni di attributi.
+- Find-S tira fuori l'ipotesi consistente agli esempi positivi più specifica possibile.
+- Quindi $c$ attesa sarà sicuramente $c >= H$
+
+*Problemi Find-S*:
+- Non sappiamo se si converge al target.
+- Non possiamo affermare se i training data siano inconsistenti, dato che ignoriamo i casi negativi.
+
+=== Definizione di Version Spaces
+
+Il *version space* $"VS"_(H,D)$ basato su uno *spazio di ipotesi* $H$ ed un *training set* $D$ corrisponde al sottoinsieme delle ipotesi $H$ *consistenti* con tutti gli esempi di training, ossia:
+
+$ "VS"_(H,D) = { h in H | "Consistent"(h,D) } $
+
+=== Version Space tramite General/Specific Boundary (con Th.)
+
+- *General Boundary*: $G$ del *version space* $"VS"_(H,D)$ rappresenta l'insieme dei membri più generici, tenendo conto di $H$ consistente con $D$.
+- *Specific Boundary*: $S$ del *version space* $"VS"_(H,D)$ rappresenta l'insieme dei membri più specifici, tenendo conto di $H$ consistente con $D$.
+- *Teorema*: Ogni membro del version space si trova tra i due boundaries:
+
+$ "VS"_(H,D) = {h in H | (exists s in S) (exists g in G) (g >= h >= s)} $ dove $x >= y$ significa che $x$ è *più generale o uguale* ad $y$.
+
+#pagebreak()
+
+=== Algoritmo Candidate Elimination
+
+Si definiscono $G,H$ rispettivamente *insieme ipotesi più generale* e *più specifica* in $H$.
+
+Allora *per ogni* esempio di training $d = (x, c(x))$:
+
+- Se $d$ è un *esempio positivo*, allora si rimuove da G ogni ipotesi che risulta essere inconsistente con $d$ per definizione di Version Space, generalizzando quindi $S$, in particolare:
+  - Rimuovi $s$ da $S$.
+  - Aggiungi ad $S$ la minima generalizzazione $h$ di $s$ tale per cui:
+    - $h$ resta consistente con $d$.
+    - Dei membri di $G$ sono più generali rispetto ad $h$.
+  - Rimuovi da $S$ qualsiasi ipotesi che risulta essere più generale di altre ipotesi in $S$.
+
+- Se $d$ è un *esempio negativo*, allora si rimuove da S ogni ipotesi che risulta essere inconsistente con $d$ per definizione di Version Space, specializzando quindi $G$, in particolare:
+  - Rimuovi $g$ da $G$.
+  - Aggiungi ad $G$ la minima specializzazione $h$ di $g$ tale per cui:
+    - $h$ resta consistente con $d$.
+    - Dei membri di $S$ sono più specifici rispetto ad $h$.
+  - Rimuovi da $G$ qualsiasi ipotesi che risulta essere meno generale di altre ipotesi in $G$.
+
+== Inductive Bias
+
+Il nostro spazio di ipotesi non può rappresentare l'operatore $or$.
+
+*Bias*: Assumiamo che lo *spazio d'ipotesi* $H$ *contenga il concetto target* $c$. In altre parole $c$ può essere descritto come *congiunzione di letterali*.
+
+*Learner Senza Bias*: Se non avessimo questo bias di riferimento allora assumendo di avere un esempio positivo $(x_1, x_2, x_3)$ ed uno negativo $(x_4, x_5)$ allora staremmo definendo
+$ S = {x_1 or x_2 or x_3} wide G = {not (x_4 or x_5)} $
+
+Grazie a questo esempio possiamo quindi definire che un learner *senza bias non è in grado* di *generalizzare*.
+
+Questo perchè avremo modo solo di valutare rispetto a cosa si ha esattamente in $S$ ed in $G$ e non nel mezzo.
+
+#v(0.5cm)
+
+=== Definizione Formale
+
+Dati:
+- Un algoritmo di learning $L$.
+- Delle istanze $X$ ed un concetto target $c$.
+- Degli esempi di training $D_c = {(x, c(x))}$.
+- Sia $L(x_i, D_c)$ la classificazione assegnata all'istanza $x_i$ da $L$ dopo allenamento su $D_c$.
+
+#pagebreak()
+
+Si definisce:
+- Il bias induttivo su L è l'insieme minimale di asserzioni $B$ tali per cui per ogni concetto target $c$ e corrispondenti dati di training $D_c$ vale che:
+
+$ (forall x_i in X) [B and D_c and x_i] tack.r L(x_i, D_c) $
+
+dove con un generico $A tack.r B$ si intende che da $A$ possiamo logicamente dedurre $B$.
+
+=== Sistemi Induttivi ed Equivalenti Deduttivi e Riassunto Learners Corrente Lezione
+
+Mostriamo degli esempi grafici rispettivamente di un sistema induttivo e di un equivalente deduttivo.
+
+#figure(
+  image("img/induttivoDeduttivo.png", width:300pt)
+)
+
+*Tre Learners Corrente Lezione e Caratteristiche*:
+- *Lookup Table*: Osserva e salva esempi, classifica x se e solo se matcha con un esempio già osservato.
+- *Version Space Candidate Elimination Algorithm*: Si basa sull'utilizzo del *bias induttivo*, si assume quindi che lo spazio delle ipotesi $H$ contenga il concetto target $c$ come congiunzione di attributi.
+- *Find-S*: Basato sul *language bias* dato dall'operatore $and$ ed il *search bias* data la preferenza sull'ipotesi più specifica.
+  - Lo spazio delle ipotesi contiene il concetto target e tutte le istanze sono negative finchè l'opposto non è implicato da altra knowledge, vista come esempi positivi.
 /*
 #figure(
   image("img/algGenetico8Regine.png", width:300pt)

@@ -894,6 +894,8 @@ Tutta la lezione è basata su esercitazione React, si riportano solo alcune note
 
 ## Note
 
+### Single Page Application Routing
+
 In single page application più pagine vanno gestite in routing.
 
 Il routing non è gestito nativamente, nella lezione si cita quindi la libreria `React Routing`, wrappando tutta l'App annidando in `Route` i componenti da renderizzare:
@@ -908,3 +910,8 @@ Il routing non è gestito nativamente, nella lezione si cita quindi la libreria 
 
 ```
 
+### Context
+
+Il contesto lo si crea a partire dalla funzione `createContext()` che prende come argomento lo stato iniziale del dato che stiamo monitorando.
+
+Si preferisce effettuare accesso al Context in Custom Hooks, per fare in modo che se dovessimo rimodellare il suo utilizzo allora non dovremmo farlo per tutti i componenti ma solo fixando gli eventuali Custom Hooks.
