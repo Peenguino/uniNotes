@@ -558,3 +558,91 @@ Si disaccoppiano le operazioni di **adattamento delle View con dati dinamici** e
 <div style="text-align: center;">
     <img src="img/architetturaRecyclerView.png" width="360">
 </div>
+
+# Lezione 11 - WebView e Drawable - 18/03/2026
+
+`Basato sul documento di slide PDF Lezione 11`
+
+Una `WebView` è una `View` che incapsula un web browser
+- Permette autenticazione, utilizzo di JS
+- Gesisce errori di rete, scroll e zoom
+
+Esistono due approcci diversi:
+- Si lancia il browser web preferito dell'utente tramite l'utilizzo di un `Intent`.
+- Incorporare la `WebView` nell'`Activity` stessa.
+    - Per utilizzare questo approccio chiaramente l'Activity deve avere il permesso ad utilizzare Internet.
+
+## Delega per Gestione Operazioni WebView
+
+Per rispettare i principi di Responsibilità Singola si definiscono delle sottoclassi di classi date che implementano metodi per la gestione di responsabilità "installabili" alla WebView:
+- Sottoclasse di `WebChromeClient`
+- Sottoclasse di `WebViewClient`
+- Sottoclasse di `WebSettings`
+
+Ciascuna di queste sottoclassi implementano metodi per operazioni aggiuntive.
+
+## Interprete JS nella WebView e Binding
+
+La WebView può eseguire nativamente il codice Javascript presente nella pagina.
+
+Quindi si possono invocare funzioni JS sia identificandole oppure bindando oggetti tra bytecode JAVA e JS
+
+Questo secondo approccio si effettua tramite l'utilizzo del metodo `addJavascriptInterface(oggetto, nome)`
+
+Su questo approccio di bridging si basano tutte le strutture di WebApp viste come se fossero native su Android. Vivono nella WebView, come in **Cordova** di **Apache**.
+
+Xamarin è un altro approccio cross platform che permette gestione nativa solo della UI e tutti i servizi offerti in ambiente .NET
+
+## Drawable
+
+La classe Drawable è la superclasse per le cose che possono essere disegnate.
+
+Ne esistono di diverse già implementate, vale la pena guardarle prima di definirne di proprie.
+- Spesso grande espressività si ottiene combinando i drawable tra loro.
+
+- `StateDrawable`: Viene disegnato in base allo stato corrente, come ad esempio stati di un pulsante.
+- `LevelDrawable`: Viene disegnato rispetto al livello passato, quindi ad esempio il livello di batteria è un singolo `Drawable` ma modellato rispetto al numero passato.
+
+### NinePatch Drawable
+
+Si dichiara quale zona del drawable può essere stretchata, per fare in modo che resti consistente anche a dimensioni variabile
+
+# Lezione 12 - Notifiche - 20/03/2026
+
+`Basato sul documento di slide PDF Lezione 11`
+
+Lezione sulla spiegazione di notifiche, che si classificano in 
+- **Toast/Snackbar**: Popup brevi sopra la corrente activity che appare e scompare automaticamente.
+    - Brevi, veloci, utilizzati per eventi "poco asincroni", quindi qualcosa che ho fatto di recente.
+    - Solitamente viene creato tramite un metodo statico, secondo il pattern Factory.
+        ```JAVA
+        Toast.makeToast(context, text, duration).show()
+        ```
+    - Le **Snackbar** è implementazione di un toast ma sono attaccate all'albero delle Activity, quindi garantisco il contesto ma se appaiono durante un altra Activity non le vedo.
+        - Utilizzano un `CoordinatorLayout` in caso di effetti per animazioni.
+        - Si assegna nella View normalmente una dimensione in altezza di $0$ e vengono sincronizzati i Layout dal coordinator, che da e toglie spazio dando animazione.
+        ```JAVA
+        Snackbar sb = Snackbar.make(myCoordinatorLayout, R.string.sb, 500)
+        ```
+- **Status bar Notification**: Classiche notifiche
+    - Segnalazione di eventi in background da parte di Activity o Services.
+    - Hanno cicli di vita completamente disaccoppiati dal componente che le ha generate.
+    - Possono fornire anche comandi o progress bar.
+    - **Classi Notification vs NotificationManager**:
+        - **Notification**: L'oggetto che rappresenta la singola notifica in questa si definiscono
+            - L'icona
+            - Il testo da mostrare
+            - L'istante della notifica
+            - Creata in maniera originale con
+            ```JAVA
+            Notification not = new Notification(icon, tickerText, when)
+            ```
+            - Dopo Android 12 si utilizzano molti più metadati per la descrizione di una notifica, secondo il solito paradigma per cui si disaccoppia e si utilizza una Factory per creare una notifica
+        - **NotificationManager**:
+            - **Servizio di sistema** che gestisce le notifiche, a cui viene passato l'ID per essere effettivamente visualizzata in tendina, per intenderci.
+            - Si wrappano gli Intent con dei PendingIntent che mantiene tutte le informazioni di contesto della Intent, per avere tutte le info necessarie a lanciare l'Intent quando necessario.
+    - **Notifiche Heads-Up**: Esempio classico di arrivo telefonata durante un altra Activity, si posiziona in alto ed è più invasiva rispetto ad una normale notifica
+    - Canali di Notifica: Una app può inviare una notifica ad uno specifico canale:
+        - Ogni canale definisce ad esempio priorità, segnale sonoro, vibrazione, se vanno su lockscreen, se vanno mostrate 
+- **Dialog**: Gestione di modali a finestre, non molto utilizzate in contesto mobile, sono più da contesto desktop
+

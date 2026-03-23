@@ -888,7 +888,7 @@ Porta vari vantaggi, è il default da React 19, vantaggi come:
 - Identificare dove dovrebbe stare lo stato.
 - Gestire il flusso inverso dei dati per la gestione del cambiamento di stato.
 
-# Lezione 10 - React II (Esercitazione To Do) - 11/03/2026
+# Lezione 10 e 11 - React II (Esercitazione To Do) - 11/03/2026
 
 Tutta la lezione è basata su esercitazione React, si riportano solo alcune note.
 
@@ -915,3 +915,227 @@ Il routing non è gestito nativamente, nella lezione si cita quindi la libreria 
 Il contesto lo si crea a partire dalla funzione `createContext()` che prende come argomento lo stato iniziale del dato che stiamo monitorando.
 
 Si preferisce effettuare accesso al Context in Custom Hooks, per fare in modo che se dovessimo rimodellare il suo utilizzo allora non dovremmo farlo per tutti i componenti ma solo fixando gli eventuali Custom Hooks.
+
+# Lezione 12 - Angular - 18/03/2026
+
+Framework completamente basato su Typescript:
+- Framework e insieme di librerie per sviluppo, testing e build in ambito web.
+
+**Inclusi in Angular**:
+- Routing per navigazione client side
+- Forms, due modelli per gestione delle form
+- HttpClient per la comunicazione client-server
+- Sistema di Animazioni di default
+- Tool per PWA di default
+- Scaffolding per gestione boilerplate
+
+**AngularCLI**: Permette da terminale la generazione di template di stubs, pipes, componenti...
+
+## Decorator Pattern
+
+Utilizzato ampiamente in Angular, citiamo la loro definizione
+
+```typescript
+function color(value: string) {
+  return function(target) {
+    // ... usa il valore passato come parametro
+  }
+}
+```
+Possono essere quindi espresse in annotazioni `@Decoratore` come zucchero sintattico.
+
+## Componenti in Angular
+
+Sono classi Typescript decorate con `@Component()` che specifica:
+- **Selettore CSS**, come per React c'era nome del Componente.
+- **Template HTML**, qualcosa di simile al JSX.
+- **Insieme** di **stili CSS**.
+
+Possiamo partire da 0 oppure usare uno stub per creare un componente.
+
+### Templates in Angular
+
+Estensione dell'HTML simil JSX ma meno permissivo da un punto di vista di utilizzo del JS.
+
+<div style="text-align: center;">
+    <img src="img/templatesAngular.png" width="400">
+</div>
+
+Le **parentesi quadre** provocano l'**evalutazione dell'exp** sulla dx, mentre le **parentesi tonde** **registrano** a quell'**evento** l'**invocazione di una funzione**.
+
+### Signals in Angular
+
+Wrapper di valori, permettono di notificare quando questi cambiano.
+
+Offrono getter e setter, per spacchettare il valore dal Signal.
+
+- **Writable Signals**: Vengono creati tramite invocazione di 
+
+  ```tsx
+  const count = signal(0)
+  count.set(3)
+  count.update( value => {
+    value + 1
+  })
+  ```
+- **Computed Signals**: Sono segnali **read-only** che definiscono il proprio valore **in base ad altri segnali**.
+  - Questi sono valutati in maniera **lazy e memoized**, quindi calcolati e memoized per gestione delle performance.
+  - Questa modalità di calcolo dei **segnali lazy è gestita tramite un grafo delle dipendenze**, per capire o meno se bisogna invocare funzioni.
+
+    ```tsx
+    const count = signal(0)
+    const doubleCount = computed(() => {
+      count() * 2
+    })
+    ```
+
+### Effect in Angular
+
+Operazione che viene eseguita quando uno o più segnali cambiano valore e viene eseguito almeno una volta.
+- I valori che vengono osservati sono inferiti, non dichiarati esplicitamente come tali.
+- Spesso sconsigliato il suo utilizzo dato che si può ottenere uno stesso risultato con un *Computed Signal*.
+
+## Gestione Dati tra Componenti
+
+### Input Signals - Passare dati ai Componenti Figli 
+
+Il **signal input** rende visibile la proprietà al componente padre.
+Si indicano input obbligatori tramite `input.required`.
+
+```typescript
+import { Component, input } from '@angular/core';
+
+@Component({
+  selector: 'app-greeter',
+  // Nel template del figlio, 'name' è un signal e viene richiamato come funzione
+  template: `<p>Hello {{ name() }} </p>`,
+})
+export class GreeterComponent {
+  // Dichiarazione di un input obbligatorio tramite signal
+  name = input.required<string>();
+}
+
+@Component({
+  selector: 'my-app',
+  // Il padre passa il valore usando la proprietà tra parentesi quadre [name]
+  template: `<app-greeter [name]="name"></app-greeter>`,
+})
+export class AppComponent {
+  name = "folks";
+}
+```
+
+### Output Signals - Passare eventi al Componente Padre
+
+Cosa non permessa in React, il padre di un componente può rispondere agli eventi del figlio
+- Il figlio dichiara delle proprietà come event emitter attraverso **output signal**.
+- Il componente padre ascolta quell'evento
+
+```typescript
+import { Component, input, output } from '@angular/core';
+
+@Component({
+  selector: 'app-btn',
+  // Al click, viene chiamato il metodo .emit() dell'output signal
+  template: `<button (click)="exploded.emit(true)">Explode!</button>`,
+})
+export class BtnComponent {
+  // Il figlio dichiara un event emitter tramite la funzione output()
+  exploded = output<boolean>();
+}
+
+@Component({
+  selector: 'my-app',
+  // Il padre ascolta l'evento tramite le parentesi tonde (exploded)
+  // $event contiene il dato passato dal metodo emit()
+  template: `<app-btn (exploded)="onExplode($event)"></app-btn>`,
+})
+export class AppComponent {
+  onExplode(evt: boolean) {
+    console.log("exploded!", evt);
+  }
+}
+```
+
+### Model Signals - Passaggio dati bidirezionale
+
+Il Model Signal implementa il two way data binding, quindi combinazione tra input ed output.
+
+```typescript
+import { Component, model, signal } from '@angular/core';
+
+@Component({
+  selector: 'custom-checkbox',
+  template: '<div (click)="toggle()"> ... </div>',
+})
+export class CustomCheckbox {
+  // 'checked' è un model input: permette sia di ricevere dati che di emetterli
+  checked = model(false);
+
+  toggle() {
+    // Aggiorna il valore del signal; il cambiamento verrà propagato al padre
+    this.checked.set(!this.checked());
+  }
+}
+
+@Component({
+  selector: 'user-profile',
+  // La sintassi "banana-in-a-box" [()] crea il two-way binding
+  template: '<custom-checkbox [(checked)]="isAdmin" />',
+})
+export class UserProfile {
+  protected isAdmin = signal(false);
+}
+```
+
+### Linked Signal
+
+Un segnale che dipende da un altro segnale, come il computed, ma vuole essere anche write, non solo read.
+
+Il suo classico utilizzo è la gestione della stato di una lista interna che dipendente dalla gestione dello stato della lista esterna, quindi lo si utilizza per evitare scrittura di boilerplate.
+
+## Resource
+
+La reattività di tutti i segnali visti fino ad ora sono sincroni, se viene aggiornata una foglia dell'albero delle dipendenze viene aggiornato anche tutto il resto.
+
+La resource permette quindi l'utilizzo di chiamate asincrone.
+
+## Ciclo di Vita dei Componenti
+
+- Creato a tempo di invocazione del costruttore.
+- Notato Cambiamento tramite utilizzo di segnali.
+- Rendering del componente.
+- Distruzione del componente.
+
+## Attribute Directive
+
+Modo per aggiungere logica agli elementi HTML di base.
+- L'elemento a cui si riferiscono viene passato nel costruttore.
+
+## Control Flow in Angular
+
+Corrispondono al *rendering condizionale* di React, nel corpo permettono la scrittura di templates.
+
+- If: @if {then} @else
+- Switch
+- For
+- `@defer` Permette lazy loading dei componenti eventualmente grandi.
+- `@placeholder` Permette di piazzare qualcosa prima del rendering effettivo. Viene mostrato a prescindere.
+- `@loading` Simile a placeholder, ma viene mostrato solo dopo che il caricamento di defer inizia.
+- `@error` Come i precedenti ma esiste per la gestione degli errori.
+
+## Dependency Injection
+
+Angular permette nativamente di gestire la delega di operazioni, costruendo delle dipendenze tramite `@Injectable`.
+
+Esistono quindi i **ruoli** di **dipendenza (consumer)** e di **utilizzatore (provider)**.
+
+Si definisce quindi una dipendenza per una classe Typescript senza preoccuparsi di istanziarla.
+
+Permette la scrittura di codice e test più semplice.
+
+La comunicazione tra **Consumer** e **Provider** avviene tramite l'**Injecton**:
+- L'**Injector** è un **oggetto** che trova una dipendenza come **Singleton in cache** **oppure** la **fornisce** tramite un **Provider**.
+- Viene costruito automaticamente per i moduli ed è disponibile per tutta l'applicazione.
+
+L'`@Injectable` segue il pattern `@Singleton` per cui tutti visualizzano queste dipendenze.

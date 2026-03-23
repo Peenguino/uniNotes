@@ -1594,7 +1594,7 @@ $ (forall x_i in X) [B and D_c and x_i] tack.r L(x_i, D_c) $
 
 dove con un generico $A tack.r B$ si intende che da $A$ possiamo logicamente dedurre $B$.
 
-=== Sistemi Induttivi ed Equivalenti Deduttivi e Riassunto Learners Corrente Lezione
+=== Sistemi Induttivi ed Equivalenti Deduttivi e Riassunto Learners
 
 Mostriamo degli esempi grafici rispettivamente di un sistema induttivo e di un equivalente deduttivo.
 
@@ -1607,6 +1607,126 @@ Mostriamo degli esempi grafici rispettivamente di un sistema induttivo e di un e
 - *Version Space Candidate Elimination Algorithm*: Si basa sull'utilizzo del *bias induttivo*, si assume quindi che lo spazio delle ipotesi $H$ contenga il concetto target $c$ come congiunzione di attributi.
 - *Find-S*: Basato sul *language bias* dato dall'operatore $and$ ed il *search bias* data la preferenza sull'ipotesi più specifica.
   - Lo spazio delle ipotesi contiene il concetto target e tutte le istanze sono negative finchè l'opposto non è implicato da altra knowledge, vista come esempi positivi.
+
+= Lezione 11 - Modelli Lineari - 05/02/2025
+
+== Regressione
+
+Processo per estimare una funzione data una quantità finita di elementi in un insieme rumoroso.
+
+Si definisce una $h(x) = w_1 x + w_0$, queste due costanti $w$ *vanno trovate* in *modo sistematico*.
+
+=== Regressione Lineare Univariata e Metodo Least Mean Square (LMS)
+
+Si parte da una $x$ in input e si ottiene una $y$ in output secondo quindi la formula 
+
+$ "output" = h(x) = w_1 x + w_0 $
+
+#pagebreak()
+
+Una volta definita la funzione di regressione questa può essere utilizzata per fare prediction, ma va costruita. Il metodo dei minimi quadrati può definire sistematicamente i due coefficienti $w$
+
+*Definizione LMS*:
+- Dato un insieme $l$ di esempi di training del tipo $(x_p, y_p)$
+- Si trova $h_(w)(x)$ nella forma $w_1x + w_0$ che minimizza la *loss* sui dati di training.ù
+  - In particolare si trova $w$ per minimizzare la somma dei quadrati:
+  $ "Loss"(h_w) = E(w) = sum^(l)_(p=1)(y_p - h_(w)(x_p))^2 = sum^(l)_(p=1)(y_p - (w_1x_p + w_0))^2$
+
+*Utilizzo Gradiente*: Per la minimizzazione di questa quantità, su una dimensione $n$ si utilizza il gradiente empirico di $E(w) = 0$, ossia $(delta E(w))/(delta w_i)$ per ogni $i = 1 dots n$.
+
+*In Sintesi*: Dato un insieme $l$ di esempi di training $(x_p, y_p)$ ed una funzione di loss, si trova il vettore peso $w$, in questo caso di dimensione 2, per la costruzione di una funzione $h_(w)(x)$ definita
+come $h_(w)(x) = w_1x + w_0$.
+
+=== Approccio Iterativo via Ricerca Locale
+
+Si basa sull'utilizzo del gradiente decrescente per la ricerca locale, quindi l'algoritmo iterativo definisce anche la dimensione di un passo ossia la step size $eta$, quindi definendo:
+
+$ Delta w = - "gradiente di" E(w) quad w_("new") = w + eta thin Delta w $
+
+Ricerca locale basata sull'assegnamento arbitrario della prima posizione, iterativamente verrà calcolato il passo successivo come definito da $x_("new")$ sopra.
+
+#figure(
+  image("img/discesaGradienteIterativo.png", width:300pt)
+)
+
+Si segue un criterio di error correction, detto anche delta rule, che cambia $w$ in maniera proporzionale all'errore in base a questi casi:
+- Se $"errore" = y_"target" - "output" = 0$ allora non viene effettuata *nessuna correzione*.
+- Se $"output" > "target"$ ossia $(y - h) < 0 $ allora l'output è troppo alto:
+  - $Delta w_0$ negativa allora si riduce $w_0$ e
+  - se input $x > 0$ con $Delta w_1$ negativa allora si riduce $w_1$.
+- Se $"output" < "target"$ ossia $(y - h) > 0 $ allora l'output è troppo basso:
+  - $Delta w_0$ positiva allora si aumenta $w_0$ e
+  - se input $x > 0$ con $Delta w_1$ positiva allora si aumenta $w_1$.
+
+#pagebreak()
+
+*Proprietà del Gradiente Decrescente*:
+- Permette la ricerca locale in un infinito spazio d'ipotesi.
+- Può essere applicata su spazio di ipotesi continue e funzioni differenziabili
+- Non è il massimo d'efficienza, ma il concetto era quello di arrivare al minimo.
+
+=== Estensione Pattern e Dimensioni Algoritmo a Gradiente Discendente
+
+Elenchiamo passo passo cosa estendiamo:
+- Abbiamo una *molteplicità* di *pattern*.
+  - Questi possono essere sommati a piccoli passi, o a grandi batch.
+- Pattern $l$ viene *esteso* da una variabile indipendente ad una *dimensione* $n$. 
+
+
+#figure(
+  image("img/matriceDatasetInput.png", width:180pt)
+)
+
+- Possiamo quindi dereferenziare la tabella utilizzando l'indice di riga e di colonna.
+- Secondo la notazione formale possiamo quindi scrivere:
+  $ w^(T)x = x^(T)w = w_0 + w_1 x_1 + dots + w_n x_n = w_0 + sum_(i=1)^(n) w_i x_i $
+- La funzione $h$ sarà quindi definita come:
+  $ h(x_p) = x^(T)_p bold(w) = sum_(i=0)^(n) x_(p,i)w_(i) $
+  - Dove indichiamo il pattern con $p$ e la feature con $i$.
+
+*In Sintesi*:
+  - *Dato* un insieme $l$ di esempi di training definiti come $(bold(x_p), y_p)$ dove
+    - $bold(x_p)$ è il vettore p-esimo, rappresentante il *pattern input*.
+    - $y_p$ è l'*output atteso corrispondente* al pattern p-esimo.
+  - *Trova* il vettore di pesi $bold(w)$ che minimizza la loss attesa sui dati di training:
+  $ E(bold(w)) = sum_(p=1)^(l) (y_p - bold(x)^(T)w)^2 = norm(bold(y) - bold(X)bold(w) )^2 $
+
+*Algoritmo Generalizzato Gradiente Discendente*:
+- Si inizia con un vettore di pesi iniziale $bold((w)_("initial"))$ piccolo, con una step size $eta$ compresa tra $0$ ed $1$.
+- Calcola $Delta bold(w) = -nabla E(bold(w)) = - (delta E(bold(w)))/(delta bold(w)) $ per ogni $w_j$.
+- Calcola il nuovo passo come $bold(w)_("new") = bold(w) + eta Delta bold(w) $.
+- Si ripete il secondo passo fino al raggiungimento della convergenza oppure ad un $E(bold(w))$ sufficientemente piccolo.
+
+== Linear Basis Expansion (LBE)
+
+Tutto quello mostrato fino ad ora tentava di modellare problemi lineari, ma alcuni problemi di regressione potrebbero richiedere
+approssimazioni non lineari.
+
+Con lineare non s'intende per forza di cose una linea dritta, ma definisce in che modo i coefficienti di regressione in $bold(w)$ si pongono nell'equazione di regressione $h_(bold(w))(x) = bold(w)^(T) thin bold(x)$.
+L'importante è che i pesi nel vettore $bold(w)$ restino lineari. Volendo spiegare informalmente la LBE:
+- I pesi $(w_1, dots , w_n)$ restano "puliti", quindi lineari.
+- Le variabili (feature) contenute nel vettore $bold(x) in RR^(n)$ vengono passate ad una funzione $Phi(x) in RR^K$, con $n$ numero di feature originale e $K$ numero di nuove variabili costruite.
+- Questo aumenta il numero di nuove variabili, ma permette di modellare il problema negli stessi termini definiti prima per problemi lineari, basta che i pesi in $bold(w)$ restino lineari.
+
+Si possono anche usare input $bold(x)$ trasformati con *relazioni non lineari* per riferire nuovamente a soluzioni come quella della LMS.
+
+*Definizione*: Definiamo quindi la trasformazione Linear Basis Expansion:
+
+$ h_(bold(w))(x) = sum_(k=0)^(K) w_(k) Phi_(k)(bold(x)) $
+
+- $Phi_(k): RR^(n) -> RR$, quindi funzione che permette la trasformazione di $bold(x)$, ad esempio:
+  - *Rappresentazione polinomiale*:
+  $ Phi(bold(x)) = x_j^2 quad Phi(bold(x)) = x_j x_i $
+  - *Trasformazione non lineare a singolo input*: 
+  $ Phi(bold(x)) = log(x_j) quad Phi(bold(x)) = sqrt(x_j) $
+  - *Trasformazione non lineare multi input*: 
+  $ Phi(bold(x)) = norm(bold(x)) $
+
+*Caratteristiche LBE*: Questo approccio dipende pesantemente da quale $Phi$ si sceglie per la trasformazione.
+
+- *Pro*: Grazie all'utilizzo di questo approccio possiamo modellare relazioni più complesse di quelle lineari.
+- *Contro*: Ci servono metodi per tenere sotto controllo la complessità del modello, gestendo eventuali fenomeni di *underfitting* ed *overfitting*.
+
 /*
 #figure(
   image("img/algGenetico8Regine.png", width:300pt)
