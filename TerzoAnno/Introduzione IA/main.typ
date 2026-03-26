@@ -1608,7 +1608,7 @@ Mostriamo degli esempi grafici rispettivamente di un sistema induttivo e di un e
 - *Find-S*: Basato sul *language bias* dato dall'operatore $and$ ed il *search bias* data la preferenza sull'ipotesi più specifica.
   - Lo spazio delle ipotesi contiene il concetto target e tutte le istanze sono negative finchè l'opposto non è implicato da altra knowledge, vista come esempi positivi.
 
-= Lezione 11 - Modelli Lineari - 05/02/2025
+= Lezione 11 - Modelli Lineari I - 19/03/2025
 
 == Regressione
 
@@ -1687,7 +1687,7 @@ Elenchiamo passo passo cosa estendiamo:
 *In Sintesi*:
   - *Dato* un insieme $l$ di esempi di training definiti come $(bold(x_p), y_p)$ dove
     - $bold(x_p)$ è il vettore p-esimo, rappresentante il *pattern input*.
-    - $y_p$ è l'*output atteso corrispondente* al pattern p-esimo.
+    - $y_p$ è il *targer atteso corrispondente* al pattern p-esimo.
   - *Trova* il vettore di pesi $bold(w)$ che minimizza la loss attesa sui dati di training:
   $ E(bold(w)) = sum_(p=1)^(l) (y_p - bold(x)^(T)w)^2 = norm(bold(y) - bold(X)bold(w) )^2 $
 
@@ -1726,6 +1726,141 @@ $ h_(bold(w))(x) = sum_(k=0)^(K) w_(k) Phi_(k)(bold(x)) $
 
 - *Pro*: Grazie all'utilizzo di questo approccio possiamo modellare relazioni più complesse di quelle lineari.
 - *Contro*: Ci servono metodi per tenere sotto controllo la complessità del modello, gestendo eventuali fenomeni di *underfitting* ed *overfitting*.
+
+#pagebreak()
+
+= Lezione 12 - Modelli Lineari II - 24/03/2025
+
+== Underfitting/Overfitting e Regolarizzazione
+
+La funzione generata dipende dalla *complessità del modello*, ossia la sua *flessibilità* sul fare *fitting sui dati*.
+
+*Regolarizzazione*: Ci permette di controllare fenomeni di overfitting penalizzando funzioni complesse effettuando uno shrink dei pesi a queste funzioni.
+
+Un errore di training molto basso non garantisce nulla da un punto di vista di buona generalizzazione. Per questo motivo si preferisce agire sul vettore di pesi con metodologie di normalizzazione.
+
+=== Regolarizzazione Ridge/Tikhonov
+
+Si vincola sui valori di $w_i$, favorendo modelli sparsi con meno termini a causa dei pesi $w_j = 0$. Effettua quindi un operazione di smoothing, arrivando a modelli meno complessi.
+
+$ "Loss"(h_w) = sum_(p=1)^(l) (y_p - h_w(bold(x)_p))^(2) + lambda norm(bold(w))^(2) $
+
+Definito ad alto livello quindi sarebbe la *somma* tra l'*errore* ed il *termine di regolarizzazione*, dove $norm(bold(w))^(2) = sum_(i) w_i^2$.
+
+L'effetto sul nuovo vettore di pesi calcolato sarà quindi:
+
+$ bold(w)_("new") = bold(w) + eta thin Delta bold(w) - 2 lambda bold(w) $
+
+Fino ad ora la definizione del polinomio era piena definizione di bias di linguaggio. Questo meccanismo di preferenze introdotto tramite l'utilizzo del $lambda$ tocca invece il concetto di bias di ricerca, perchè stiamo preferendo alcune ipotesi rispetto ad altre.
+
+#h(1cm)
+
+#grid(
+  columns: (1fr, 1fr),
+  figure(
+    image(
+      "img/underfitting.png",
+      width: 100%
+    ),
+    caption: [Esempio di Underfitting]
+  ),
+  figure(
+    image(
+      "img/overfitting.png",
+      width: 100%
+    ),
+    caption: [Esempio di Overfitting]
+  )
+)
+
+#pagebreak()
+
+*Rappresentazione Funzione Regolarizzata*: Una funzione regolarizzata con $ln lambda = -18$ appare così:
+
+#v(0.2cm)
+
+#figure(
+  image("img/funzioneRegolarizzata.png", width:220pt)
+)
+
+#v(0.2cm)
+
+
+== Classificazione per Regressione
+
+#v(0.2cm)
+
+
+Riutilizziamo la classificazione della regressione per definire se un oggetto appartenga o meno alla parte positiva o negativa di un iperpiano $bold(x)^(T)bold(x)$.
+
+#v(0.2cm)
+
+
+L'idea quindi non è utilizzare la funzione ipotizzata per stimare un valore numerico, ma classificare un valore $+1$ `true` oppure un $-1$ `false`.
+
+#v(0.6cm)
+
+=== Decision Boundary
+
+Informalmente dove l'iperpiano vale $0$, quindi formalmente:
+
+$ bold(x)^(T) bold(x) = w_1 x_1 + w_2 x_2 + w_0 = 0 $
+
+#figure(
+  image("img/decisionBoundary.png", width:360pt)
+)
+
+#pagebreak()
+
+=== Decision Boundary Threshold Classifier
+
+La classificazione può essere vista come la divisione dello spazio degli input in regioni di decisione, nel caso binario due regioni ${0,1}$.
+
+Nel caso semplice a due dimensioni, la funzione determina la soglia tra le due regioni.
+
+#figure(
+  image("img/sogliaRegioniClassificazione.png", width:200pt)
+)
+
+Si definisce quindi:
+
+$ h(x) = "sign"(bold(w)bold(x) + w_0) quad h(x) = cases(
+    1 "if" bold(w)bold(x) + w_0 >= 0,
+    0 "otherwise"
+  )
+$
+
+$
+  h(bold(x)_p) = "sign"(bold(x)^T_p bold(w)) = sum_(i=0)^(n) x_(p,i) w_(i)
+$
+
+Questa è detta *Linear Threshold Unit (LTU)*.
+
+Il vantaggio quindi è quello di poter utilizzare gli stessi strumenti di prima (LBE e Regolarizzazione) per una classe di problemi differenti, ossia quelli di classificazione.
+
+=== Formalizzazione Learning Problem for Linear Classifiers
+
+Assumendo di utilizzare ancora il Least Min Square:
+
+- Sia *dato* un insieme di esempi di training $l$.
+- Si *trova* il vettore $bold(w)$ che minimizza la somma residua dei quadrati:
+
+  $
+    E(bold(w)) = sum_(p=1)^(l) (y_p - bold(x)^(T)_p bold(w))^2 = norm(bold(y) + bold("Xw"))^2
+  $
+
+*Attenzione*: A differenza della regressione non utilizzamo in $E(bold(w))$ la forma $h(bold(x))$ perchè se definita a tratti potrebbe risultare non differenziabile. Di conseguenza $h(bold(x)) = "sign"(bold(w)^(T)bold(x))$ viene usato solo per la classificazione.
+
+Questo ci permette l'utilizzo *anche* in *questo contesto* dell'*algoritmo iterativo a gradiente discendente*.
+
+#pagebreak()
+
+*Riassumendo*:
+- I *modelli* vengono *allenati* su training set tramite l'utilizzo del Least Min Square su $bold(w)^(T)bold(x)$. Nello specifico si allena utilizzando l'*algoritmo del gradiente discendente* per la *regressione lineare*.
+- I *modelli* possono anche *essere utilizzati* però per la *classificazione* utilizzando la funzione come threshold, ottenendo quindi analiticamente $h(bold(x)) = "sign"(bold(w)^T bold(x))$.
+  - In questo caso di utilizzo è possibile quindi calcolare una *accuracy* e complementare percentuale di errore di classificazione secondo il calcolo:
+  $ "accuracy" = (l - "num_err")/l = l - "mean_err" $
+
 
 /*
 #figure(
