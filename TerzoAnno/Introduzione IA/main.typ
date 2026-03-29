@@ -64,13 +64,13 @@
 
 #v(-0.2cm)
 
-= Lezione 1 - Introduzione al Corso - 05/02/2025
+= --- --- --- --- --- Lezione 1 - Introduzione al Corso - 05/02/2026
 
 Cenni storici ed introduzione. Vedi slide.
 
 #v(-0.2cm)
 
-= Lezione 2 - Agenti - 05/02/2025
+= --- --- --- --- --- Lezione 2 - Agenti - 05/02/2026
 
 `Rif: Slide Lezione_1 - AIMA Cap: 2`
 
@@ -239,7 +239,7 @@ Possiamo definire un problema di ricerca tramite 6 elementi:
 
 Quindi un *cammino* rappresenta una *sequenza di azioni*, una *soluzione* è un *cammino* che parte dallo *stato iniziale* ed arriva ad uno *stato obiettivo*. Tra tutte le soluzioni ne esiste una *ottimale*, ossia di *costo minimo*.
 
-= Lezione 3 - Algoritmi di Ricerca e Strategie Ricerca non Informata - 10/02/2025
+= --- --- --- --- --- Lezione 3 - Algoritmi di Ricerca e Strategie Ricerca non Informata - 10/02/2026
 
 `Rif: Slide Lezione_2 - AIMA Cap: 3, Sez: 3.3, 3.4`
 
@@ -486,7 +486,7 @@ Non si procede però espandendo due nodi contemporaneamente, si sceglie infatti 
 
 Quindi tutti questi sono detti di ricerca non informata perchè si basano solo sulla definizione del problema.
 
-= Lezione 4 - Strategie di Ricerca Informata o Euristica - 12/02/2025
+= --- --- --- --- --- Lezione 4 - Strategie di Ricerca Informata o Euristica - 12/02/2026
 
 `Rif: Slide Lezione_3 - AIMA Cap: 3, Sez: 3.5, 3.6`
 
@@ -712,7 +712,7 @@ Non possiamo però a priori sommare i valori di ciascuna soluzione di istanza, d
 
 #pagebreak()
 
-= Lezione 5 - Ricerca Locale e Cenni di Ricerca Online - 17/02/2025
+= --- --- --- --- --- Lezione 5 - Ricerca Locale e Cenni di Ricerca Online - 17/02/2026
 
 `Rif: Slide Lezione_4 - AIMA Cap: 4, Sez: 4.1, 4.2, 4.3`
 
@@ -863,7 +863,7 @@ In questo caso il sottoalbero soluzione è quello rappresentato in grassetto.
 
 = *PARTE II: LOGICA E AGENTI* <parte2>
 
-= Lezione 6 - Agenti Basati su Conoscenza - 05/03/2025
+= --- --- --- --- --- Lezione 6 - Agenti Basati su Conoscenza - 05/03/2026
 
 `Riferimento AIMA Cap 7.1 - 7.3`
 
@@ -1089,7 +1089,7 @@ Nella zona evidenziata dei problemi difficili ci comporta meglio `Walksat`, ma s
 
 #pagebreak()
 
-= Lezione 7 - Calcolo Proposizionale (PROP) - 06/03/2025
+= --- --- --- --- --- Lezione 7 - Calcolo Proposizionale (PROP) - 06/03/2026
 
 `Rif AIMA 7.5, 7.6`
 
@@ -1136,7 +1136,7 @@ Abbiamo tre metodologie: Tavole verità, SAT e Refutazione.
 
 #pagebreak()
 
-= Lezione 8 - Logica del Prim'Ordine (FOL) - 10/03/2025
+= --- --- --- --- --- Lezione 8 - Logica del Prim'Ordine (FOL) - 10/03/2026
 
 `Rif. AIMA 8.1 8.2 8.3`
 
@@ -1364,7 +1364,7 @@ Partendo quindi da un insieme di goals del tipo $G_1 , G_2 thin dots thin G_(n-1
 
 = *PARTE III: MACHINE LEARNING* <parte3>
 
-= Lezione 9 - Introduzione al Machine Learning - 12/03/2026
+= --- --- --- --- --- Lezione 9 - Introduzione al Machine Learning - 12/03/2026
 
 Quando bisogna utilizzare soluzioni basate sul Machine Learning?
 - In caso di ambienti dinamici.
@@ -1449,7 +1449,7 @@ sulla *generalizzazione*, ossia sulla *capacità di rispondere* in maniera appro
   - *Fase di Learning (training e fitting)*: Si costruisce il modello dai dati conosciuti, tramite fase di training.
   - *Fase di Predizione (testing)*: Preso un nuovo input $x^'$, questo viene dato al modello che computa una risposta sulla base del nuovo input e questo viene valutato in base alla capacità di generalizzazione.
 
-= Lezione 10 - Concept Learning - 17/03/2026
+= --- --- --- --- --- Lezione 10 - Concept Learning - 17/03/2026
 
 `Rif. Slide IIA-26-ML-concept-learning-v0.1.pdf`
 
@@ -1608,7 +1608,7 @@ Mostriamo degli esempi grafici rispettivamente di un sistema induttivo e di un e
 - *Find-S*: Basato sul *language bias* dato dall'operatore $and$ ed il *search bias* data la preferenza sull'ipotesi più specifica.
   - Lo spazio delle ipotesi contiene il concetto target e tutte le istanze sono negative finchè l'opposto non è implicato da altra knowledge, vista come esempi positivi.
 
-= Lezione 11 - Modelli Lineari I - 19/03/2025
+= --- --- --- --- --- Lezione 11 - Modelli Lineari I - 19/03/2026
 
 == Regressione
 
@@ -1729,7 +1729,7 @@ $ h_(bold(w))(x) = sum_(k=0)^(K) w_(k) Phi_(k)(bold(x)) $
 
 #pagebreak()
 
-= Lezione 12 - Modelli Lineari II - 24/03/2025
+= --- --- --- --- --- Lezione 12 - Modelli Lineari II - 24/03/2026
 
 == Underfitting/Overfitting e Regolarizzazione
 
@@ -1860,6 +1860,135 @@ Questo ci permette l'utilizzo *anche* in *questo contesto* dell'*algoritmo itera
 - I *modelli* possono anche *essere utilizzati* però per la *classificazione* utilizzando la funzione come threshold, ottenendo quindi analiticamente $h(bold(x)) = "sign"(bold(w)^T bold(x))$.
   - In questo caso di utilizzo è possibile quindi calcolare una *accuracy* e complementare percentuale di errore di classificazione secondo il calcolo:
   $ "accuracy" = (l - "num_err")/l = l - "mean_err" $
+
+= --- --- --- --- --- Lezione 13 - Decision Trees - 26/03/2026
+
+Il *Decision Tree* è una *visualizzazione grafica* di *espressioni composte* da $or, and$.
+
+== Algoritmo ID3
+
+L'algoritmo *ID3* è pensato per l'apprendimento basato su Decision Tree, in particolare per la costruzione in *top down greedy* dell'albero.
+
+*Descrizione in Pseudocodice*:
+- Dato un training set di esempi, l'algoritmo per la costruzione del DT effettua una ricerca nello spazio degli alberi DT.
+- La *costruzione* è definita in *top down*, l'algoritmo effettua una *ricerca greedy*.
+- La *domanda fondamentale* è "quale è il prossimo attributo da testare?"
+  - Si seleziona l'*attributo migliore*, secondo le funzioni $"Entropy"$ e $"Gain"$ definite dopo.
+  - Un *nodo discendente* è creato per *ogni possibile valore* di questo *attributo migliore*, e gli *esempi* sono anch'essi *partizionati* secondo questo *attributo migliore*.
+  - Questo *processo* viene *reiterato fino a quando* tutti gli *esempi* sono *correttamente classificati* o fino a quando *non sono più presenti attributi*.
+
+Oltre alla definizione in se dell'algoritmo ricorsivo, bisogna analizzare cosa si intenda per *scelta migliore*. Abbiamo quindi la necessità di definire cosa sia l'*entropia*.
+
+=== Definizione Entropia
+
+L'entropia misura quanto impura sia una collezione di esempi, viene calcolata come:
+
+$ 0 <= "Entropy"(S) eq.triple - p_(+) log_2(p_(+)) - p_(-) log_2(p_(-)) <= 1 $
+
+Questo quindi ci permette di ripartire la collezione, in questo contesto siamo quindi interessati agli estremi $(0,1)$.
+
+=== Definizione Gain
+
+Il gain è la riduzione attesa in entropia causata dal partizionamento dell'insieme su un attributo.
+
+$ "Gain"(S,A) = "Entropy"(S) - sum_(v in "Values"(A)) (|S_v|)/(|S|) "Entropy"(S_v) $
+
+#pagebreak()
+
+L'*obiettivo* è quello di scegliere A in maniera tale da *massimizzare* il *gain*, quindi *diminuendo* il *termine a destra della sottrazione*.
+
+Nello specifico il termine a destra della sottrazione corrisponde, per ogni sottoalbero, al entropia di ciascun ramo in questione. Quindi *viene scelto* quello ad *entropia inferiore*.
+- Da un *punto di vista semantico*, stiamo classificando meglio a *gain alti*, quindi stiamo *differenziando meglio gli elementi* nei sottoinsiemi.
+
+#figure(
+  image("img/gainSuiBranch.png", width:400pt),
+  caption: "Nota che per ogni branch cambia solo il valore del termine sinistro della sottrazione."
+)
+
+*Correttivo al Information Gain*: Vogliamo evitare la polverizzazione in numerosità di classificazioni, quindi non vogliamo creare troppi branch. Si definisce quindi un $"GainRatio"()$.
+
+$ "GainRatio"(S,A) eq.triple "Gain"(S,A) / "SplitInformation"(S,A) $
+dove
+$ "SplitInformation"(S,A) eq.triple - sum_(i=1)^(c) (|S_i|)/(|S|) log_2 (|S|)/(|S_i|) $
+
+Questo *semanticamente* indica la *penalizzazione di casi* che portano ad *alto branching*.
+
+#v(1cm)
+
+*Ulteriore Correttivo*: Il valore di $"SplitInformation"(S,A)$ può diventare 0 o un valore molto piccolo quando $|S_i|$ è circa quanto $|S|$.
+- Per risolvere questa problematica si applicano euristiche per cui:
+  - Si calcola la $"Gain"$ per ogni attributo.
+  - Si applica la $"GainRatio"$ su attributi con la $"Gain"$ sopra la media, applicando quindi questo $"GainRatio"$ solo quando necessario.
+
+#pagebreak()
+
+== Inductive Bias del Learning su Decision Tree (DT)
+
+I bias induttivi del DT learning:
+- *Alberi corti* sono *preferiti* ad *alberi lunghi*.
+- Si *preferiscono* alberi che piazzano informazioni con attributi ad *alto gain vicino alla radice*.
+
+== Bias di Ricerca vs Bias di Linguaggio in Modelli Discreti/Lineari
+
+- *Modelli Discreti*:
+  - Definite *preferenze* con *Bias di Ricerca*, causa *strategia di ricerca*:
+    - L'*algoritmo ID3* cerca uno *spazio di ipotesi completo*, mentre la *strategia di ricerca è incompleta*. 
+  - Definite *restrizioni* con *Bias di Linguaggio*, causa insieme di ipotesi espressibile o considerato:
+    - L'*algoritmo Candidate-Elimination* cerca uno *spazio delle ipotesi incompleto*, mentre la *strategia di ricerca è completa*.
+- *Modelli Lineari*:
+  - Si utilizzano *combinazioni dei due bias*, con *preferenza su quello di linguaggio* per *flessibilità*, stando sempre attenti al fenomeno dell'Overfitting.
+
+== Definizione di Overfitting
+
+Data un ipotesi $h$ in uno spazio di ipotesi $H$:
+- Si considerano due errori:
+  - Su *training set* $"error"_(D)(h)$, quindi *errore empirico*.
+  - Sull'*intera distribuzione* $"error"_(X)(h)$, quindi *errore reale*, permette di stimare la *bontà della generalizzazione*.
+
+*Definizione*: Un ipotesi $h in H$ fa *overfitting sui dati di training* se esiste un *ipotesi alternativa* $h' in H$ tale che
+
+$ "error"_(D)(h) < "error"_(D)(h^') quad text(e) quad "error"_(X)(h^') < "error"_(X)(h) $
+
+Quindi informalmente, $h^'$ *alternativa fitta peggio* sui *dati di training* ma *generalizza meglio* sui *nuovi esempi*.
+
+=== Strategie di Mitigazione Overfitting (Early Stopping, Pruning)
+
+Esistono diverse strategie:
+- *Early Stopping*: Fermarsi prima nello sviluppo dell'albero, prima della classificazione piena.
+- *Pruning*: Permettere l'overfit e successivamente effettuare operazioni di *prune* tagliando rami dell'albero.
+  - *Reduced-Error Pruning*:
+    - Rimozione di interi sottoalberi di nodi, effettuata iterativamente.
+    - I nodi vengono rimossi solo se gli alberi risultanti non performano peggio di quelli precedenti sul validation set e per ciascuna iterazione vengono rimossi i nodi la cui rimozione apporta un maggior incremento di accuracy.
+    - La reiterazione si ferma quando nessun altro pruning porta a miglioramenti sull'accuracy
+#pagebreak()
+  - *Rule Post-Pruning*:
+    - Si *parte* da un *DT*.
+    - Si *converte in DT* in un *insieme di regole equivalente*, dove:
+      - Ogni *path* mappa su una *regola*.
+      - Ogni *nodo* mappa su una *pre-condizione*.
+      - Ogni *foglia* mappa su una *post-condizione*.
+    - Si effettua *pruning* sulle *pre-condizioni* la *cui rimozione migliora l'accuracy* sul validation set oppure sui dati di training.
+    - Si *ordinano le regole* su una *stima di accuracy*, considerandole in sequenza durante la classificazione di nuove istanze. 
+
+== Gestione Valori Continui, Gestione Valori Mancanti e Gestione Attributi a Costi Non Omogenei
+
+#v(0.5cm)
+
+*Gestione Valori Continui*: Possiamo utilizzare un approccio discreto anche su valori continui, utilizzando i valori discreti come soglie.
+
+Si determinano le soglie stabilendo dove mediamente esiste un cambio di classificazione tra i valori continui ordinati.
+
+*Gestione Valori Mancanti*: In contesti reali è molto probabile che alcuni attributi non vengano istanziati, di conseguenza si stabiliscono delle strategie per la gestione di queste casistiche:
+- Si sostituiscono i campi non compilati con il valore più comune della stessa classe.
+- Si gestisce in maniera più a grana fine utilizzando una distribuzione ed associando una probabilità $p$ per ciascun valore $v$.
+
+*Gestione Attributi a Costi Non Omogenei*: Gli attributi delle istanze potrebbero avere un costo associato. Si preferiscono DT con attributi a basso valore. In questo modo si definiscono modifiche di ID3 per tenere conto dei costi:
+
+- *Tan and Shimmler*:
+$ ("Gain"^(2)(S,A))/("Cost"(A)) $
+- *Nunez*:
+$ (2^("Gain"^(2)(S,A))-1)/(("Cost"(A)+1)^w) quad "con" quad w in [0,1] $
+
 
 
 /*

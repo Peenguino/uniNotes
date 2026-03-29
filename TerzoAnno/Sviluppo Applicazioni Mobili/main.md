@@ -646,3 +646,113 @@ Lezione sulla spiegazione di notifiche, che si classificano in
         - Ogni canale definisce ad esempio priorità, segnale sonoro, vibrazione, se vanno su lockscreen, se vanno mostrate 
 - **Dialog**: Gestione di modali a finestre, non molto utilizzate in contesto mobile, sono più da contesto desktop
 
+# Lezione 13 - Dialog e Fragment - 20/03/2026
+
+`Basato sul documento di slide PDF Lezione 12`
+
+## Dialog
+
+I dialog sono poco consigliati perchè rompono l'astrazione per cui non è mai il programmatore a definire quale sia il comportamento che deve assumere.
+
+Ne esistono di predefiniti, in cui si blocca il flusso di operazioni dell'utente per forzarlo a fare qualcosa:
+- `AlertDialog`
+- `ProgressDialog`
+
+### Interazione tra Dialog e Activity
+
+Gestito anche in questo caso con identificativi numerici su metodi:
+- `showDialog(id)`
+- `onPrepareDialog(id, dialog)`
+- `onCreateDialog(id)`
+
+### Dialog in Compose
+
+In Compose i `Dialog` sono Composable come tutti gli altri e vengono gestiti secondo la gestione dell'accesso alla variabile il cui comportamento è delegato ad un valore lazy e sincronizzato per il processo di ricaricamento della UI come avevamo già visto.
+
+```kotlin
+var showDialog by remember { mutableStateOf(false) }
+
+if (showDialog) {
+    AlertDialog(
+        onDismissRequest = { showDialog = false },
+        title = { Text(text = "Titolo del Dialog") },
+        text = { Text(text = "Vuoi procedere?") },
+        confirmButton = {
+            Button(onClick = { showDialog = false }) {
+                Text("Conferma")
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = { showDialog = false }) {
+                Text("Annulla")
+            }
+        }
+    )
+}
+```
+
+## Fragment
+
+- Porzioni riciclabili di UI, come i componenti dei framework web.
+- Un istanza di Fragment si porta dietro un proprio stato ed un proprio ciclo di vita.
+- Le istanze di Fragment possono essere attaccate e staccate dalle Activity, in base a se siano o meno visibili.
+    - Quindi anche il ciclo di vita delle Activity diventa un po' più complessa, dato che questa si compone di Fragment.
+    - Quindi un Activity può comprendere nel suo albero delle View dei Fragment.
+
+<div style="text-align: center;">
+    <img src="img/cicloVitaFragment.png" width="300">
+</div>
+
+- Anche questi hanno la gestione a Bundle con `onSaveInstanceState()`
+- È comune definire Fragment custom, questo lo si fa estendendo la classe Fragment.
+
+# Lezione 14 - Tematiche di Storage I (Salvataggio Temporaneo Stato, Preferenze e File System) - 27/03/2026
+
+## Salvataggio Stato, Bundle e Parcelable
+
+Si affronta la gestione dei `Bundle`.
+- La classe bundle si compone di
+    - **Key** di tipo `string`
+    - **Value** è un `Parcelable`: Questa interfaccia è utilizzata come IPC in Android, si ispira a `Serializable` ma più economica, quindi si gestisce una serializzazione di specifici tipi.
+
+Un interfaccia utilizzata anche per passare un oggetto custom a tempo di lancio di un `Intent`.
+
+Potrebbe risultare utile per processi di serializzazione anche l'utilizzo della libreria.
+
+Il `Bundle` è preparato nell onSaveInstanceState() e salva lo stato di istanza di una `Activity`, permette quindi di far ripartire l'istanza logica dell'`Activity` salvandone lo stato.
+
+Viene poi passato a diversi metodi, ciascuno dei quali utilizzerà le informazioni a cui è interessato.
+
+## Preferenze ed Impostazioni
+
+Si memorizzano in memoria permanente le preferenze dell'utente.
+
+- `SharedPreferences`: Mappa chiave valore simile al bundle ma con alcune differenze:
+    - Sono memorizzate in maniera permanente
+        - Seguono una logica transazionale, quindi vengono applicate solo uscendo e confermando oppure annullate tutte se effettuato un abort.
+        - Le modifiche in scrittura di preferenze si effettuano da uno specifico `PreferencesEditor`.
+            - Le modifiche possono essere confermate con `commit()` bloccante oppure `apply()` non bloccante.
+            - Il modo più comune è accedere all'oggetto standard tramite `PreferenceManager.getDefaultSharedPreferences(ctx)`.
+    - I valori possono acquisire solo tipi base, `String` o `Set<String>`
+    - Si gestiscono ad aggiornamento atomico ed il sistema notifica in caso di modifica.
+
+### Preferenze di Notifiche
+
+Tramite listener è possibile acquisire le notifiche a tempo di cambiamento di preferenze.
+
+### PreferenceScreen
+
+Permette in modo dichiarativo (in XML), in maniera simile ad un `Layout`, di definire interfacce di preferenze custom.
+
+Si utilizzano anche per spedire un Intent per cambiare preferenze, quindi ad esempio un "dai permesso per Bluetooth".
+
+## Accesso al File System
+
+Raramente utilizzato, si romperebbe l'astrazione creata per allontanarsi dalla gestione manuale di Linux, ma in ogni caso esiste.
+- Si basa sulla coppia `(utente, applicazione)`.
+- Si distinguono molto i dati in **memoria interna** e quelli in **memoria esterna**.
+    - Ciascuna coppia `(utente, applicazione)` ha due directory, rispettivamente per memoria interna ed esterna.
+- Ogni app ha una cache directory per file temporanei.
+- Ogni app ha una directory pensata per file condivisi con altre app.
+- Il `FileProvider` è un particolare `Provider` che tramite un compromesso permette l'interazione in stile Android ma scrivendo effettivamente un file nel FS, mantenendo una tabella che mappa sui file in questione.
+    - Oltre a questo un file può essere anche dereferenziato tramite URI con `file://`

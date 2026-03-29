@@ -916,7 +916,7 @@ Il contesto lo si crea a partire dalla funzione `createContext()` che prende com
 
 Si preferisce effettuare accesso al Context in Custom Hooks, per fare in modo che se dovessimo rimodellare il suo utilizzo allora non dovremmo farlo per tutti i componenti ma solo fixando gli eventuali Custom Hooks.
 
-# Lezione 12 - Angular - 18/03/2026
+# Lezione 12 - Angular I - 18/03/2026
 
 Framework completamente basato su Typescript:
 - Framework e insieme di librerie per sviluppo, testing e build in ambito web.
@@ -1139,3 +1139,180 @@ La comunicazione tra **Consumer** e **Provider** avviene tramite l'**Injecton**:
 - Viene costruito automaticamente per i moduli ed è disponibile per tutta l'applicazione.
 
 L'`@Injectable` segue il pattern `@Singleton` per cui tutti visualizzano queste dipendenze.
+
+# Lezione 12 - Angular II e Svelte - 25/03/2026
+
+## Forms
+
+Due metodologie:
+- **Reactive Form**
+- **Template Driven Form**
+
+### Reactive Form
+
+- Forniscono accesso diretto ed esplicito al modello dei dati del form
+- Modello di flusso sincrono
+- Sono robuste e scalabili, utilizzate quando i form sono parte fondamentale dell'applicazione
+- Il modello è definito con la classe `FormControl`
+
+```typescript
+import { Component } from '@angular/core';
+import { FormControl } from '@angular/forms';
+
+@Component({
+  selector: 'app-reactive-form',
+  template: `
+    <input type="text" [formControl]="colorControl">
+  `
+})
+export class FavoriteColorComponent {
+  colorControl = new FormControl('');
+}
+```
+
+### Template Driven Form
+
+- Si poggiano su direttive nei template per manipolare le form
+- Utili in caso di poca business logic
+- Usano un modello di flusso di dati asincrono
+- Utilizzano il two-way data binding per aggiornare il modello
+
+```typescript
+import { Component } from '@angular/core';
+
+@Component({
+  selector: 'app-template-form',
+  template: `
+    <input type="text" [(ngModel)]="color">
+  `
+})
+export class FavoriteColorComponent {
+  color = '';
+}
+```
+
+## Pipes
+
+Sono funzioni che possono essere aggiunte ad un Template
+- Si usano per trasformare un valore in input in un altro
+  - Ad esempio data una `str` passiamo a `Date` oppure dato un `Object` passiamo a `JSON`.
+  - Si utilizza questo costrutto proprio perchè nel Template HTML di Angular abbiamo solo un sottoinsieme di JS meno espressivo ad esempio del JSX di React, quindi questo costrutto può tornarci utile.
+
+## RxJS
+
+Libreria esterna per la composizione di programmi basati su eventi.
+- Si basa sul concetto di `Observable`.
+  - Uno stream di valori che cambia nel tempo, verso cui ci possiamo iscrivere.
+- Si può definire in maniera dichiarativa, e permette la gestione di iscrizioni si Observable che risulterebbe macchinoso o completamente impossibile da implementare solo tramite l'utilizzo dei Framework.
+
+## Moduli di Angular
+
+Non molto utilizzato attualmente, permette di definire moduli tramite costrutti di `import` ed `export` su classi.
+
+## Gestione DOM - Angular vs React
+
+Si mettono **a confronto gli approcci** di **gestione del DOM** dei **due framework**:
+
+## Zone.js - Angular
+
+Libreria che implementa il concetto di `Zone`, ossia un contesto di esecuzione che persiste attraverso le operazioni asincrone.
+- Crea una bolla attorno all'applicazione per uniformare le API che utilizza Angular.
+- Ogni volta che termina un operazione asincrona, Zone.Js si occupa di avvisare Angular che controlla se deve aggiornare l'HTML.
+  - Questo deresponsabilizzava il programmatore per il controllo sui cambiamenti, ma allo stesso tempo aggiunge codice alle librerie che stiamo utilizzando.
+- **Zoneless**: Con Angular 18/19 la gestione è affidata invece completamente al grafo dei `Signal`, quindi grazie alla visita di questo grafo è Angular ad aggiornare il renderizzato.
+
+## Virtual DOM - React
+
+Per evitare di manipolare direttamente il DOM, operazione costosa, React gestisce un oggetto JS che virtualizza il DOM. Questo approccio segue delle fasi specifiche:
+
+- **Render**: Quando un componente cambia, React genera un nuovo albero VDOM.
+- **Diffing**: Confronta il nuovo albero VDOM con quello precedente.
+- **Calcolo delle Differenze**: Si seguono due regole
+  - Se cambia il tipo, ad esempio da div a span, allora React distrugge l'intero vecchio ramo e lo ricostruisce.
+  - Se non cambia il tipo, allora React aggiorna solo l'attributo specifico nel DOM reale.
+- **Commit**: Solo le differenze riscontrate con **diff** vengono riportate al DOM reale.
+
+### Sintesi Differenze
+
+- **ZoneJS - Angular**:
+  - Focalizzato sul quando, non sul dove.
+  - Non sa cosa sia cambiato ma è consapevole dell'occorrenza di un evento asincrono.
+  - Permette ri-rendering più granulare
+  - Analizzandone pro e contro potremmo dire che permette uno sviluppo trasparente, automatizzando il ri-rendering dei componenti ma allo stesso tempo potrebbe risultare difficile ottimizzare una grande quantità di componenti.
+- **Virtual DOM - React**:
+  - Si focalizza sul [dove, e non sul quando](https://www.youtube.com/watch?v=4QhyYngmW0I), rieseguendo sempre la funzione del componente ogni volta che lo stato cambia.
+  - Permette la creazione di un nuovo albero virtuale effettuando diff con quello precedente.
+
+## Svelte
+
+Nasce da Reactive.js, framework interno usato per il The Guardian.
+- La filosofia è quella di definire un framework che rimanesse vicino al vanilla js.
+- Quindi vorrebbe essere più un linguaggio per interfacce web che non un framework.
+- A tempo di build dell'applicazione il linguaggio Svelte viene compilato completamente in JS, HTML e CSS (vera in parte, attualmente ha un leggero runtime).
+
+### Componenti
+
+Compongono le applicazioni, vengono definiti in un unico file con estensione `.svelte`
+- Si compongono di script, CSS ed HTML.
+- La sezione module viene eseguita una sola volta e non per ogni istanza dei componenti.
+- I componenti possono essere tra loro annidati.
+
+### Snippet
+
+Sono porzioni riutilizzabili di markup all'interno dei vari Componenti.
+
+### Runes
+
+Versione Svelte dei Signal di Angular, se ne elencano alcune:
+- `$state` si definisce con `let count = $state(0)`, permette la dichiarazione di uno stato reattivo.
+  - Anche array e oggetti sono in questo modo reattivi
+- `$derived` dichiara il valore di una runa sulla base del valore di altre rune.
+  - Se il valore di derived non è una semplice espressione usare `$derived.by`
+  - Definisce la push-pull reactivity, ossia quando cambia lo stato tutto ciò che dipende da quello stato viene aggiornato, i valori derivati vengono calcolati solo quando vengono letti.
+- `$effect` permette l'esecuzione di codice a tempo di aggiornamento di una delle sue dipendenze, utile per sincronizzarsi con sistemi esterni.
+  - Viene eseguita anche quando il componente viene aggiunto al DOM.
+- `$props` dichiara le proprietà del componente, permette il passaggio di valori dal componente padre al figlio.
+- `$bindable` permette il passaggio di valori dal compomente figlio al padre.
+
+### Rendering Condizionale
+
+Basato su sintassi del tipo
+
+```
+{#if A}
+  // A
+{:else}
+  {#if B}
+    // B
+...
+```
+
+### Iterazione, Blocchi Await ed Evemt Handlers
+
+- **Iterazione**: Si basa su un blocco definito in questo modo
+  ```
+  <script>
+    let colorModels = ["RGB", "HSV"]
+  </script>
+
+  {#each colorModels as c}
+  ```
+- **Blocchi Await**: Permettono la gestione di dati asincroni, quindi handlano il risultato di una chiamata ad una funzione asincrona.
+  ```
+  {#await getAnswer() then n}
+    <p> The answer is {n} </p>
+  {/await}
+  ```
+- **Event Handlers**: Utilizza gli stessi handler del DOM, ma il loro valore viene interpolato tramite l'utilizzo di `({})`.
+
+### Lifecycle dei Componenti
+
+Ciascun componente ha un ciclo di vita che inizia quando viene creato e termina con la sua distruzione sulla base di questi due metodi:
+- `onMount()` viene eseguito al primo rendering del componente
+- `onDestroy()` viene eseguito quando il componente viene rimosso, utile per operazioni di cleanup.
+
+## Piccolo Confronto Finale tra Frameworks
+
+<div style="text-align: center;">
+    <img src="img/confrontoTreFrameworks.png" width="600">
+</div>
