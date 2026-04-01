@@ -1989,7 +1989,132 @@ $ ("Gain"^(2)(S,A))/("Cost"(A)) $
 - *Nunez*:
 $ (2^("Gain"^(2)(S,A))-1)/(("Cost"(A)+1)^w) quad "con" quad w in [0,1] $
 
+#pagebreak()
 
+= --- --- --- --- --- Lezione 14 - Validation and Theoretical Issues - 31/03/2026
+
+== Rapida Sintesi su Fasi Learning/Prediction e Capacità di Generalizzazione
+
+Si torna sulla *generalizzazione*, abbiamo visto anche criteri di regolarizzazione sia nel continuo sia nel discreto.
+
+Ricapitolando cosa abbiamo visto nelle precedenti lezioni di ML avevamo due fasi principali:
+
+- *Fase di Learning*: *Costruzione* del *modello* partendo dai dati conosciuti, quindi dai *dati di training e dai bias*.
+- *Fase di Prediction (Test)*: Si acquisiscono nuovi input $x^'$ e si genera la risposta del modello. Questa risposta viene confrontata con il suo target atteso $d^'$ che il modello non ha mai visto.
+  - Sulla base di questo di questo *si stabilisce* la *capacità di generalizzazione* di un *modello*.
+
+== Model Selection vs Model Assessment
+
+Si definiscono due fasi fondamentali della validazione:
+
+1. *Model Selection*: Si stima la performance, sulla base dell'errore di generalizzazione, di modelli diversi al fine di scegliere quello che generalizza meglio.
+  - Quindi si sceglie il modello, gli iperparametri.
+  - Questa *fase ritorna* un *modello finale*, quello migliore.
+2. *Model Assessment*: Avendo scelto il modello finale, bisogna stimare come si comporterà il modello in futuro in termini di generalizzazione su nuovi dati di test, per misurare la sua capacità di generalizzazione.
+  - Questa *fase ritorna* una *stima sul modello finale*.
+
+== Validazione su Stima Empirica
+
+=== Hold Out - Ripartizione del Set
+
+Approccio per cui si ripartisce l'*insieme di dati complessivo* in *sottoinsiemi disgiunti*, quindi:
+
+$ "Set" = "Training Set" union "Validation Set" union "Test Set" $
+
+dove
+
+$ "Development/Design Set" = "Training Set" union "Validation Set" $
+
+Il principio per cui i *sottoinsiemi* devono essere *disgiunti* è fondamentale, costruire un modello sulla base del $"Test Set"$ causerà una *finta buona stima* in fase di Assessment. Questo porterà ad una *stima sovraottimistica*. In sintesi:
+- Il $"Training Set"$ va usato nella *fase di Training*.
+- Il $"Validation Set"$ va usato per la *Model Selection*.
+- Il $"Test Set"$ va usato per la *Risk Estimation*.
+
+#pagebreak()
+
+=== Pseudoalgoritmo Grid Search - Hold Out
+
+Definizione dell'algoritmo che permette l'utilizzo a partizioni del dataset:
+
+1. Si separa l'intero dataset in $"Training Set TR"$, $"Validation Set TL"$ e $"Test Set TS"$.
+2. Si cerca il *miglior modello $h_(bold(w),lambda)$* *cambiando gli iperparametri* $lambda$, che possono ad esempio essere l'ordine dei polinomi, oppure il lambda per la normalizzazione.
+3. *FOR ESTERNO*: Per ogni valore diverso di $lambda$:
+  - 3.1. *FOR INTERNO*: Si cerca la migliore *$h_(bold(w),lambda)$* che minimizza l'errore empirico, quindi che fitta meglio il $"TR set"$, trovando il $bold(w)$ di parametri migliore. Quindi con migliore in questo caso si intende
+
+  $ "argmin"_(bold(w)) "Loss"(bold(w)) in L_2 $
+4. Opzionale: Si può, dopo le esecuzione dei FOR, far fittare la *$h_(bold(w),lambda)$* su $"TR Set" + "VL Set"$.
+5. In conclusione si valuta la finale *$h_(bold(w),lambda)(x)$* sul $"TS Set"$.
+
+=== Potenziali Errori causati da Cattiva Suddivisione dataset
+
+- *Stima Rischio, TR e VL*: L'errore che stimiamo su training o validation nel selection model non è utile per la stima del rischio. I dati di Training e di Validation non vanno mai usati per scopi di test.
+- *Feature Selection Bias#footnote("In questo caso bias con accezione negativa.")*: Non va usato tutto il dataset durante la selezione delle feature o del modello, perchè questo può indurre ad una specifica scelta rispetto ai risultati che utilizzeremo per i test, quando non dovremmo mai essere a conoscenza di quei dati durante allenamento e validazione.
+  - In questo senso stiamo quindi *mettendo in discussione la correttezza della stima* e non la possibilità di risolvvere il task.
+
+=== K-Fold Cross Validation
+
+Tecnica per cui si ottimizza l'utilizzo del dataset, partizionando in maniera "dinamica" quest'ultimo invece che staticamente.
+
+#figure(
+  image("img/kfoldCrossValidation.png", width:90pt)
+)
+
+*Definizione* Si seguono questi passi:
+
+- Si splitta il dataset $D$ in $k$ sottoinsiemi mutualmente esclusivi.
+- Si allena l'algoritmo su $D \/ D_i$ e si testa su $D_i$.
+- Si tiene una media dei risultati dati dalle $D_i$ della diagonale.
+
+Questo permette un utilizzo più efficiente dei dati a scambio di maggiore complessità computazionale.
+
+#pagebreak()
+
+== Validazione - Fondamenti Teorici tramite Statistical Learning Theory - SLT
+
+Teniamo conto e motiviamo con teoria formale elementi già citati precedentemente:
+
+- *Capacità di generalizzazione*, misurata in termini di $"Risk"$ o $"Test Error"$ di un modello.
+  - Tenendo *conto dell'errore di training*.
+  - Gestendo zone di *overfitting* ed *underfitting*.
+- Ruolo della *complessità del modello*, misurata in termini di $"VC-dim"$.
+- Ruolo della *quantità di dati* misurati in $l$.
+
+=== Setting Formale della Statistical Learning Theory (SLT)
+
+1. Si vuole approssimare una funzione $f(bold(x))$ reale con $d$ che corrisponde al *target*, 
+
+  quindi $d = "true" f + "noise"$
+2. Minimizzare la funzione $"Risk"$: 
+$ "Risk" = R = integral L(d,h(bold(x))) d P(bold(x),d) $
+3. Siano dati
+  - Un valore da $d$ e la distribuzione di probabilità $P(bold(x),d)$
+  - Una funzione $"Loss"$ definita come:
+$ L(h(bold(x), d)) = (d - h(bold(x)))^2 $
+4. Si cerca $h$ ipotesi in $H$ tale per cui si minimizza $"Risk"$.
+5. Ma i dati nel nostro dataset non sono infiniti, infatti $"TR" = (bold(x)_p, d_p)$ con $p = 1 dots l$.
+6. La $h$ quindi si cerca minimizzando un $"Risk"$ empirico, $"Risk"_("emp")$, definito come:
+  $ R_("emp") = (1)/(l) sum_(p=1)^(l) (d_p - h(bold(x)_p))^2 $
+  - Non diamo per scontato che il $"Risk"_("emp")$ approssimi bene l'originale $"Risk"$, lo argomentiamo tramite la teoria di _Vapnik-Chervonenkis_.
+
+=== Teoria di Vapnik-Chervonenkis
+
+- Data la $"VC-dim" ("VC")$, ossia una misura di complessità di $H$, quindi la flessibilità nel fittare i dati del $"TS"$.
+- Settiamo un bound sul $"Risk"$ nella seguente forma:
+  $ R <= R_"emp" + epsilon(frac(1,l), "VC", frac(1,delta)) quad text("con") quad epsilon(frac(1,l), "VC", frac(1,delta)) = "VC-confidence" $
+  - $epsilon$ è una *funzione* che *cresce al crescere* di $"VC"$ e *decresce al crescere* di $l$ e $delta$.
+  - Sappiamo che $R_("emp")$ decresce utilizzando modelli complessi, quindi ad alta $"VC"$.
+- Grazie a questa formulazione possiamo anche spiegare i fenomeni di Overfitting ed Underfitting:
+  - *Overfitting*: Modello poco complesso a bassa $"VC"$ non sufficiente data l'alta $R_"emp"$
+#pagebreak()
+  - *Underfitting*: Modello molto complesso ad alta $"VC"$ su un numero limitato $l$ di dati può abbassare $R_"emp"$ ma la $"VC-confidence"$ aumenta, aumentandoo $R$.
+
+*Def. Minimizzazione del Risk Strutturale* Si tenta di minimizzare il bound settato.
+
+#figure(
+  image("img/minRiskStrutturale.png", width:350pt)
+)
+
+Questo definisce il controllo sulla complessità (flessibilità) di un modello, definendo quindi un trade-off tra fitting sul TR e complessità effettiva del modello in termini di $"VC"$.
 
 /*
 #figure(
