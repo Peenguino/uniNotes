@@ -1316,3 +1316,298 @@ Ciascun componente ha un ciclo di vita che inizia quando viene creato e termina 
 <div style="text-align: center;">
     <img src="img/confrontoTreFrameworks.png" width="600">
 </div>
+
+# Lezione 13 - REST API - 30/03/2026
+
+Con **REST (Representional State Transfer)** si definisce uno stile architetturale per sistemi distribuiti
+  - Consiste di **6 vincoli** che si applicano agli elementi dell'architettura.
+  - Basato su **risorse** e non su **azioni**.
+
+## Risorse ed URI
+
+Solitamente una comunicazione tra client e server avviene tramite verbi HTTP utilizzando una URI per identificare la risorsa.
+- **Uniform**: Tipi diversi di risorse possono essere utilizzati nello stesso contesto, aggiungere nuovi tipi di risorse è semplice, gli identificatori possono essere riutilizzati in contesti diversi.
+- **Resource**: Qualsiasi cosa possa essere identificato da un URI.
+- **Identifier**: L'identificatore di una risorsa, una sequenza di caratteri che segue lo schema dell'immagine.
+
+Separazione tra risorsa ed identificatore, infatti una risorsa può essere identificata da più di un URI.
+
+### Rappresentazione di Risorse
+
+Una risorsa può essere ad esempio una entry nel DB, e per ciascuna di queste risorse possono esistere più rappresentazioni (HTML, JSON, XML...)
+
+Una rappresentazione si compone di dati e metadati, dove i metadati sono coppie $(nome, valore)$.
+
+## Vincoli REST
+
+- **Interfaccia Uniforme**:
+  - Forte enfasi su un interfaccia uniforme fra i componenti dell'architettura
+  - Migliora l'interoperabilità dei componenti
+  - L'interfaccia viene definita da quattro vincoli
+    - Identificazione delle risorse
+    - Manipolazione delle risorse attraverso le rappresentazioni
+    - Messaggi autodescrittivi
+    - **HATEOAS**: Hypermedia as the Engine of Application State
+      - Idealmente non sarebbe necessaria una documentazione su un API perchè i client ottengono informazioni dinamicamente tramite hypermedia tramite appunto i verbi.
+      - Si basa quindi sul concetto di discoverability per cui l'API diventa esplorabile.
+- **Stateless**:
+  - La comunicazione fra client e server deve essere stateless, ossia il server non contiente alcuno stato del client.
+  - **Prima di questo vincolo**, esisteva il **concetto di sessione**, che veniva **mantenuto lato server**.
+  - Trade-off: aumenta la dimensione del payload ma semplifica la gestione del server.
+- **Cacheable**:
+  - In questo contesto di RESTFUL API, un client che fa una richiesta, può evitare di richiedere una risorsa se questa a tempo di prima richiesta è stata indicata come cacheable.
+  - Questo va dichiarato esplicitamente e permette parzialmente di evitare la richiesta delle risorse.
+- **Client-Server**:
+  - Paradigma di chi visualizza una GUI e la gestione effettiva dei dati.
+- **Sistema Stratificato**:
+  - Tutti i componenti si interfacciano solo con lo stato che vedono direttamente.
+  - Dall'esterno stiamo quindi esponendo solo un endpoint che offre delle funzionalità, astraendo da eventuali implementazioni o replicazioni del server.
+  - Questa astrazione può portare anche a svantaggi, come ad esempio un maggiore overhead e/o latenza.
+- **Code On Demand (Opzionale)**:
+  - Permette di trasferire logica dal client al server, riducendo la complessità del client e richiedere al server l'esecuzione.
+
+## Design di API REST
+
+Ci basiamo sui **verbi del protocollo HTTP**.
+- `GET` Permette l'acquisizione di una risorsa da una URI.
+  - Se tutto `ok 200`, allora viene restituita la risorsa come JSON.
+  - Se la risorsa non viene trovata viene restituito `404`
+  - Se viene fatta una richiesta che il server non accetta ritorna `400`
+  - Gli errori con `500` indicano errori  
+- `POST` Aggiunge una risorsa ad una collezione.
+  - Non idempotente
+  - Permette lacrazione di una risorsa, passati i suoi attributi.
+    - Per questo non è idempotente, eseguendo due volte la POST sulla stessa URI con stessi dati, sto creando più risorse istanziate allo stesso modo.
+  - Va usata in modo canonico per la creazione di risorse.
+- `PUT` Modifica sostituendo una risorsa.
+  - Idempotente, perchè si occupa dell'aggiornamento dei campi passando tutto il nuovo oggetto.
+  - Non andrebbe utilizzata per la creazione delle risorse.
+- `PATCH` Modifica una risorsa dati alcuni suoi nuovi campi
+  - Come la `PUT` ma si passa solo un sottoinsieme degli attributi della risorsa.
+- `DELETE` elimina una risorsa
+  - Non idempotente, proprio perchè alla prima invocazione idealmente la risorsa viene eliminata.
+
+### Path alle Risorse
+
+Solitamente definite secondo questi principi generali:
+- Si usano nomi e non verbi, quindi risorse e non azioni.
+- Si usano nomi sematnicamente interessanti nei path.
+- Si sfruttano le gerarchie nei path.
+
+### Ricerche, Filtri e Sort su Risorse
+
+Si possono settare criteri più a grana fine sulla richiesta compilando i query parameters, non esiste uno standard però su quali di queste funzionalità siano disponibili, dipende da cosa il servizio sceglie di offrire.
+
+### CORS - Cross Origin Resource Sharing
+
+Meccanismo per richiedere dati da un origin URL ad un server su un altra URL.
+- Potrebbero essere settate delle configurazioni di default sulla gestione della cross origin.
+- Normalmente se il server si trova nella stessa origin la risposta sarà positiva.
+- Se il server si trova su una altra URL allora quest'ultimo nella risposta invia l'header `Access-Control-Allow-Origin` impostato con la propria URL.
+
+### OpenAPI
+
+Standard per la definizione di interfacce per API HTTP.
+- Agnostico rispetto al linguaggio
+- Human e machine understandable
+- Permette la generazione di stub lato client e server a partire dalla specifica.
+
+# Lezione 14 - Sviluppo API REST
+
+`Basato sulle Slide del PDF 12 - Sviluppare API REST`
+
+Sviluppo di API REST basato su Express.
+
+## NodeJS
+
+Runtime JS open-source e cross-platform, nasce per portare JS lato backend.
+- Come per il runtime di node lato browser, anche questo lato server è singlethreaded e basato su un singolo event loop.
+- Permette gestione di http, fs ed altre funzioni non presenti in JS lato browser.
+
+### nvm - Gestione versioni node
+
+Tool che permette la gestione di versioni di node.
+
+## Express
+
+Framework minimalista che consiste in una serie di chiamate a **middlewares**.
+  - Minimalista perchè senza middlewares l'applicazione ha funzionalità limitate.
+  - L'intera libreria si basa su quattro oggetti:
+    - **Application**: Rappresenta un intera applicazione express, la si inizializza invocando relativa funzione, ossia `app = express()`
+      - Fornisce metodi per fare routing delle richieste HTTP
+      - Configurare dei middleware
+      - Fare rendering di HTML
+      - Registrare un template engine
+      - Il metodo `app.listen()` si occupa del binding tra host e porta con le connessioni al servizio.
+
+      Permettiamo quindi con `app.METHOD(PATH, HANDLER)` la definizione di un metodo rispetto alla risorsa definita nel `PATH` gestita tramite funzione `HANDLER`.
+        - `PATH`: Possono essere stringhe, regex o string pattern.
+          - String pattern: Permette l'utilizzo di placeholder che verranno sostituiti da valori reali secondo la sintassi
+            ```
+            routepath = "/ricette/:id/ingredienti"
+            ```
+            Quindi `:id` verrà istanziato dopo.
+    - **Request**: Oggetto che rappresente una richiesta HTTP.
+      - Contiene tutte le proprietà relative alle informazioni relative alla richiesta.
+        - `req.body` contiene gli effettivi dati.
+        - `req.cookies` usando il middleware cookie-parser è un oggetto che contiene i cookie.
+        - `req.params` contiene i path parameters della richiesta
+        - `req.query` contiene i query parameters della richiesta
+        - `req.get` contiene il valore dell'header passato come parametro.
+    - **Response**: Oggetto che rappresenta una risposta HTTP.
+      - `res.cookie(name, value, [,options])` imposta un cookie
+      - `res.clearCookie(name [, options])` rimuove un cookie
+      - `res.download(path)` trasferisce il file al path passato come parametro, il
+      browser aprirà il prompt di download
+      - `res.end` termina il processo di risposta
+      - `res.get` restituisce il valore dell’header passato come parametro
+      (case-insensitive)
+      - `res.json([body])` invia una risposta JSON
+      - `res.redirect([status], path)` ridireziona verso una URL
+      - `res.send([body])` invia dei dati di risposta
+      - `res.status(code)` imposta lo status code della risposta
+      - `res.set(field, [,value])` imposta l’header della risposta
+      - `res.type(type)` imposta il content type
+    - **Router (Middleware)**:
+      - È una sottoapplicazione all'applicazione stessa per la definizione di path e si comporta da **middleware**.
+      - Se definissimo tutto l'insieme di path nell'applicazione allora questi dovrebbero aggiornare tutti i path esposti solo per l'aggiornamento della versione.
+      - I **middleware** sono quindi **funzioni** che hanno tre parametri:
+        - `req` request object
+        - `res` response object
+        - `next` la funzione del prossimo middleware
+
+      Questo permette quindi di eseguire del codice, modificare req e res, teminare il ciclo di richiesta e risposta e chiamare un eventuale prossimo middleware.
+
+### Tipi di Middleware
+
+Esistono diversi tipi di Middlewares.
+
+- **Middleware a livello Applicazione**: Si definisce letteralmente una catena di chiamate a middleware, in questo modo:
+
+  ```typescript
+  app.use((req, res, next) => {
+    console.log("First Middleware exec!")
+    next() //anche next passata è un middleware
+  })
+  ```
+
+- **Middleware a livello Router**: Simili a quelli definiti sopra, ma passano per la creazione di un oggetto router.
+
+### Built-In Middleware di Express
+
+Esistono un po' di middleware predefiniti:
+- `express.static` utile per servire file statici
+- `express.json` parsa le richieste considerando il loro payload come JSON.
+- `express.urlencoded` parsa le richieste con body urlencoded.
+
+### Middleware di Terze Parti Utili
+
+Potrebbero tornare utili `cookieParser = require('cookie-parser')` e anche `cors = require('cors')`.
+
+## Chiamare un Backend in JS
+
+Si utilizza la `fetch()`, funzione appartenente all'oggetto globale di JS, che restituisce una `Promise`.
+
+```javascript
+fetch(url, {
+  method: "POST",
+  mode: "cors",
+  cache: "no-cache",
+  credentials: "same-origin",
+  headers: {
+    "Content-Type": "application/json",
+  },
+  redirect: "follow",
+  body: JSON.stringify(data),
+}).then((response) => response.json());
+```
+
+# Lezione 15 - Autenticazione e Firebase Auth
+
+`Basato sulle Slide del PDF 13 e 14 - Autenticazione, Firebase Auth`
+
+## Autenticazione
+
+**Autenticazione**: Capacità di stabilire l'**identità** di un utente per permettere di fornire contenuti personalizzati per un utente.
+  - **Differente da autorizzazione**, che non è chi è che accede all'applicazione ma cosa quest'ultimo può fare, quindi **diritti** di **accesso alle risorse**.
+
+Un modo classico è tramite l'utilizzo di nome utente e password.
+  - Se l'**autenticazione va a buon fine** allora viene creata una **sessione**, o alternativamente viene richiesto che le credenziali vengano inviate ad ogni chiamata.
+    - Attualmente **si preferisce approccio a scambio di token** e non a sessione.
+    - Con scambio di credenziali non andrebbe mai passata in chiaro la password nel body.
+
+### Basic Authentication
+
+Metodo HTTP per richiedere nome utente e password quando si fa una richiesta.
+- Il client invia una prima richiesta, a cui il server risponde 401 Unauthorized, settando l'header a `WWW-Authenticate: <type> realm = <realm>`
+- Il client invia una richiesta con l'header *Authorization: Basic credential*, con encoding base64 di `username:password`.
+- Se le credenziali sono corrette il server invia una risposta con codice di successo.
+- Si può facilmente decodificare, quindi non è sicuro, le comunicazioni vanno su TLS.
+
+### OAuth2
+
+Framework pensato per l'autorizzazione, permette l'accesso ad applicazioni di terze parti di accedere ad un insieme di risorse attraverso un servizio HTTP.
+- Permette l'autorizzazione, ma allo stesso tempo anche l'autenticazione.
+
+Si segue questo **workflow**:
+- L'applicazione che intende utilizzare un servizio HTTP deve registrarsi al servizio.
+- Invia nome, sito web, callback URL all'API.
+- L'API invia un ClientID ed un Client Secret.
+
+<div style="text-align: center;">
+    <img src="img/oauth_flow.png" width="450">
+</div>
+
+### Access Tokens
+
+Chi è in possesso del token può utilizzarlo per eseguire operazioni per conto di un utente.
+- Solitamente vengono scambiati su Transport Layer Security TLS.
+- Tipi noti di token:
+  - **Basic Authentication Tokens**: definiti come `username:password` codificati in *base64*.
+  - **Opaque Tokens**: Chunk di byte random.
+  - **JWT**: token basati su JSON.
+  - **Refresh Tokens**: utilizzati per rinnovare i token senza richiedere una nuova autenticazione.
+
+### JWT
+
+Standard che definisce un modo compatto ed autocontenuto per **scambiare informazioni** attraverso **oggetti JSON**.
+- Permette la valutazione dell'integrità dell'informazione scambiata, utilizzando una firma digitale.
+- Esistono **metodi diversi** di firma:
+  - **Chiave simmetrica** (HMAC)
+  - **Chiave pubblica/privata** (RSA, ECDSA)
+
+#### Anatomia di JWT
+
+Si compone di tre parti:
+- **Header**: Contiene le informazioni sull'algoritmo utilizzato per il token e sul tipo di token.
+- **Payload**: Contiene un insieme di claims, ossia le informazioni da condividere.
+  - Possono essere opzionali oppure obbligatori.
+- **Signature**: Viene utilizzata per verificare l'integrità del messaggio.
+
+### JWT vs Token Opachi
+
+- **JWT**
+  - Contiene informazioni che possono essere decodificate e lette da chiunque.
+  - Il payload è di dimensioni contenute
+  - Verificabile
+  - Difficile da revocare
+  - Solitamente codificati e non cifrati
+- **Token Opachi**
+  - Le informazioni si trovano nel servizio
+  - Il payload non è contenuto nel token
+  - Possono essere revocati
+
+## Introduzione a Firebase
+
+Firebase è un BaaS, quindi Backend as a Service, quindi offrono gestione DB, Auth, Hosting, Cloud Storage....
+
+### Progetti Firebase
+
+L'unità principale di Firabase è il progetto, ossia un contenitore di App, Risorse e Servizi.
+- Tutte le applicazioni dello stesso progetto condividono le risorse.
+
+### Auth con Firebase
+
+Si configura tramite l'utilizzo di firebaseConfig passato alla `initializeApp(firebaseConfig)`
+  - L'api key non è sensibile in questo caso, può essere anche in chiaro, si passa per le security rules e non per la key.
+

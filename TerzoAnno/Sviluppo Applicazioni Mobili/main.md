@@ -756,3 +756,346 @@ Raramente utilizzato, si romperebbe l'astrazione creata per allontanarsi dalla g
 - Ogni app ha una directory pensata per file condivisi con altre app.
 - Il `FileProvider` è un particolare `Provider` che tramite un compromesso permette l'interazione in stile Android ma scrivendo effettivamente un file nel FS, mantenendo una tabella che mappa sui file in questione.
     - Oltre a questo un file può essere anche dereferenziato tramite URI con `file://`
+
+# Lezione 15 - Tematiche di Storage II (DB e Content Provider) - 27/03/2026
+
+Android ha embedded nel sistema operativo il DBMS SQLite, utilizzato per uso generale ma non in dimensione molto estesa.
+- È presente un solo server per OS ma per applicazione viene utilizzato un DB.
+- Possiamo accedere a questo DB direttamente o tramite un Content Provider.
+    - Durante questa lezione è il focus con l'interazione diretta con SQLite.
+
+## Manipolazione DB
+
+Si gestisce tutto tramite la classe `SQLiteDatabase`:
+- `openDatabase(path, factory, flags)` che restituisce un istanza di SQLiteDatabase.
+    ```java
+    SQLiteDatabase db = SQLiteDatabase.openOrCreateDatabase(path, null) 
+    ```
+- `String [] databaseList()`
+- `boolean deleteDatabase(nome)`
+- `String getDatabasePath(nome)`
+
+### Classe SQLiteOpenHelper
+
+Esiste un modo alternativo per accesso a DB per utilizzo di pattern comuni. Ad esempio fornisce l'apertura in Singleton del DB per evitare che a ciascun tipo di interazione venga riaperto il DB.
+
+Oltre a questo usa anche una lazy evaluation, quindi non apre il DB fino a quando non ha la reale necessità di farlo.
+- Permette di aprire anche solo in lettura per efficienza in memoria.
+- Permette anche la gestione a ciclo di vita del db, tramite l'utilizzo di metodi come `onCreate()`, `onUpgrade()`, `onOpen()`...
+
+**Riassumendo** Solitamente si seguono questi passi:
+- Si definisce una sottoclasse di `SQLiteOpenHelper`
+- Su quest'ultima si invocano i metodi `getWritableDatabase()` o `getReadableDatabase()`
+- I metodi restituiscono un `SQLiteDatabase`
+- In scrittura si invocano su `db` i metodi `insert()`, `update()` ...
+- In lettura si invocano su `db` rawQuery() oppure query() che restituiscono un `Cursor cur`, e su quest'ultimo si possono invocare `getTipo(i)` e `moveNext()`.
+
+## Esecuzione SQL (non interrogazioni)
+
+Si passa come stringa l'SQL al comando `db.execSQL(sql)` della parte gestionale delle tabelle, quindi ad esempio comandi come `CREATE TABLE`, `SELECT` o `UPDATE`.
+
+Un esempio comune di utilizzo è quello di parametrizzazione di parametri formali compilando un comando:
+
+```java
+s = "INSERT INTO Aule (nome, edificio) VALUES (?,?)";
+Object[] a = {"A", "Marzotto B"};
+db.execSQL(s,a);
+```
+
+Inserendo direttamente comandi SQL passati come stringhe potrebbe esporre a potenziali SQL Injection, quindi si preferisce l'utilizzo dei wrapper delle operazioni più comuni come `delete()`, `insert()`, `replace()`, `update()`...
+
+Esistono anche varianti overloaded di metodi come `put()` tramite la classe `ContentValues`.
+
+## Query SQL e Cursor
+
+Esistono due metodi principali
+
+- Eseguire la SELECT come statement SQL
+```JAVA
+Cursor rawQuery(sql, args)
+```
+- Eseguire la SELECT a programma
+```JAVA
+Cursor query(distinct, tabella, colonne, selezione, args,
+groupby, having, orderby, limit)
+```
+
+### Cursor
+
+Da un punto di vista logico un cursor è una entry "evidenziata" della tabella su cui stiamo facendo la query, permette di ottimizzare la query evitando magari il caricamento di tutti i dati tabulari in memoria.
+
+**Caratteristiche**:
+- Permette spostamento nella tabella
+- Permette accesso ai campi e controllo di condizioni
+
+### Cursor Adapter
+
+Tra tutti i Data Adapter avevamo menzionato il Cursor Adapter, ossia un Adapter che mappa una entry su una View:
+
+```
+Adapter a = new SimpleCursorAdapter(
+ context, // spesso l’activity o l’application
+ layout, // solitamente, R.layout. …
+ cur, // ottenuto da rawQuery() o query()
+ from, // array di nomi di colonne
+ to, // array di ID di TextView nel layout
+ flags );
+```
+
+## Jetpack Room e Mapping Orientato agli Oggetti
+
+Permette maggiore astrazione, lasciando accesso alle entry rappresentate come oggetti JAVA
+
+<div style="text-align: center;">
+    <img src="img/jetpackRoom.png" width="260">
+</div>
+
+## Content Provider
+
+**Uno dei quattro componenti citati** all'inizio del corso.
+- Ha lo scopo di condividere dati, esponendo i propri dati ed accedendo a quelli degli altri.
+
+Si **basa tutto sull'esposizione** e gestione di **qualsiasi tipo di dati** in **tabelle logiche**.
+
+### Content Resolver
+
+Parte di un applicazione che si occupa della ricerca del corretto **Content Provider** a cui chiedere le informazioni.
+
+<div style="text-align: center;">
+    <img src="img/contentResolver.png" width="350">
+</div>
+
+Anche il Content Resolver usa l'interfaccia Cursor, implementandola diversamente rispetto alla gestione dei DB.
+Questo è ricorrente in Android, l'utilizzo di un Cursore per la navigazione di una tabella.
+
+
+### Utilizzo di Content Provider
+
+Seguendo il paradigma dell'astrazione di Android, ogni tipo di Content si porta dietro una tabella che può essere navigata con un cursore, ad esempio per Contatti, Brani, ....
+
+**URI e Tabelle**: Le tabelle sono identificate da URI, e hanno una forma del tipo
+- Le URI possono essere istanziate sia tramite Costruttore nativo oppure tramite Builder.
+
+```java
+//esempio di URI
+uri = "content://media/internal/images"
+```
+
+Il path permette la gestione dell'esposizione del Content.
+
+Si utilizzano operazioni classiche del CRUD proprio perchè vengono esposte tabelle logiche.
+- I permessi di scritture/letture devono essere definiti nei *manifest* sia da chi offre sia da chi utilizza il Content Provider.
+
+### Definizione Content Provider
+
+I Content Provider possono anche essere definiti in maniera custom.
+
+**Definizione del XML**:
+
+```xml
+<provider android:name="ArcobalenoProvider"
+    android:authorities="it.unipi.di.sam.arcobaleno"
+    android:exported="true"
+    android:enabled="true"
+    android:description="@string/abdesc">
+</provider>
+```
+
+**Estensione della classe ContentProvider**:
+
+```java
+public class ArcobalenoProvider extends ContentProvider {
+    @Override
+    public int delete(Uri uri, String selection, String[] selectionArgs)
+        { /* ... */ }
+    @Override
+    public String getType(Uri uri) 
+        { /* ... */ }
+    @Override
+    public Uri insert(Uri uri, ContentValues values) 
+        { /* ... */ }
+    @Override
+    public boolean onCreate()
+        { /* ... */ }
+    @Override
+    public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String
+    sortOrder)
+        { /* ... */ }
+    @Override
+    public int update(Uri uri, ContentValues values, String selection,String[] selectionArgs) 
+        { /* ... */ }
+}
+```
+
+### IPC e Lettura dati da Content Provider ed Ottimizzazione
+
+Il cursor viene utilizzato in una maniera simile a
+
+```java
+while(!cur.isAfterLast()){
+    // ....
+}
+```
+
+Questo porterà ad operazioni potenzialmente lente, non andrebbero quindi eseguite nel thread della UI.
+
+**Ottimizzazioni**:
+- Le operazioni di CRUD possono essere raggruppate in batch, per fare in modo che vengato eseguite in gruppo dato che il context switch ha un prezzo.
+- **Classe Contratto**: Design pattern definito da una classe con una serie di campi statici che mantengono gli argomenti e le costanti giuste.
+    - Usati ad esempio per `ContactsContract` e `CallLog`.
+
+## File Provider
+
+Si gestiscono i file non accedendo direttamente al FS ma con le API esposte da un Content Provider.
+
+Si legge un file XML del sistema che mappa file fisico a file logico e successivamente viene esposto a modo Content Provider.
+
+**Definizione di Mapping**:
+
+```xml
+<paths>
+    <files-path path="images/" name="myimages" />
+</paths>
+```
+
+Quindi la tabella `myimages` sarà mappata su `<<basedir>>/.../files/images`
+
+# Lezione 16 - Operazioni Asincrone e Concorrenza I
+
+Fino ad ora abbiamo visto un sistema basato su callback quindi metodi come `onCreate()`, `onPause()`, `onClick()`, `onKey()`, tutti questi metodi vengono invocati dal **Thread della UI**.
+- Per evitare la creazione di **tantissimi monitor** per la **gestione della UI** si **utilizza questa convenzione** per cui solo **questo thread può invocare questi metodi**, dando per scontato che il programmatore non li invocherà da altre parti.
+
+## Regole Auree Thread UI
+
+- **Non va mai usato il thread della UI per operazioni lunghe**, deve essere responsive.
+- **Mai usare** un **thread diverso** dal **thread UI** per **aggiornare la UI**.
+
+## AsyncTask
+
+Si basa sull'estensione di `AsyncTask`:
+
+```java
+class MyTask extends AsyncTask<args, progress, typeRes> {
+    // cosa verrà eseguito da un altro thread
+    doInBackground() {
+        // ...
+    }
+
+    // cosa verrà eseguito dal Thread UI
+    onProgressUpdate() {
+        // ...
+    }
+}
+```
+
+Il passaggio di valore, tipo nel caso della progress bar, è completamente gestito dal sistema, che lo passerà a `onProgressUpdate()`.
+
+Quindi possiamo informalmente dividere i metodi in due tipi:
+- **Metodi eseguiti da Thread UI**:
+    - `onPreExecute()`
+    - `onProgressUpdate()`
+    - `onPostExecute()`
+    - `onCancelled()`
+- **Metodi eseguiti altri Thread**:
+    - `doInBackground()`
+    - `publishProgress()`
+
+### Scendendo più a Basso Livello
+
+Se tutte le classi e i metodi forniti non dovessero bastare, in ogni caso abbiamo la possibilità di scendere ad un livello più basso tramite:
+- `Handler` gestisce la `MessageQueue` di un thread
+- `Message` wrappa un `Bundle`
+- `MessageQueue` coda di `Message`
+- `Looper` classe che offre un ciclo di lettura e dispatch dalla `MessageQueue`
+
+Quindi ogni `Activity` ha un `Looper` eseguito dal `Thread UI`.
+
+### Gestione Sistema tramite MessageQueue
+
+Il sistema segue questi passi per eseguire un operazione richiesta:
+
+- La richiesta di operazione crea un `Message` che descrive l'operazione.
+- Lo passa all'`Handler` che lo accoda nella `MessageQueue`.
+- Un `Looper` estrarrà questo `Message` dalla `MessageQueue`.
+- L'estrazione permette l'esecuzione dell'operazione nel `Message`.
+
+<div style="text-align: center;">
+    <img src="img/messageQueueSistemaAndroid.png" width="350">
+</div>
+
+Esistono `Handler` predefiniti, come ad esempio `AsyncQueryHandler`, pensata per Content Provider.
+
+### Weak References
+
+Dato che un `Activity` può essere deschedulata allora le strutture riferite da normali puntatori non verrebbero deallocate. Di conseguenza si utilizzano questo tipo di riferimenti per permettere al garbage collector la deallocazione, dato che l'Activity può essere chiusa in qualsiasi istante.
+
+# Lezione 17 - Operazioni Asincrone e Concorrenza II - 10/04/2026
+
+Si tratta in questa lezione dei Broadcast Receiver, il terzo dei quattro Componenti presentati all'inizio.
+
+## Broadcast Receiver
+
+Componente che ha lo scopo di ricevere e rispondere agli `Intent` inviati in broadcast.
+
+Si registrano quindi eventi, magari anche di sistema, che permettono di associare l'operazione da eseguire all'evento che sta accadendo.
+
+Definiti solitamente tramite estensione della classe `BroadcastReceiver`
+
+Esiste anche una `LocalBroadcastReceiver`, che permette la sottoscrizione ad eventi locali, quindi che non necessitano di interazioni tra processi diversi ma nello stesso processo.
+
+### Metodo `onReceive()`
+
+- `onReceive()` definisce tutto il ciclo di vita, quindi viene passato l'Intent a questo metodo quando va istanziato il `Broadcast Receiver`.
+    - Per questo metodo, anch'esso definito come metodo eseguito dal sistema, ha un sacco di tempo rispetto a tutti gli altri metodi. Non vengono lasciati millisecondi ma secondi, questo porta a delle conseguenze:
+        - Solitamente non si avviano Activity da questo metodo, perchè sostituirebbe la corrente UI istantaneamente.
+        - Usato invece per invocare Services 
+
+- Solitamente questa gestione quindi è per definizione asincrona.
+
+### Registrazione Dinamica di Broadcast Receiver
+
+Più si va avanti con Android più si evitano i `BroadcastReceiver` statici.
+
+Si può quindi registrare e deregistrare un `BroadcastReceiver` tramite i seguenti metodi di `Context`:
+- `Intent registerReceiver()`
+- `void unregisterReceiver()`
+
+### Intent Sticky
+
+Intent che devono essere essere catturati anche se sono stati inviati prima della registrazione di un `BroadcastReceiver`.
+- Questo ha bisogno di permessi speciali, dato che idealmente un Intent Sticky dovrebbe rimanere all'infinito in memoria.
+
+## Alarm
+
+Tra tutti i servizi di sistema c'è il manager di `Alarm`, ossia l'`AlarmManager`.
+
+### Impostare un Alarm
+
+Si setta un `Alarm` tramite questo metodo:
+
+```java
+am.set(int type, long triggerAtTime, PendingIntent operation)
+```
+dove `PendingIntent` è l'intent che viene lanciato a tempo di scadenza `Alarm`.
+
+Lo si può fare anche in maniera periodica tramite specifico `setInexact()` o `setExact()` nelle versioni di API più recenti.
+
+**Clusterizzazione di WakeUps**: Il lancio di Alarm ha la possibilità di riprendere il dispositivo da fasi di sleep, di conseguenza si preferisce raggrupparli quanto più possibile per evitare frequenti Wakeups.
+
+## WorkManager (Jetpack)
+
+Una delle API di Jetpack dedicata all'esecuzione di task asincroni con specifiche proprietà:
+- **Asincrono**: viene eseguito in qualche punto nel futuro.
+- **Deferrable**: può essere rimandato senza danno
+- **Coordinati**: si possono esprimere tramite strutture come pipeline, farms o in map/reduce.
+- **Vincolati**: per ogni task si possono specificare condizioni che devono essere verificate per l'esecuzione.
+
+Si segue il pattern del Singleton per il WorkManager.
+
+### `Worker` e `doWork` in Kotlin
+
+Gestione di Kotlin alla gestione multithread, garantisce che venga eseguito **non in un Thread UI**.
+
+### WorkRequest
+
+Classe si oggetti che si occupa di descrivere caratteristiche del `Work`, ad esempio la periodicità.
