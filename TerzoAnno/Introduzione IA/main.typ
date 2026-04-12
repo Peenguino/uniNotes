@@ -1544,23 +1544,27 @@ $ "VS"_(H,D) = {h in H | (exists s in S) (exists g in G) (g >= h >= s)} $ dove $
 
 === Algoritmo Candidate Elimination
 
-Si definiscono $G,H$ rispettivamente *insieme ipotesi più generale* e *più specifica* in $H$.
+Si definiscono $G,S$ rispettivamente *insieme ipotesi più generale* e *più specifica* in $H$.
 
 Allora *per ogni* esempio di training $d = (x, c(x))$:
 
-- Se $d$ è un *esempio positivo*, allora si rimuove da G ogni ipotesi che risulta essere inconsistente con $d$ per definizione di Version Space, generalizzando quindi $S$, in particolare:
-  - Rimuovi $s$ da $S$.
-  - Aggiungi ad $S$ la minima generalizzazione $h$ di $s$ tale per cui:
-    - $h$ resta consistente con $d$.
-    - Dei membri di $G$ sono più generali rispetto ad $h$.
-  - Rimuovi da $S$ qualsiasi ipotesi che risulta essere più generale di altre ipotesi in $S$.
+- Se $d$ è un *esempio positivo*:
+  1. Rimuovi da G qualsiasi ipotesi che risulta essere inconsistente con l'esempio $d$:
+  2. Per ogni singola ipotesi $s in S$ che non è consistente con $d$:
+    - Rimuovi $s$ da $S$.
+    - Aggiungi ad $S$ tutte le minime generalizzazioni di $h$ di $s$ tali per cui valgono queste due condizioni:
+      - $h$ resta consistente con $d$.
+      - Dei membri di $G$ sono più generali rispetto ad $h$.
+  - Infine pulisci da $S$ qualsiasi ipotesi che risulta essere più generale di altre ipotesi in $S$.
+- Se $d$ è un *esempio negativo*:
+  1. Rimuovi da S qualsiasi ipotesi che risulta essere inconsistente con l'esempio $d$:
+  2. Per ogni singola ipotesi $g in G$ che non è consistente con $d$:
+    - Rimuovi $g$ da $G$.
+    - Aggiungi a $G$ tutte le minime specializzazioni di $h$ di $g$ tali per cui valgono queste due condizioni:
+      - $h$ resta consistente con $d$.
+      - Dei membri di $S$ sono più generali rispetto ad $h$.
+  - Infine pulisci da $S$ qualsiasi ipotesi che risulta essere più generale di altre ipotesi in $S$.
 
-- Se $d$ è un *esempio negativo*, allora si rimuove da S ogni ipotesi che risulta essere inconsistente con $d$ per definizione di Version Space, specializzando quindi $G$, in particolare:
-  - Rimuovi $g$ da $G$.
-  - Aggiungi ad $G$ la minima specializzazione $h$ di $g$ tale per cui:
-    - $h$ resta consistente con $d$.
-    - Dei membri di $S$ sono più specifici rispetto ad $h$.
-  - Rimuovi da $G$ qualsiasi ipotesi che risulta essere meno generale di altre ipotesi in $G$.
 
 == Inductive Bias
 
