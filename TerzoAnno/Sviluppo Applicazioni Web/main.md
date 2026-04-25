@@ -1558,6 +1558,21 @@ Si segue questo **workflow**:
     <img src="img/oauth_flow.png" width="450">
 </div>
 
+### OpenID Connect - OICD
+
+Aggiunge un layer a OAuth2 con le informazioni di autenticazione
+- L'utente accede con un Provider
+- L'applicazione invia l'utente al Provider di Identità e nella richiesta include lo scope.
+- L'utente autorizza l'app a leggere i suoi dati base
+- Il provider si occupa di restituire all'app **Access Token**, **ID Token** e **Validazione**.
+
+### Multi-Factor Authentication - MFA
+
+Autenticazione basata sulla combinazione di prove di identità dette fattori, queste possono essere di categorie diverse:
+- **Conoscenza**: Password o PIN
+- **Possesso**: Una apposita USB o una smart card
+- **Inerenza**: Caratteristiche biometriche, come l'impronta.
+
 ### Access Tokens
 
 Chi è in possesso del token può utilizzarlo per eseguire operazioni per conto di un utente.
@@ -1584,6 +1599,10 @@ Si compone di tre parti:
   - Possono essere opzionali oppure obbligatori.
 - **Signature**: Viene utilizzata per verificare l'integrità del messaggio.
 
+#### Combinazione Refresh Token e JWT
+
+Per evitare la riautenticazione dell'utente si utilizza un altro token, che non mantiene effettivamente le informazioni sull'utente ma permette il refresh del JWT senza nuova richiesta delle credenziali.
+
 ### JWT vs Token Opachi
 
 - **JWT**
@@ -1596,6 +1615,29 @@ Si compone di tre parti:
   - Le informazioni si trovano nel servizio
   - Il payload non è contenuto nel token
   - Possono essere revocati
+
+### Cross Site Request Forgery CSRF o XSRF
+
+Attacco che inganna il browser di una bittima facendogli eseguire una richiesta HTTP non intenzionale verso la web app su cui l'utente è autenticato.
+- L'attaccante non ruba le credenziali ma sfrutta la fiducia che il server ripone nel browser dell'utente.
+
+Esempio di Funzionamento:
+- **Autenticazione**: L'utente accede al sito e riceve un cookie di sessione.
+- **Inganno**: L'utente senza chiudere la sessione visita un sito malevolo o clicca su un link sospetto.
+- **Esecuzione**: Il sito malevolo tramite uno script o form nascosto invia una richiesta al server che si fida.
+- **Validazione**: Il browser invia il cookie di sessione e quindi il servizio si fida ed esegue la richiesta 
+
+### Cross Site Scripting XSS 
+
+Ne esistono di diversi tipi:
+- **Stored XSS (Persistente)**: Forma più grave, ad esempio dove è possibile aggiungere un commento l'attaccante scrive
+  ```
+  <script> rubaCookie(document.cookie) </script>
+  ```
+  Se questo "commento" non viene pulito, il codice viene eseguito e non stampato.
+- **Reflected XSS (Riflesso)**: Non viene salvato ma inviato dal server al client tramite richiesta HTTP.
+  - Se il server stampa il parametro `q` nella pagina senza ripulirlo, lo script viene eseguito non appena la vittima clicca sul link.
+- **DOM-Based XSS**: Si inietta nel DOM lo script malevolo usando .innerHTML, potrebbe per nulla essere coinvolto il server.
 
 ## Introduzione a Firebase
 
@@ -1611,3 +1653,279 @@ L'unità principale di Firabase è il progetto, ossia un contenitore di App, Ris
 Si configura tramite l'utilizzo di firebaseConfig passato alla `initializeApp(firebaseConfig)`
   - L'api key non è sensibile in questo caso, può essere anche in chiaro, si passa per le security rules e non per la key.
 
+# Lezione 16 - Progressive Web App (PWA) - 15/04/2026
+
+## Definizione PWA
+
+Si usano **web API moderne** per sembrare **quanto più possibile** delle **app native**, si basano su queste proprietà:
+- **Reliable**: devono caricarsi immediatamente, indipendentemente dalla rete.
+- **Fast**: La UX non deve avere lag.
+- **Engaging**: Deve comportarsi come un app nativa.
+
+### Metodologie Seguite
+
+Si seguono delle proprietà:
+- **Progressive Enhancement**: Rendere il contenuto dell'app accessibile a quanti più utenti possibili.
+- **Optimistic UI**: Si suppone che la maggior parte delle richieste avranno successo, quindi non è necessario attendere l'esito della risposta, ma gestire un fallback in caso di esito negativo.
+  - Nello specifico non dovremmo pensare funzionalità con successo e fallback come bianco e nero ma come scala dei grigi tra i due, quindi con operazioni eseguibili anche offline. L'ottimalità sale all'aumentare delle funzionalità offerte anche offline.
+- **Network Managment Layer**: Il passaggio tra connessione e disconnessione deve essere trasparente all'utente.
+
+## Checklist della PWA
+
+Si definisce una checkist per una PWA sulla base di due tipologie di richieste:
+- **Core**:
+  - Si avvia velocemente.
+  - Funziona su tutti i browser.
+  - Responsive.
+  - Fornisce una pagina offline.
+  - Installabile.
+- **Optimal**:
+  - Esperienza offline.
+  - Accessibile.
+  - Utilizza quando possibile le API per fonrire l'esperienza migliore per l'utente.
+  - Ricercabile.
+
+## Manifest e Service Worker di una PWA
+
+Due elementi fondamentali di una PWA
+
+### Manifest in JSON
+
+Si specificano le proprietà della PWA in JSON:
+
+<div style="text-align: center;">
+    <img src="img/manifestPWA.png" width="400">
+</div>
+
+Sono tutti meta dettagli dell'app, alcuni particolari:
+- `display`: Quanto la PWA sembri una app nativa a gradi quindi in senso decrescente:
+  - `fullscreen` tutto schermo
+  - `standalone` un po' meno
+  - `minimal-ui` si lascia spazio ai tasti di navigazione
+  - `browser` si apre come normale scheda del browser
+
+### Web/Service Worker
+
+Il Service Worker è un Web Worker, quindi si definiamo prima i Web Worker:
+
+#### Web Worker
+
+Di base JS è singlethreaded e gestito in Event Loop dei messaggi della Message Queue.
+- La gestione del Web Worker permette il multithread
+- Solitamente si danno task più pesanti ai Worker.
+
+**Proprietà Web Workers**:
+- Non hanno accesso al DOM quindi agli oggetti `document` o `window`.
+- Comunicano in IPC, con metodo specifico `worker.postMessage(msg)`
+- Rimane attivo in memoria anche se l'utente non interagisce con la pagina.
+
+#### Service Worker
+
+Uno specifico Web Worker che funge da Proxy tra browser e rete.
+- In questo modo forniscono il modo con cui gestire uno stato di offline.
+- Anch'esso non può accedere al DOM o alle variabili globali citate prima.
+- Esiste un solo service worker per **scope**:
+  - Con **scope** intendiamo la `dir` in cui è definito il **Service Worker**.
+  - Quindi se definiamo nella route un `sw.js` allora ce ne sarà solo uno, altrimenti uno per `dir`.
+- Funzionano esclusivamente su HTTPS.
+
+## In Verticale su Service Worker
+
+Analizziamo in dettaglio il Service Worker:
+
+### Ciclo di Vita Service Worker
+
+Si segue questo grafo:
+
+<div style="text-align: center;">
+    <img src="img/serviceWorkerLifecycle.png" width="240">
+</div>
+
+- Post `Installing` si eseguono operazioni di prefetching per la cache.
+- Se tutto va come atteso si passa in stato di `Activated`.
+- Per aggiornare il comportamento di un `Service Worker` bisogna che non ci sia nemmeno un client che faccia riferimento a lui.
+
+Ciascuno degli stati mappa sul primo parametro passato alla `self.addEventListener` nella definizione del `Service Worker`.
+
+### Registrazione Service Worker
+
+Si registra tramite una proprietà dell'oggetto globale `Navigator` con utilizzo di un metodo `.register()` che viene gestito in Promise like.
+
+### Gestione Storage di Web App
+
+Si compone di quattro parti:
+- **Session Storage**: `<5MB`, usato per dati temporanei di una singola tab.
+- **Local Storage**: `<10MB` permanente, solitamente mantiene le preferenze utente.
+- **Cache API**: `GB` permanente e mantiene dati statici.
+- **IndexedDB**: `GB` permanente ma mantiene dati strutturati offline con astrazione su DB locale.
+
+Nelle PWA si usano tanto gli ultimi due tipi di storage.
+
+#### Accesso Storage dai Thread
+
+- Il Main Thread può accedere a tutti gli storage
+- Il Service Worker/Web Worker hanno accesso solo a IndexedDB e Cache API.
+- La persistenza va definita esplicitamente, altrimenti lo storage viene gestito.
+
+### In Verticale su Cache API
+
+Oggetto CacheStorage gestito con metodi in Promise-like.
+- Questi sono accessibili da Web Worker e gestiti tramite `cache.open()`, `cache.delete()` o `cache.match()`.
+
+#### Tecniche di Caching
+
+- **Precaching**: Si definisce staticamente una cache su risorse, ad esempio un `.css`
+- **Cache First**: PWA chiede alla cache del Service Worker, se misso effettuo richiesta al Network.
+- **Network First**: PWA chiede alla Network, se fallisce causa ad esempio mancanza connessione allora riferisce alla cache del Service Worker.
+- **Stale While Revalidate**: Segue questo schema:
+
+<div style="text-align: center;">
+    <img src="img/staleWithRevalidate.png" width="400">
+</div>
+
+**Funzionamento**: Restituisce una risposta in cache subito ed in seguito controlla la rete per un aggiornamento.
+
+Quindi si definisce un modo per aggiornare la cache dopo la richiesta, questo permette la notifica a tutti i client dell'aggiornamento di un eventuale risorsa, ma non solo, può essere fatto anche su qualcosa di statico come un `.html`
+
+Questo tipo di gestione permette l'implementazione della Optimistic UI.
+
+### In Verticale su IndexedDB
+
+DB NoSQL progettato per memorizzare grandi quantità di dati.
+- Si basano sul concetto di Object Store, l'equivalente delle tabelle in SQL, memorizzando record come coppie `chiave-valore`.
+- La `key path` funziona da chiave primaria.
+- **Indici**: Strutture opzionali che permettono l'interrogazione alternativa rispetto alla chiave primaria.
+- Ogni database ha un numero di versione, lo si utilizza per effettuare un diff e/o informare il browser su eventuali modifiche causate da un evento.
+- Pensato per la gestione asincrona di eventi.
+- Anche questo tipo di DB è atomico sulle operazioni.
+
+## Scambio Messaggi tra `Main Thread` e `Workers` (`Web Services`)
+
+Comunicazione basata su scambio di messaggi asincroni.
+- `Main Thread` e `Service Worker` vivono in contesti isolati, di conseguenza non possono direttamente condividere variabili o funzioni.
+
+### Metodologia Standard
+
+- Si utilizzano normalmente `postMessage()` per inviare e `onMessage()` per ricevere.
+  - In questo modo si inviano messaggi per copia e non per riferimento.
+
+### Metodologia tramite Channel
+
+Gestione più complessa delle comunicazioni tramite i `MessageChannel`:
+- Canale diretto e privato tra `Service Worker` e `Main Thread`.
+- Bidirezionale, quindi gestito a due porte `port1` mantenuta da chi ha creato il canale e `port2` e riferita dall'altro script.
+- Utilizzabile quando la pagina deve instaurare una conversazione complessa con il `Service Worker` senza interferire con altri messaggi generici del sistema.
+
+# Lezione 17 - Firebase Firestore, Hosting e Security Rules - 15/04/2026
+
+## Storage in Firebase
+
+Ne esistono di tipi diversi:
+- **Realtime Database**: Basata su un singolo grande JSON, condiviso tra tutte le applicazioni. Permette sincronizzazione offline, realtime e risulta essere scalabile.
+  - Per la prima volta non si basava più l'interazione tra server e client come richiesta dal client al server ma in impostazione push.
+- **Firestore**: NoSQL, anch'esso JSON like.
+  - Sincronizzazione offline  e realtime.
+  - Organizzato in documenti e collezioni.
+  - Supporta le transazioni e query, non presente in realtime database.
+- **Cloud Storage**: Equivalente di S3 di Amazon, utilizzato per dati persistenti di grandi dimensioni (video, immagini ecc..)
+
+## Security Rules
+
+Si parte dal presupposto per cui la configurazione di Firebase/Supabase sia pubblica a tutti.
+- Bisogna quindi permettere di leggere e/o scrivere in base al ruolo dell'utente.
+- Si basa su un linguaggio fatto di espressioni.
+
+### Categorie
+
+Possono essere di due tipi diversi:
+- **User-Based**: Classificazione sugli utenti.
+- **Content-Based**: Classificazione usando i valori dei dati esistenti.
+
+### Limiti delle Security Rules
+
+- Le regole sono "passive": possono solo decidere se una richiesta è autorizzata o meno.
+  - Non possono agire come un trigger che modifica il dato prima di salvarlo.
+  - Non possiamo controllare l'origine dei dati.
+  - Non possiamo filtrare i documenti di una query.
+
+### Security Rules: Anatomia
+
+Segue questo schema:
+
+```
+rules_version = 2
+service <<name>> {
+  match <<path>> {
+    allow <<methods>> : if <<condition>>
+  }
+}
+```
+
+### Security Rules: Service Declaration
+
+Dichiara il prodotto Firebase a cui si applica la regola, ad esempio Firestore.
+- Contiene uno o più blocchi match
+- Preceduta dalla dichiarazione di versione
+- Una sola service declaration per file
+
+### Security Rules: Match Block
+
+Il match block definisce un path nel database al quale applicare le regole.
+- Il corpo del blocco deve contenere una o più
+  - match block annidati
+  - allow statement
+  - dichiarazioni di funzione
+- Il path nei match block annidati è relativo a quello del parent
+
+### Security Rules: Path
+
+Rappresenta il luogo in cui cercare la risorsa del database rappresentato come un URI
+- Può riferire a variabili o wildcard, 
+
+### Security Rules: Allow Statement
+
+- Sono le effettiva regole di sicurezza
+- Sono contenute in un blocco match
+- Se un qualsiasi allow statement viene soddisfatto, la richiesta viene permessa, quindi gli statement sono in $OR$.
+- Si compone quindi di due parti: metodo e condizione.
+
+### Security Rules: Condizioni
+
+Si basano su espressioni booleane, associate a due variabili `request` e `resource`
+
+#### Condizioni: `request`
+
+Contiene i seguenti campi:
+- `auth` un JSON Web Token (JWT) con le credenziali ed i claims di Firebase Authentication, in particolare uid - l’identificatore dell’utente che fa la richiesta
+- `method` uno dei metodi dell’allow statement
+- `path` il path della risorsa a cui si vuole accedere
+- `query` le proprietà di query quando presenti: limit, offset, orderBy
+- `resource` la nuova risorsa (solo per le write)
+- `time` quando la richiesta è stata ricevuta dal servizio
+
+#### Condizioni: `resource`
+
+Rappresenta il documento da leggere e scrivere rappresentato come una **mappa**:
+- `__name__` il nome del documento come path
+- `data` la mappa dei dati del documento
+- `id` chiave del documento
+
+### Security Rules: Function Declaration
+
+Permettono il raggruppamento in insiemi di condizioni in funzioni da usare nelle regole.
+- Non contengono logica aggiuntiva come loop
+- Possono essere chiamate ricorsivamente ma lo stack è volontariamente piccolo
+- Si possono definire massimo $10$ variabili massime nella funzione.
+
+**Esempio di Regola** Una regola tipo potrebbe essere:
+
+```
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Allow only authenticated content owners access
+    match /some_collection/{userId}/{documents=**} {
+      allow read, write: if request.auth != null && request.auth.uid == userId
+    }
+  }
+}
+```

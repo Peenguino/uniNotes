@@ -1099,3 +1099,474 @@ Gestione di Kotlin alla gestione multithread, garantisce che venga eseguito **no
 ### WorkRequest
 
 Classe si oggetti che si occupa di descrivere caratteristiche del `Work`, ad esempio la periodicità.
+
+# Lezione 18 - Services e Sensori - 15/04/2026
+
+Si trattano due temi scorrelati tra loro nella corrente lezione.
+
+## Services
+
+Definiscono il **quarto componente** di un **applicazione**.
+- Permette l'esecuzione di codice senza l'esistenza di una specifica UI.
+- Non è legato di default ad un thread non UI, stiamo definendo cosa staticamente sia un Service, non la sua gestione dinamica.
+
+### Tipi di Services - Started vs Bound
+
+Possono essere
+- `Started` se deve eseguire una one time operation.
+- `Binded` si eseguono operazioni tra una apertura ed una chiusura.
+
+### Ciclo di Vita di un Service
+
+Si definisce anch'esso con i metodi `onCreate()` e `onDestroy` solo che esistono per **Started** e **Binded** due automi diversi:
+
+<div style="display: flex; align-items: center; justify-content: center; gap: 104px;">
+    <img src="img/startedService.png" width="100">
+    <img src="img/bindedService.png" width="110">
+</div>
+
+- **Started**: Il servizio richiesto ha solo un inizio.
+- **Bound**: Il servizio richiesto ha un inizio ed una fine.
+
+### Utilizzo di Intent per Avvio Service
+
+Chiedere un servizio vuol dire invocare `startService(intent)` ed in base alla gestione degli Intent Filter questi verrano lanciati.
+
+### Terminazione di un Service
+
+Un Service può terminare in tre modi:
+- `stopSelf()` termina incondizionatamente
+- `stopSelf(id)` segnala che è terminato il servizio con quell'`id`.
+
+### `Intent Service`
+
+Quasi sempre un Service ha la necessità di usare uno o più thread separati per servire le richieste.
+- `Intent Service` è una sottoclasse di Service che:
+    - Serve le richieste in un thread separato.
+    - In caso di richieste multiple gestisce una coda.
+        - Vengono accodate e non gestite automaticamente in parallelo, il completo parallelismo andrebbe gestito manualmente.
+    - Viene quindi gestita la creazione di un thread, looper, message queue e handler nella `onCreate()` dell'`Intent Service`.
+
+**Riassumendo**:
+- Si crea una sottoclasse di `IntentService`.
+- Si fa overload di `onHandleIntent()`.
+- Il codice sarà eseguito in un thread separato.
+- Le richieste verranno serializzate.
+- Il service termina a tempo di coda vuota.
+
+### Service Bound
+
+I `Services Started` hanno interazione limitata con l'utente, quindi si può utilizzare un `Service Binded` che funziona tramite il `Binding` tra un `Component` e lo stesso `Service`.
+
+- `bindService()` invocazione che causa una chiamata alla `onBind(intent)`
+- La `onBind()` restituisce un oggetto binder che implementa l'interfaccia `IBinder`
+- Il binder viene passato alla `onServiceConnected` di `conn`
+- Da qui in avanti il chiamante usa i metodi del binder
+- Alla fine si chiama la `unbindService(conn)`
+
+### Services Default e Manager come Services
+
+Tutti i manager citati nelle lezioni precedenti non sono quindi altro che dei Binded Services, a tempo di `getSystemService()` e dato un nome simbolico fa una bindService() al `Service` di sistema corrispondente.
+
+## Sensori
+
+Android implementa una gestione di sensori generica, lasciando l'interpretazione degli output.
+
+Si basa sull'utilizzo del servizio di sistema `SensorManager`.
+
+```JAVA
+SensorManager sm = (SensorManager)getSystemService(Context.SENSOR_SERVICE)
+List<Sensor> list = sm.getSensorList(Sensor.TYPE_ALL)
+```
+
+**Sensori Necessari**: Nel `AndroidManifest.xml` possiamo definire in `<uses-feature>` quali sensori siano necessari all'utilizzo dell'app.
+
+**Gestione Tipica a Listener di Lettura Sensori**: Come tutto Android, sarà il sistema a chiamare il nostro codice, di conseguenza il `SensorManager` chiamerà i nostri `Listener`.
+- `onSensorChanged()`
+    - Cambia il valore letto dal sensore. Per esempio, leggo la bussola e il telefono viene ruotato.
+- `onAccuracyChanged()`
+    - Cambia l'accuracy del sensore. Per esempio, passo dalla localizzazione GPS a quella radio, anche se il GPS non è gestito propriamente come sensore.
+
+**Gestione su Specifico Thread**: Le letture da sensori non andrebbero mai fatte nei metodi `on`, ma sempre in thread esterni che magari utilizzano una struttura dati di appoggio.
+
+**Riferimento a SensorEvent**: Il `SensorEvent` passato al listener rimane proprietà del `SensorManager`, non andrebbe quindi mantenuto il riferimento all'evento dopo il ritorno da `onSensorChanged()`.
+- Il `SensorManager` potrebbe usare un pool di `SensorEvent` per evitare allocazioni, gestione interna di riutilizzo di oggetti già allocati.
+
+# Lezione 19 - GPS, Geocoding e Mappe - 17/04/2026
+
+In generale l'approccio è simile a quello dei sensori, ma il GPS non è considerato un sensore.
+- Si chiama un servizio di sistema per accesso alle informazioni di posizione.
+- Si registrano listener per ottenere info sulla posizione
+- Opzionalmente si chiede di lanciare un Intent sotto certe condizioni.
+
+## GPS
+
+Gestione a coordinate del GPS dei dispositivi Android.
+
+### `LocationManager`
+
+Servizio di sistema definito come:
+```java
+LocationManager lm = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
+```
+Lascia l'accesso a tutte le caratteristiche come precisione, consumo energetico, costo ecc...
+
+#### Metodi offerti da `LocationManager`
+
+```java
+List<String> providers = lm.getAllProviders();
+// oppure si specifica il nome, il migliore attuale...
+LocationProvider provider = lm.getBestProvider();
+```
+
+#### Registrazione di un Listener
+
+Solitamente definito tramite un metodo apposito ossia:
+
+```java
+public void requestLocationUpdates(
+    String provider,
+    long minTime,
+    float midDistance,
+    LocationListener listener
+)
+```
+
+#### Deregistrazione di un Listener
+
+Si deregistrano solitamente i listener nella `onPause()` e nella `onResume()` tramite il metodo
+
+```java
+public void removeUpdates(LocationListener listener)
+```
+
+### Gestione Ricezione di Locazione
+
+Tutto avviene tramite i metodi da implementare della seguente interfaccia:
+
+```java
+public interface LocationListener {
+    void onLocationChanged(Location location);
+    void onStatusChanged(String provider, int status, Bundle extras);
+    void onProviderEnabled(String provider);
+    void onProviderDisabled(String provider);
+}
+```
+
+Gli oggetti di tipo `Location` contengono:
+- latitudine, longitudine, tempo di acquisizione
+- opzionalmente anche velocità, direzione, altitudine o accuracy.
+
+### Proximity Alert
+
+Permette la gestione di avvisi in caso di allontanamento/avvicinamento ad un bordo, gestendo in maniera adattiva la sensibilità, viene settato in questo modo:
+
+```java
+Intent i = new Intent(…);
+PendingIntent pi = PendingIntent.getBroadcast(this, 0, i, 0);
+lm.addProximityAlert(lat,long,raggio,timeout,pi);
+```
+
+### Libreria fornita da Google Play Services
+
+Disponibile una libreria che offre tre tipi di Services:
+- **Fuzed Location Provider**: Strategia ottimale tra location provider, caching e risparmio batteria.
+- **Geofencing**: Strategia di questa libreria al Proximity Alert.
+- **Activity Recognition**: Permette la classificazione delle attività dell'utente.
+
+## Geocoding
+
+**Mapping** tra **latitudine e longitudine** di un punto e i loro **indirizzi postali**.
+- **Forward Geocoding**: Da coordinate a indirizzi.
+- **Reverse Geocoding**: Da indirizzi a coordinate.
+
+Questo calcolo sarebbe troppo complesso da mantenere in locale, di conseguenza viene fatto su server.
+
+### Geocoder
+
+Tutto il dialogo con i server di Google è incapsulato nella classe, va quindi verificata la sua presenza dato che dipende dai Google Play Services.
+
+```java
+List<Address> la = gc.getFromLocationName(ind, max);
+```
+
+#### Classe `Address`
+
+Permettono la rappresentazione strutturata di un indirizzo inteso come tale da una persona, quindi espone tutti getter per acquisire specifiche info:
+```java
+getAdminArea()
+getCountryCode(), getCountryName(),
+getFeatureName(), getLocality(), getPhone(),
+getPostalCode(), getPremises(),
+getLatitude(), getLongitude()
+```
+
+## Mappe
+
+Parliamo nello specifico delle Mappe v2, caratterizzate dall'essere 3D, vettoriali, basate su `MapFragment`.
+
+Anche questo si basa su Google Play Services.
+
+Questo è gestito quindi tutto da un istanza di Google Maps, tramite il metodo `getMap()`.
+
+### CameraUpdate
+
+I CameraUpdate sono prodotti tramite l'utilizzo di una `Camera UpdateFactory`, che fornisce metodi per spostare la Camera, o cambiare l'inquadratura.
+
+### Marker
+
+Definizione di marcatori di posizione custom oppure se ne usano di predefiniti.
+- `addMarker()` che acquisisce un `MarkerOptions` che specifica che marker si sta generando, magari se draggabile, coordinate geografiche...
+- Esistono i `InfoWindowAdapter` che implementano due metodi:
+    - `View getInfoWindow(Marker m)`
+        - Dato un marker restituisce una `View` per l'intero pop-up.
+        - Può restituire null.
+    - `View getInfoContents(Marker m)`
+        - Dato un marker restituisce una `View` per il contenuto del pop-up che viene inserito nella finestra standard.
+
+# Lezione 20 - Architettura Multimediale - 22/04/2026
+
+## `MediaPlayer` - Riproduzione Contenuti Multimediali
+
+Si parla di flusso multimediale indipendente da video o audio, Android riferisce a `MediaPlayer` per riproduzione o `MediaRecorder` per registrazione.
+- Tutti i componenti sono presenti in `android.media.*`
+
+La riproduzione richiede di **allocare e configurare** un `MediaPlayer`
+- Si appoggia su librerie più a basso livello ad esempio di decompressione
+
+### Automa del `MediaPlayer`
+
+<div style="text-align: center;">
+    <img src="img/automaMediaPlayer.png" width="350">
+</div>
+
+### Rilasciare un `MediaPlayer`
+
+Solitamente si segue il pattern:
+
+```java
+mp.release()
+mp = null
+```
+
+### Riproduzione Video
+
+Va handlata diversamente, specificando una `Surface` ed un `Display`, detto anche `SurfaceHolder` secondo i metodi:
+
+```java
+setSurface(Surface s)
+setDisplay(SurfaceHolder sh)
+```
+Questa gestione permette di disegnare all'interno di una `Surface` rispetto ad una logica specifica.
+
+- `Wake Lock`: Un applicazione può richiedere il Wake Lock, ossia richiedere esplicitamente che ad esempio lo schermo o la CPU non si fermino.
+    - Va acquisito ma anche rilasciato quando non serve più.
+
+#### `MediaController`
+
+Si perde controllo ma predefinito dal sistema, offre quindi una bar, un tasto play, pause...
+
+Si definisce tramite:
+
+```java
+MediaPlayerControl mpc
+mc.setMediaPlayer(mpc)
+```
+
+Permette di definire quali cose si possono e quali non si possono fare, ad esempio nelle pubblicità non ci permette di fare il seek o lo skip.
+
+#### `VideoView`
+
+Ancora meno responsabilità, View che ha pieno controllo della gestione video.
+- Questo ci permette poca personalizzazione.
+
+## `MediaRecorder` - Registrazione Contenuti Multimediali
+
+Molto simile al MediaPlayer ma chiaramente la configurazione è più complessa, dato che tutte le caratteristiche deve stabilirle lui.
+
+<div style="text-align: center;">
+    <img src="img/mediaRecorder.png" width="350">
+</div>
+
+### Sorgenti `MediaRecorder`
+
+Costanti in `MediaRecorder.AudioSource`:
+- `CAMCORDER` Microphone audio source with same orientation as camera if available,
+the main device microphone otherwise
+- `DEFAULT` Default audio source
+- `MIC` Microphone audio source
+- `REMOTE_SUBMIX` Audio source for a submix of audio streams to be presented remotely.
+- `VOICE_CALL` Voice call uplink + downlink audio source
+- `VOICE_COMMUNICATION` Microphone audio source tuned for voice communications such as VoIP.
+- `VOICE_DOWNLINK` Voice call downlink (Rx) audio source
+- `VOICE_RECOGNITION` Microphone audio source tuned for voice recognition if available,
+behaves like DEFAULT otherwise.
+- `VOICE_UPLINK` Voice call uplink (Tx) audio source
+
+### Approccio Alternativo più Semplice ad Intent
+
+```java
+Intent vi = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
+if (vi.resolveActivity(getPackageManager()) != null) {
+startActivityForResult(vi, 1);
+}
+
+// e poi prendere il risultato
+@Override
+protected void onActivityResult(int req, int res, Intent resi) {
+    if (req == 1 && res == RESULT_OK) {
+        Uri video = resi.getData();
+        myVideoView.setVideoURI(video);
+    }
+}
+```
+
+## `Camera` - Gestione Fotografia
+
+L'approccio solito è quello di lancio Intent e utilizzo app predefinita.
+- Per avere controllo più fino, grazie all'accesso alla classe `Camera`.
+    - **Accesso alla Camera v1**: La classe Camera $<= 21$ forniva accesso a metodi statici.
+    - **Accesso alla Camera v2**: La classe Camera $> 21$, non definita più a classe singola ma a pipeline, dove il buffer di byte attraversa questa pipeline.
+    - **`Camerax`** Basato su use case dell'utilizzo della Camera, quindi ad esempio:
+        - **Preview**: Mirino.
+        - **Image Analysis**: Algoritmi per immagini inquadrate.
+        - **Image Capture**: Fotografia.
+
+# Lezione 21 - Tecnologie di Rete - 24/04/2026
+
+## Tecnologie di Rete
+
+### Networking TCP/IP
+
+Routing simile a quello standard, quindi gestione a ServerSocket e Socket:
+
+```java
+// Server side
+try {
+    ServerSocket ss = new ServerSocket(8080);
+    while (!done) {
+        Socket s = ss.accept();
+        servi(s);
+    }
+} catch (…) { … }
+
+// Client side
+try {
+    Socket s = new Socket(server, 8080);
+    ordina(s);
+} catch (…) { … }
+```
+
+Dato che queste operazioni sono bloccanti non si eseguono mai nel thread UI.
+
+È anche poco comune avere un server sul cellulare, solitamente vengono usati come client.
+
+**Batteria e Rete**: Questa dinamica è costosa in termini di energia, non per la comunicazione in se ma per l'accensione e spegnimento dei chip in cui sono presenti effettive antenne.
+- Si preferisce quindi fare batching di pacchetti di byte prima di accendere il chip relativo alla comunicazione in rete.
+
+### `ConnectivityManager`
+
+Gestito come tutti gli altri Manager già visti, quindi gestione tramite Service. Lo otteniamo tramite
+
+```java
+// Acquisizione servizio di sistema
+ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+
+// Ogni network è rappresentato da un oggetto
+NetworkInfo[] ni = cm.getAllNetworkInfo();
+NetworkInfo currni = cm.getActiveNetworkInfo();
+NetworkInfo wfni = cm.getNetworkInfo(NetworkInfo.TYPE_WIFI);
+```
+
+Quindi la classe `NetworkInfo` ci permette di ottenere caratteristiche di dettaglio della rete.
+- È stato deprecato dalle API 28 dato che si assumeva che la connessione fosse solo una.
+- Si è passato a `getNetworkCapabilities()` per 
+
+- **Notifiche Broadcast**: Il `ConnectivityManager` usa le notifiche in broadcast, quindi se si perde connessione, o se peggiora la connessione, questo manager si occupa di mandare in broadcast queste info.
+
+### Bluetooth
+
+Definito da un **protocollo alquanto complesso**, gestito a **profili**.
+- Quindi ciascun profilo rappresenta l'astrazione di un tipo di dispositivo.
+- Noi riferiamo al **profilo RFCOMM**, ossia lo **standard delle porte seriali**.
+
+**Accoppiamento Bluetooth**: Era pensato per confermare che entrambi i dispositivi vogliono essere nella comunicazione.
+
+**Stati Modulo Bluetooth**: Ci sono vari stati:
+- Spento
+- Acceso, non discoverable
+- Discoverable ma non paired
+- Discoverable e paired
+- Paired e non discoverable
+
+**Piconet e Scatternet**: In realtà il Bluetooth permette gestione a piccole reti locali **Piconet** o approccio mesh con **Scatternet**.
+
+#### Classi per il Bluetooth
+
+Tutto gestito tramite le classi
+- `BluetoothAdapter` rappresenta la scheda di rete
+- `BluetoothDevice` rappresenta un dispositivo
+- `BluetoothServerSocket` e `BluetoothSocket` analoghi a quelli del TCP/IP.
+
+- **Abilitazione Bluetooth**: Effettuata tramite un lancio di `Intent`:
+
+    ```java
+    BluetoothAdapter bta=BluetoothAdapter.getDefaultAdapter();
+
+    if (!bta.isEnabled()) {
+        Intent i=new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+        startActivityForResult(i, 1);
+    }
+    ```
+    - Altrimenti si può seguire un approccio in piggybacking.
+
+- **Lista di Discoverable**:
+    ```java
+    Set<BluetoothDevice> devs = bta.getBondedDevices()
+    ```
+- **Dispositivi discoverable e in range**:
+    ```java
+    IntentFilter f = new IntentFilter(BluetoothDevice.ACTION_FOUND);
+    registerReceiver(this,f);
+    bta.startDiscovery();
+    ```
+
+- **Caratteristiche Collegamento**: Si basa sul match dello UUID, quindi esegue lo stesso ruolo della porta nel TCP/IP.
+
+### Wi-Fi Direct
+
+Tecnologia relativamente nuova, API molto Android-like.
+- Permette di creare gruppi di dispositivi Android, non necessitando di una connessione ad una station ma può essere P2P.
+- Inizialmente non utilizzabile in parallelo al normale WiFi, successivamente sì.
+- Gestito tramite la classe `WifiP2pManager` espone tutti i metodi.
+
+```java
+// Creazione Servizio di Sistema
+WifiP2pManager wfdm = (WifiP2pManager) getSystemService(Context.WIFI_P2P_SERVICE);
+
+// Canale da usare come handle
+Channel ch = wfdm.initialize();
+```
+
+- Dopo essersi connesso la gestione è a reti standard locali secondo il TCP/IP.
+
+### NFC - Near Field Comunication
+
+Permette lettura e scrittura di tag, dove questi funzionano da **"memoria di massa"** circa 256 byte, esistono 3 casi d'uso:
+- Lettura/scrittura di tag NFC
+- NFC P2P
+- Simulazione di tag NFC.
+
+**Lettura**: Si effettua nel intent filter, staticamente o dinamicamente:
+
+```xml
+<intent-filter>
+    <action android:name="android.nfc.action.TAG_DISCOVERED"/>
+</intent-filter>
+```
+
+- **Android Beam**: Invio messaggi P2P con primo pairing (scambio UUID) con NFC e successiva comunicazione in bluetooth, gestito tramite il metodo:
+    ```java
+    setNdefPushMessage(msg, activities)
+    ```
+    - Permetteva la condivisione della seguente activity tramite contatto degli smartphone.

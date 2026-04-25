@@ -869,14 +869,11 @@ In questo caso il sottoalbero soluzione è quello rappresentato in grassetto.
 
 == Agenti Knowledge Based KB e Dichiarativo vs Procedurale
 
-Si aumentano le capacità degli agenti di visualizzare ed avere la rappresentazione di mondi complessi e astratti.
-
-Questo permette definizione di agenti detti *Knowledge Based KB*:
+Si aumentano le capacità degli agenti di visualizzare ed avere la rappresentazione di mondi complessi e astratti. Questo permette definizione di agenti detti *Knowledge Based KB*:
 
 #pagebreak()
 
 - Si definisce quindi la *necessità di rappresentare la conoscenza* che siano espressivi e con *capacità di inferenza*.
-
 
 *Approccio Dichiarativo vs Procedurale*:
 
@@ -2105,12 +2102,14 @@ $ L(h(bold(x), d)) = (d - h(bold(x)))^2 $
 - Data la $"VC-dim" ("VC")$, ossia una misura di complessità di $H$, quindi la flessibilità nel fittare i dati del $"TS"$.
 - Settiamo un bound sul $"Risk"$ nella seguente forma:
   $ R <= R_"emp" + epsilon(frac(1,l), "VC", frac(1,delta)) quad text("con") quad epsilon(frac(1,l), "VC", frac(1,delta)) = "VC-confidence" $
+#v(-0.4cm)
+  - $delta$ è la confidence, regola la probabilità che mantiene il bound, mentre $l$ è la quantità di dati.
   - $epsilon$ è una *funzione* che *cresce al crescere* di $"VC"$ e *decresce al crescere* di $l$ e $delta$.
   - Sappiamo che $R_("emp")$ decresce utilizzando modelli complessi, quindi ad alta $"VC"$.
 - Grazie a questa formulazione possiamo anche spiegare i fenomeni di Overfitting ed Underfitting:
-  - *Overfitting*: Modello poco complesso a bassa $"VC"$ non sufficiente data l'alta $R_"emp"$
+  - *Underfitting*: Modello poco complesso a bassa $"VC"$ non sufficiente data l'alta $R_"emp"$
 #pagebreak()
-  - *Underfitting*: Modello molto complesso ad alta $"VC"$ su un numero limitato $l$ di dati può abbassare $R_"emp"$ ma la $"VC-confidence"$ aumenta, aumentandoo $R$.
+  - *Overfitting*: Modello molto complesso ad alta $"VC"$ su un numero limitato $l$ di dati può abbassare $R_"emp"$ ma la $"VC-confidence"$ aumenta, aumentandoo $R$.
 
 *Def. Minimizzazione del Risk Strutturale* Si tenta di minimizzare il bound settato.
 
@@ -2120,8 +2119,245 @@ $ L(h(bold(x), d)) = (d - h(bold(x)))^2 $
 
 Questo definisce il controllo sulla complessità (flessibilità) di un modello, definendo quindi un trade-off tra fitting sul TR e complessità effettiva del modello in termini di $"VC"$.
 
+= --- --- --- --- --- Lezione 15 - Support Vector Machine (SVM) - 14/04/2026
+
+== Definizione SVM e Obiettivi
+
+*Obiettivi SVM*: Modello della SVM argomento di questa lezione, basato su tre obiettivi:
+1. Controllare la complessità del modello tramite un approccio di ottimizzazione, tramite l'utilizzo di un *Max Margin Classifier*
+2. Utilizzo della *Linear Base Expansion* via *kernel*
+3. Si *evitano* condizioni di *overfitting*, dando dei criteri di fiducia.
+
+=== Obiettivo 1: Maximum Margin Classifier
+
+Si assume un problema che sia linearmente separabile.
+- Non tutti modelli sono equivalenti, perchè se definiamo un margine questo varia tra soluzioni valide.
+
+#v(0.25cm)
+
+#figure(
+  image("img/marginiSVM.png", width:220pt)
+)
+
+Dove si definiscono i $"support vectors"$ come $bold(x)_p = abs(bold(w)^T bold(x)_p + b) = 1$
+
+#pagebreak()
+
+Quindi considerando il problema di definizione di un modello lineare per classificazione binaria ossia $h(bold(x)) = "sign"(bold("xw")+b)$.
+
+*Def. Training Problem*: Cercare $(bold(w), b)$ tale per cui tutti i *punti sono classificati correttamente* ed il *margine è massimizzato*:
+
+$ (bold(w)^T bold(x)_p + b) y_p >= 1 $
+
+==== Rapporto VC-DIM e Massimizzazione Margine
+
+- La *massimizzazione* del *margine* causa *minimizzazione* di $norm(bold(w))$.
+- La *VC-dim della SVM* ha un *valore inverso* a quello del *margine*, di conseguenza l'*iperpiano ottimale* è quello che *massimizza il margine*.
+
+#v(0.5cm)
+
+==== Hard Margin SVM: Problema di Ottimizzazione Quadratica
+
+Questo problema è definito come *primale* su ottimizzaione quadratica secondo queste formulazioni:
+- *Def. di Training Problem*: Cercare $(bold(w), b)$ tale per cui tutti i *punti sono classificati correttamente* ed il *margine è massimizzato*:
+- *Def. di Training Problem in Forma Primale*: Minimizzare $norm(bold(x))^2/2$ tale per cui 
+
+$ (bold(w)^T bold(x)_p + b) y_p >= 1 #text("per ogni") p = 1 dots l $.
+
+#v(0.5cm)
+
+*Formulazione Duale*: Solitamente non si risolve tramite il duale ma torna comoda la sua formulazione. Questo perchè il duale non si basa sui pesi dei $bold(w)$ ma definisce $h$ sulla base dei soli vettori di supporto.
+
+$ h(x) = "sign"(bold(w)^T bold(x) + b) = "sign"(sum^l_(p=1) alpha_p y_p bold(x)^T_p bold(x) + b ) = "sign"(sum_(p in "SV") alpha_p y_p bold(x)^T_p bold(x) + b ) $
+
+#v(0.5cm)
+
+==== Soft Margin SVM
+
+Fino ad ora abbiamo *ipotizzato* un *ambiente ideale senza iperparametri* forniti dall'utente. Nella soft margin invece includiamo l'utilizzo di un iperparametro $C>0$ che guida il *numero di errori ammessi*.
+
+*Primal Training Problem*: Minimizzare $norm(bold(w))^2/2 + C sum_p xi_p $ quindi:
+- *Basso Valore $C$*: Più errori ammessi sul $"TR"$, possibile underfitting.
+- *Alto Valore $C$*: No errori ammessi sul $"TR"$, possibile overfitting.
+
+#pagebreak()
+
+=== Obiettivo 2: Kernel Trick in Linear Basis Expansion
+
+Dato che uno dei *possibili problemi* era avere *spazi non divisibili linearmente* si utilizza una funzione di mapping $Phi$, tramite LBE già vista, che parte dalla dimensione originale ad una più grande.
+
+L'idea in questo contesto è però quella di normalizzare *non utilizzando* direttamente il prodotto scalare $Phi^(T)(bold(x)_p)Phi(bold(x))$ contenuto in
+
+$ h(x) = "sign"(alpha_p y_p Phi^(T)(bold(x)_p)Phi(bold(x))) $
+
+ma utilizzando $Phi^(T)(bold(x)_p)Phi(bold(x)) = K(bold(x)_p, bold(x))$ quindi:
+
+$ h(x) = "sign"(alpha_p y_p K(bold(x)_p, bold(x))) $
+
+==== Kernel Noti
+
+Esistono noti Kernel a cui possiamo fare riferimento:
+- *Lineare*:
+$ K(bold(x)_i, bold(x)_j) = bold(x)_i^T bold(x)_j $
+- *Polynomial*: 
+$ K(bold(x)_i, bold(x)_j) = (1+bold(x)_i^T bold(x)_j)^k $
+- *Radial Basis Function - (RBF) Gaussian*:
+$ K(bold(x)_i, bold(x)_j) = e^(-((norm(bold(x)_i - bold(x)_j))^2)/(2 rho^2)) $
+
+==== Formulazione Finale SVM
+
+Riassumendo:
+- Scelta iperparametro $C$ e funzione kernel $K$.
+- Si risolve il problema di ottimizzazione per trovare $alpha$
+
+Il modello finale è quindi:
+
+$ h(x) = "sign"(alpha_p y_p K(bold(x)_p, bold(x))) $
+
+
+=== Obiettivo 3: Evitare Interpretazioni Sbagliate
+
+Esistono tipiche interpretazioni sbagliate dell'SVM:
+
+- *Overfitting*: Può occorrere a causa della *scelta sbagliata di iperparametri*.
+- Le *tecniche di validazione* andrebbero utilizzate rigidamente per fare selezione del modello corretto.
+
 /*
 #figure(
   image("img/algGenetico8Regine.png", width:300pt)
 )
 */
+
+#pagebreak()
+
+= --- --- --- --- --- Lezione 16 - K-NN, Unsupervised Learning e Altri Approcci - 16/04/2026
+
+Lezione basata su paradigmi lasciati un po' da parte in tutte le altre lezioni.
+
+== K-Nearest Neighbors (Supervised Learning)
+
+Si basa su questa definizione:
+- Date le coppie $(bold(x)_p, y_p)$
+- Dato un input $bold(x)$ con dimensione $n$.
+- Trova l'esempio $bold(x)_i$ nel training set che è più vicino all'input, sulla base di una distanza euclidea:
+$ i(bold(x)) = arg min d(bold(x), bold(x)_p) quad text("dove") quad d(bold(x), bold(x)_p) = sqrt(sum_(t=1)^(n) (x_t - x_(p,t)) ) = norm(bold(x) - bold(x)_p) $
+
+Questo permette di l'output di $y_i$.
+
+In questo modo definiamo un 1-NN, quindi un approccio secco sul dato più vicino nel TR.
+
+*Smoothing NN*: Se definiamo un insieme di k più vicini abbiamo modo di ammorbidire la scelta in base ad una *media*.
+
+#figure(
+  image(
+    "img/smoothingNN.png", width:180pt
+  )
+)
+
+*Motivazione Supervisionato*: Questo algoritmo è supervisionato perchè stiamo guardando la coordinata $y_i$ nel $"TS"$ quindi abbiamo un etichetta di riferimento.
+
+=== Definizione Formale K-Nearest Neighbors
+
+Un modo naturale quindi per classificare un nuovo punto è quello di guardare i suoi vicini e farne una media $"avg"_(k)(bold(x)) = 1/k sum_(x_i in N_k (bold(x))) y_i$.
+
+=== Caratteristiche K-Nearest Neighbors
+
+Si basa sulla memorizzazione del $"TR"$, ma non definisce un effettivo modello ma utilizza a tempo debito l'accesso al TR.
+- Si elimina la fase di training, ma la fase di predizione è molto più consistente.
+- Per questo motivo si definisce come *lazy*, *memory based*, *instance based* e *distance based*.
+- Si perde la compattezza del modello lineare e costa molto da un punto di vista computazionale (spazio e tempo).
+#pagebreak()
+  - A causa della memorizzazione, il volume a crescita esponenziale impatta negativamente sulla densità dei dati.
+  - Quindi questo funziona fino a quando i dati sono realmente vicini, ma questo all'aumentare delle dimensioni risulta essere molto fragile.
+- La scelta della metrica è l'inductive bias in questo caso, dato che la scelta della metrica non è fissata.
+- Il trade-off tra overfitting e underfitting è gestito dall'iperparametro $K$.
+  - Un esempio estremamente flessibile con $K=1$.
+  - Un esempio rigido con $K=l$.
+
+#v(0.5cm)
+
+
+== Approcci di Unsupervised Learning
+
+Si mostrano approcci di Unsupervised Learning.
+
+=== K-Means (Unsupervised Learning)
+
+Si assume un TR *senza label $"target"$* quindi dati della forma $(x)$.
+
+#figure(
+  image(
+    "img/clusteringAndCentroids.png", width:250pt
+  )
+)
+
+#v(0.5cm)
+
+- Classico per riconoscimento naturale a cluster di dati.
+- Non si definiscono solo *cluster (pattern)* ma anche *centroidi*, quindi rappresentanti di quel pattern.
+  - Si discretizza *mappando* quindi l'*intero cluster sul centroide*, *minimizzando* una loss, ossia distanza tra il pattern ed il suo centroide: 
+  $ L(h(bold(x)_p)) = norm(bold(x)_p - c(bold(x)_p))^2 $.
+
+#v(1cm)
+
+==== Basic K-Means Batch Alg. - (LBG, Generalized Lloyd Alg.)
+
+*Def. Algoritmo di Ricerca Locale*:
+- Scegli $k$ centroidi a caso, posizionati in maniera randomica all'interno dello stesso spazio dei pattern.
+- Assegna ad ogni pattern al relativo centroide più vicino.
+- Ricalcola i centroidi rispetto ai membri dei cluster.
+- Se non si raggiunge il criterio di convergenza si ritorna al secondo step.
+
+#pagebreak()
+
+*Dettagli Algebrici*: Dati i centroidi $c_1, dots, c_k$, per ogni vettore $bold(x)$ il vincitore è il prototipo più vicino:
+- $i^*(bold(x)) = arg min norm(bold(x) - c_i)^2$
+- Per ogni cluster indicizzato con $i$ il nuovo *centroide basato su media* è:
+$ c_i = (1)/(abs("cluster"_i)) sum_(j:x_j in "cluster"_i) bold(x)_j $
+
+==== Caratteristiche K-Means
+
+- Il numero di cluster deve essere definito a priori.
+- La minimizzazione della loss $L(x)$ dipende pesantemente dalla scelta iniziale, dato che la sua minimizzazione segue criteri di discesa locale.
+- Non ha proprietà di visualizzazione in caso di alto numero di dimensioni.
+
+*Evalutazione dei Cluster Identificati*: Come si definisce se sia stato effettuato o meno un buon clustering?
+- L'evalutazione può essere potenzialmente soggettiva, non esistono a priori standard di riferimento.
+- Esistono però metriche di purezza, errore di quantizzazione o entropia per definire quanto un cluster si allontani da una classe di oggetti presistenti.
+
+=== Dimensionality Reduction via Principal Component Analysis (PCA)
+
+Grazie a questo metodo possiamo ridurre un numero di feature in dimensione $n$ su una combinazione di feature in dimensione $n^'$ con $n > n^'$.
+- Si definiscono assi nello spazio a maggior dimensioni che vengono usati per la generazione dello spazio a dimensione inferiore.
+
+#figure(
+  image(
+    "img/PCA.png", width:300pt
+  )
+)
+
+== Reinforcement Learning e Semi-Supervised Learning
+
+Non *Supervised* ma nemmeno *Non Supervised*, tramite feedback all'agente di *rewards* e *punishment* non sull'azione atomica ma
+su tutto il comportamento che sta assumendo.
+- Utilizzato in contesti come grafi, alberi, vettori di pattern...
+
+Esiste anche il *Semi-Supervised Learning* per cui si combinano esempi etichettati con esempi non etichettati, per generare una funzione o un classificatore appropriato.
+
+== Neural Networks
+
+Possono essere sia Supervised sia Non Supervised, ma in questa lezione si trattano quelle Supervised.
+- *Perceptron*: Unità base della rete neurale.
+#figure(
+  image(
+    "img/neuralNetwork1.png", width:180pt
+  )
+)
+- Si basano su *gestione di errori* con *backpropagation* e approccio a *gradiente discendente*.
+- I layer successivi al primo sono gestiti con pesi $w$ adattivi gestiti con *basis expansion* dove le $Phi$ sono imparate dal modello progressivamente.
+- *Deep Learning*: Layer molteplici di unità di calcolo, tutti i livelli successivi al primo sono caratterizzati da un *livello di astrazione crescente*.
+#figure(
+  image(
+    "img/deepLearning.png", width:270pt
+  )
+)
