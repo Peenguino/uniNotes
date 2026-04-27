@@ -1929,3 +1929,93 @@ service cloud.firestore {
   }
 }
 ```
+
+# Lezione 18 - Notifiche e WebAssembly - 27/04/2026
+
+## Notifiche
+
+### Stato Offline/Online
+
+Si gestisce tramite l'API `navigator.onLine`, dove se valutandolo restituisce `false` allora non abbiamo connessione ad Internet.
+- Si possono anche ascoltare gli eventi `offline` ed `online` di `window`.
+
+### Definizione Generale
+
+Parlando di notifiche locali, non notifiche push da server, se questo è supportato dal browser tramite la proprietà `window["Notification"]`
+- Questi necessitano i permessi dell'utente, mantenuti nella proprietà `Notification.permission`.
+- Se abbiamo il permesso si istanzia un oggetto `Notification` e quindi la notifica viene visualizzata se il device e l'utente lo consentono.
+
+### Notifiche Cellulare
+
+Non sempre supportato su mobile l'oggetto notification quindi si usa metodo specifico `showNotification()`
+
+### Push Notification
+
+Sono notifiche asincrone, indipendenti dallo stato attuale della web app (se in foreground o background).
+- Si basano sull'utilizzo di un **servizio intermediario fidato**, ossia `Push Service`.
+
+È uno schema a **tre attori**:
+- **Client (PWA)**: Richiede permesso all'utente e successivamente si iscrive al `Push Service` e ottiene un **Endpoint URL univoco** e delle **chiavi crittografiche VAPID**
+- **Backend Server**: Memorizza l'endpoint del client, e quando accade un evento crea un payload della notifica, lo cifra e lo invia via POST all'**Endpoint URL** del `Push Service`.
+- **Push Service**: Server sicuro gestito dal produttore del browser, riceve il messaggio dal backend, lo accoda e lo consegna al dispositivo non appena questo è online, svegliando il `Service Worker` della **PWA**.
+
+Si segue questo **flusso di esecuzione**:
+
+<div style="text-align: center;">
+    <img src="img/notifichePushFlusso.png" width="400">
+</div>
+
+Quindi fasi importanti sono:
+- **Server**: Genera o utilizza delle VAPID Keys, che permettono di identificarsi volontariamente come push service.
+  - Gestisce le Subscription da parte delle App.
+  - Invia le notifiche al verificarsi di un evento.
+- **WebApp**: Definita da due componenti:
+  - **App**: Segue questi passi:
+    - Registra un `Service Worker`.
+    - Accede alla registration del `Worker` tramite `navigator.serviceWorker.ready`.
+    - Recupera la VAPID public key dal Push Service.
+    - Richiede una subscription tramite `registration.pushManager.subscribe`.
+    - Invia la registrazione al `Push Service`.
+    - Invia gli eventi che diventeranno `Push Notification` al `Push Service`.
+  - **Service Worker**:
+    - Registra un `EventListener` per l'evento push.
+    - Può mostrare le notifiche tramite il metodo `showNotification`.
+
+## WebAssembly - WASM
+
+JS non era nato per un utilizzo di calcolo pesante, ma per scripting di piccole cose.
+- Si basa su fasi di Parsing, Compilazione ed Ottimizzazione che sono processi costosi.
+- **Problema di Garbage Collection**: Potenziali pause imprevedibili a causa della pulizia della memoria.
+
+### WASM - Approccio a VM
+
+Si definisce un formato binario per le istruzioni di una virtual machine a stack.
+- Si garantiscono proprietà di performance, portabilità e sicurezza.
+- Non rimpiazza JS, ma coesiste con esso tramite JS GlueCode
+
+#### Formati `.wasm` e `.wat`
+
+- `.wasm` formato binario compattato per il download ed il parsing veloce.
+- `.wat` rappresentazione testuale leggibile di WASM.
+
+#### Stack Machine
+
+Le istruzioni vengono prese da uno stack con operazioni di push e pop.
+
+#### Tipi di Dati
+Esistono un limitato numero di tipi:
+- Tipi primitivi `int` e `float` ossia `i32`, `i64`, `f32` e `f64`
+- Niente stringhe o oggetti nativi
+- **Linear Memory**: UN array di byte contiguo e ridimensionabile.
+- **Sandboxing**: Wasm può accedere solo alla propria memoria, non allo stack o allo heap del processo chiamante.
+
+#### WASM come Target di Compilazione
+
+WASM non è pensato per essere direttamente scritto ma si usano linguaggi ad alto livello come `Rust` o `Swift`.
+
+#### Glue Code
+
+Dato che WASM non può accedere direttamente al DOM oppure alle Web API si usano approcci intermedi
+- **AssemblyScript**: Sottoinsieme di Typescript progettato per parlare con JS ed essere compilanto in WASM.
+- **Go**: Ha supporto nativo nel suo compilatore per interagire con il DOM e JavaScript.
+- **C/C++**: Utilizzano principalmente Emscripten, che include il proprio sistema di bindings per connettere il codice C++ a JS.
