@@ -1570,3 +1570,29 @@ Permette lettura e scrittura di tag, dove questi funzionano da **"memoria di mas
     setNdefPushMessage(msg, activities)
     ```
     - Permetteva la condivisione della seguente activity tramite contatto degli smartphone.
+
+# Lezione 22 - Google API ed Accenni di Programmazione Nativa - 06/05/2026
+
+## Google API
+
+API offerte da Google che offrono servizi (raccolte di metodi) che vengono erogati da Google appunto.
+- Esiste un motore di ricerca Google Api Explorer per navigare tra tutte le funzionalità offerte
+- Il flusso dell'architettura è questo $App \to Libreria Google \to ServicesGoogle \to GoogleCloud$
+
+### `GoogleAPI` vs `GoogleApiClient`
+
+Il pattern classico era l'utilizzo della prima interfaccia e successivamente ci si è spostati al secondo progressivamente.
+- La nuova API cerca di:
+    - Separare tutta la parte di autenticazione, quindi anche tutto l'handling di errori di quella sezione. Questo avviene tramite il `GoogleSignInClient`.
+    - Semplificare l'ottenimento di risultati che si effettuava nella prima API tramite la gestione manuale dei `PendingIntent`.
+        - Questo viene gestito tramite la gestione di `Task`. L'approccio a `Task` permette una gestione multithread e con thread diverso da quello UI in modo più semplice.
+
+## Accenni Programmazione Nativa in C per Android
+
+Sconsigliato dato che il Java viene compilato in DEX.
+- Utilizzato in contesti particolari come ad alte prestazione (ad esempio engine come Unreal) o per scendere molto a contatto con l'hardware.
+
+### Java Native Interface (JNI)
+
+Un metodo in Java può essere dichiarato come **nativo**, quindi non offrono un metodo ma solo una segnatura, dove il corpo sarà quindi ad un `.o` scritto in C.
+- Questa libreria permette quindi di effettuare operazioni che mappano su Java che in C non esistono, come eccezioni, utilizzo di reflection, metodi statici e d'istanza ecc...

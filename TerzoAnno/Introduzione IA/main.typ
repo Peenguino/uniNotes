@@ -449,7 +449,7 @@ Questo potrebbe sembrare uno spreco di iterazioni, ma aumentando profondità sap
 
 - *Completezza*: Completa su spazi di stati aciclici finiti, o su qualsiasi spazio degli stati finito se controlliamo la presenza di cicli risalendo l'intero cammino.
 - *Ottima per problemi* in cui tutte le *azioni* hanno lo *stesso costo*.
-- *Complessita Temporale*: $O(b^d)$ se esiste una soluzione, $O(b^m)$ se esiste una soluzione.
+- *Complessita Temporale*: $O(b^d)$ se esiste una soluzione, $O(b^m)$ se non esiste una soluzione.
 - *Complessita Spaziale*: $O(b d)$ se esiste una soluzione, $O(b m)$ se non esiste.
 
 #pagebreak()
@@ -657,11 +657,11 @@ Ciascuna di queste funzioni euristiche ha delle caratteristiche:
     
     $ N + 1 = 1 + b^\* + (b^\*)^2 + ... + (b^\*)^d $
 
-    Una buona funzione euristica dovrebbe avere un valore di $b^{*}$ vicino ad $1$.
+    Una buona funzione euristica dovrebbe avere un valore di $b^*$ vicino ad $1$.
 
 === Dominazione di Euristiche
 
-Date due euristiche $h_1, h_2$ si dice che $h_1$ *domina* $h_2$ se per ogni nodo $n$ vale che $ h_1(n) <= h_2(n) $.
+Date due euristiche $h_1, h_2$ si dice che $h_1$ *domina* $h_2$ se per ogni nodo $n$ vale che $ h_1(n) >= h_2(n) $.
 
 #v(-1cm)
 
