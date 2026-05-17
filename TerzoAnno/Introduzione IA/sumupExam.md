@@ -386,7 +386,7 @@ Guardati gli appunti main.
 | 05 | 30 | SplitInformation | $ SplitInformation(S,A) = - \sum_{i=1}^{c} \frac{\| S_i \|}{\| S \|} log_2 \frac{\| S_i \|}{\| S \|} $
 | 05 | 31 | Search Bias - Bias di Ricerca | Rappresentano delle preferenze, causate dalla strategia di ricerca
 | 05 | 32 | Language Bias - Bias di Linguaggio | Rappresentano delle restrizioni, date dall'insieme delle ipotesi considerabili o esprimibili
-| 05 | 33 | Definizione Overfitting I | Un ipotesi $h \in H$ fa overfitting sui dati di training se esiste un alternativa ipotesi $h' \in H$ tale per cui vale che $error_{D}(h) < error_{D}(h')$ e $error_{X}(h) < error_{X}(h')$ dove $error_{D}$ rappresenta l'errore empirico mentre $error_{X}$ l'errore reale.
+| 05 | 33 | Definizione Overfitting I | Un ipotesi $h \in H$ fa overfitting sui dati di training se esiste un alternativa ipotesi $h' \in H$ tale per cui vale che $error_{D}(h) < error_{D}(h')$ e $error_{X}(h') < error_{X}(h)$ dove $error_{D}$ rappresenta l'errore empirico mentre $error_{X}$ l'errore reale.
 | 06 | 34 | Model Selection | Stima la performance (errore di generalizzazione) di modelli diversi con l'obiettivo di scegliere il migliore in capacità di generalizzazione. **Ritorna quindi un modello**.
 | 06 | 35 | Model Assessment | Avendo scelto un modello si stima la sua capacità di generalizzazione. **Ritorna quindi una stima**.
 | 06 | 36 | Training, Validation e Testing Set | **Training Set** usato per per fittare il dataset <br> **Validation Set** utilizzato per scegliere il modello migliore <br> **Test Set** utilizzato per una stima della capacità di generalizzazione del modello scelto
@@ -411,15 +411,13 @@ Guardati gli appunti main.
 | 07 | 55 | Kernel RBF | $ K(\bold{x}_p, \bold{x} ) = e^{\frac{\|\| \bold{x}_{i} - \bold{x}_{j} \|\|}{ 2 \sigma^2 }} $
 | 07 | 56 | Nearest Neighbor Index $(K=1)$ | $i(\bold{x}) = argmin\: d(\bold{x}, \bold{x}_p)$
 | 07 | 57 | Nearest Neighbor Distanza Euclidea | $d(\bold{x}, \bold{x}_p) = \sqrt{\sum_{i=0}^{n} (x_t - x_{p,t})^2} = \|\| \bold{x} - \bold{x}_{p} \|\|^2  $
-| 07 | 58 | K-Nearest Neighbors | $ avg_k(\bold{x}) = \frac{1}{k} \sum_{\bold{x}_i \in N_k (\bold{x}) }$ <br> Questo modello è detto lazy, memory based e distance based.
+| 07 | 58 | K-Nearest Neighbors | $ avg_k(\bold{x}) = \frac{1}{k} \sum_{\bold{x}_i \in N_k (\bold{x}) } y_i $ <br> Questo modello è detto lazy, memory based e distance based.
 | 07 | 59 | Clustering (K-means) | Partizioni di dati tra loro simili, definiti grazie ad un **centroide** centrale. <br> Basati sulla funzione di loss $L(h(\bold{x}_p)) = \|\| \bold{x}_p - c(\bold{x}_p) \|\| $
 | 07 | 60 | Alg. K-Means | Si seguono i seguenti passi: <br> - Si scelgono $k$ centri di cluster (**centroidi**) in maniera casuale <br> - Si assegna ad ogni pattern il **centroide più vicino**. <br> - Si ricalcolano i centroidi utilizzando l'attuale clusterizzazione. <br> - Se non è raggiunto il criterio di convergenza atteso allora si reitera ripartendo dalla fase 2.
 | 07 | 61 | Formule K-Means | Si definiscono due formule: <br>  $i^*(\bold{x}) = argmin \|\| \bold{x} - c_{i} \|\|^2$ <br> $ c_i = \frac{1}{\| cluster_{i} \|} \sum \bold{x}_j $
 | 07 | 62 | PCA e Riduzione Dimensioni | $<x_1, x_2, \dots, x_n> \to <x_1', x_2', \dots, x_n'>$ con $n > n'$
 
-
-
-## 04 - Cose Uscite dai Quiz
+## 04 - Note Esercizi
 
 - **Calcolo Proposizionale e Decidibilità**: Il problema della soddisfacibilità per il calcolo proposizionale è decidibile
 - **Tikonov/Ridge Regression**: Il lambda in ridge regression permette la penalizzazione di pesi grandi. Quindi un lambda grande alza il rischio empirico e abbassa la VC-confidence.
@@ -466,8 +464,6 @@ Guardati gli appunti main.
     quello con il break-count più basso, ossia quel letterale che flippato spacca meno clausole possibili.
 - **Consistenza Euristica**: Se viene dato un grafo e viene chiesto se un euristica sia consistente, allora bisogna verificare per ogni nodo che
 il valore della h sia inferiore o uguale alla somma del costo dell'arco e del nodo in uscita.
-<div style="text-align: center;">
-    <img src="img/esempioEuristicaConsistente.png" width="320">
-</div>
+
 
 - **Ascesa/Discesa Gradiente in Ricerca Locale in Continuo**: Tenendo in considerazione la formula $\bold{w}_{new} = \bold{w} + \nabla \bold{w}$ se segno $+$ siamo in ascesa di gradiente, se $-$ siamo in discesa di gradiente.
